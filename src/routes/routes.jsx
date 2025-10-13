@@ -3,7 +3,7 @@ import Home from '~/pages/Home';
 import Profile from '~/pages/Profile';
 import BookItem from '../pages/BookItem';
 
-import HeaderOnly from '../Layout/HeaderOnly';
+import HeaderOnly from '../Layouts/HeaderOnly';
 
 const publicRoutes = [
     { path: '/', component: Home },

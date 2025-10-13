@@ -20,6 +20,33 @@ body {
     font-size: 1.6rem;
     line-height: 1.5;
     text-rendering: optimizeSpeed;
+
+    // Color
+    --primary-color: #ff6f61;
+    --primary-hover: #ff8a7a;
+    --text-color: #333;
+    --background-color: #f6f4ef;
+    --white: #fff;
+
+    // Font
+    --font-family-primary: 'Instrument Serif', serif;
+    --font-size-base: 1.6rem;
+    --font-size-logo: 2.6rem;
+    --font-size-nav: 2.2rem;
+    --font-size-icon: 1.8rem;
+
+    // Layout base
+    --header-height: 60px;
+    --container-width: 1200px;
+    --icon-size: 32px;
+    --badge-size: 16px;
+
+    // Transition
+    --transition-base: 0.25s ease;
+    --transition-fast: 0.15s ease;
+
+    // Shadow
+    --shadow-header: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 h1 {

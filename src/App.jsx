@@ -3,7 +3,7 @@ import './App.css';
 import { Fragment } from 'react';
 
 import { publicRoutes } from './routes/routes';
-import DefaultLayout from './Layout/DefaultLayout';
+import DefaultLayout from './Layouts/DefaultLayout';
 
 function App() {
     return (

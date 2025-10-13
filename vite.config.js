@@ -26,4 +26,9 @@ export default defineConfig({
             '~': path.resolve(__dirname, 'src'), // Vite also needs alias to understand the path
         },
     },
+    css: {
+        modules: {
+            generateScopedName: '[name]_[local]_[hash:base64:5]',
+        },
+    },
 });
