@@ -1,1 +1,44 @@
+.profile-menu {
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    padding: 6px 0;
+    min-width: 160px;
+}
 
+.menu-item {
+    padding: 10px 16px;
+    font-size: 1.6rem;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+
+    &:hover {
+        border-radius: 10%;
+        background-color: var(--primary-hover);
+        color: #fff;
+    }
+}
+
+.text-item {
+    margin-left: 16px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: var(--icon-size);
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-icon);
+    color: var(--text-color);
+    transition: color var(--transition-base), transform var(--transition-base);
+
+    &:hover {
+        color: var(--primary-hover);
+        transform: scale(1.15);
+    }
+}

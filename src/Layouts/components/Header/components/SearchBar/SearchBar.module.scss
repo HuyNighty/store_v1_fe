@@ -1,1 +1,140 @@
+:root {
+    --search-width: 200px;
+}
 
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+
+    .search-icon {
+        color: #000;
+        cursor: pointer;
+        font-size: 20px;
+        transition: transform 0.2s ease, color 0.2s ease;
+        z-index: 11;
+
+        &:hover {
+            color: var(--primary-hover);
+            transform: scale(1.1);
+        }
+    }
+
+    .search-input {
+        position: absolute;
+        right: 34px;
+        opacity: 0;
+        width: 0;
+        padding: 6px 34px 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        background-color: var(--white);
+        transition: opacity 0.3s ease, width 0.3s ease;
+        z-index: 10;
+        color: #000;
+        pointer-events: none;
+    }
+
+    &.active .search-input {
+        opacity: 1;
+        width: var(--search-width);
+        pointer-events: auto;
+    }
+
+    .clear {
+        position: absolute;
+        right: 32px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(22, 24, 35, 0.6);
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        z-index: 12;
+        background: transparent;
+        border: transparent;
+
+        &:hover {
+            color: var(--primary-hover);
+        }
+    }
+
+    .loading {
+        position: absolute;
+        right: 38px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #000;
+        font-size: 16px;
+        animation: spinner 1s linear infinite;
+        z-index: 12;
+    }
+}
+
+.search-results {
+    width: 360px;
+    max-height: 480px;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: var(--shadow-light);
+    padding: 8px 0;
+    border: 1px solid #f3f1f1;
+
+    .search-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 18px;
+        text-decoration: none;
+        color: var(--text-color);
+        transition: background 0.2s ease;
+
+        &:hover {
+            background: var(--primary-hover);
+            color: #fff;
+        }
+
+        .book-thumb {
+            width: 70px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .book-info {
+            display: flex;
+            flex-direction: column;
+            font-size: 13px;
+
+            .book-title {
+                font-weight: 900;
+                font-size: 16px;
+            }
+
+            .book-price {
+                color: var(--primary-color);
+                font-size: 12px;
+            }
+        }
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 8px;
+        color: #888;
+        font-size: 13px;
+    }
+}
+
+@keyframes spinner {
+    from {
+        transform: translateY(-50%) rotate(0);
+    }
+    to {
+        transform: translateY(-50%) rotate(360deg);
+    }
+}

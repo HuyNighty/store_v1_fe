@@ -1,1 +1,33 @@
+.cart-wrapper {
+    position: relative;
+    width: var(--icon-size);
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform var(--transition-base);
+    color: #000;
 
+    &:hover {
+        color: var(--primary-color);
+        transform: scale(1.15);
+    }
+
+    .badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: var(--primary-color);
+        color: var(--white);
+        font-size: 11px;
+        font-weight: 600;
+        border-radius: 50%;
+        width: var(--badge-size);
+        height: var(--badge-size);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+    }
+}
