@@ -56,6 +56,7 @@
 .nav {
     display: flex;
     gap: 22px;
+    transition: all 0.3s ease;
 
     button {
         background: none;
@@ -76,6 +77,7 @@
     display: flex;
     align-items: center;
     gap: 24px;
+    position: relative;
 }
 
 .icon-btn {
@@ -109,10 +111,6 @@
 
     &:hover {
         transform: scale(1.15);
-    }
-
-    .icon {
-        font-size: var(--font-size-icon);
     }
 
     .badge {
@@ -159,22 +157,17 @@
     margin-left: 16px;
 }
 
-.actions {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    position: relative;
-}
-
 // Search
 .search-wrapper {
     position: relative;
     display: flex;
     align-items: center;
+    width: fit-content;
+    overflow: visible;
 
     .search-input {
         position: absolute;
-        right: 40px; /* icon width + khoảng cách */
+        right: 36px;
         opacity: 0;
         transform: translateX(20px);
         width: 0;
@@ -185,12 +178,15 @@
         background-color: var(--white);
         transition: all 0.4s ease;
         z-index: 10;
+        color: #000;
+        pointer-events: none;
     }
 
     &.active .search-input {
         opacity: 1;
         transform: translateX(0);
         width: 180px;
+        pointer-events: auto;
     }
 
     .search-icon {
@@ -200,8 +196,64 @@
         z-index: 11;
 
         &:hover {
-            color: var(--primary-color);
+            color: var(--primary-hover);
             transform: scale(1.1);
         }
+    }
+}
+
+.search-results {
+    width: 360px;
+    max-height: 480px;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: var(--shadow-light);
+    padding: 8px 0;
+    border: 1px solid #f3f1f1;
+
+    .search-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 18px;
+        text-decoration: none;
+        color: var(--text-color);
+        transition: background 0.2s ease;
+
+        &:hover {
+            background: var(--primary-hover);
+            color: #fff;
+        }
+
+        .book-thumb {
+            width: 70px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .book-info {
+            display: flex;
+            flex-direction: column;
+            font-size: 13px;
+
+            .book-title {
+                font-weight: 900;
+                font-size: 16px;
+            }
+
+            .book-price {
+                color: var(--primary-color);
+                font-size: 12px;
+            }
+        }
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 8px;
+        color: #888;
+        font-size: 13px;
     }
 }
