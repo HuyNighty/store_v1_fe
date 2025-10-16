@@ -24,10 +24,6 @@
     border-radius: 8px;
     margin-right: 10px;
     transition: background-color var(--transition-base);
-
-    .logo:hover & {
-        background-color: var(--primary-hover);
-    }
 }
 
 .logo-text {

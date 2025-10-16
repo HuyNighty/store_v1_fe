@@ -83,17 +83,18 @@
     box-shadow: var(--shadow-light);
     padding: 8px 0;
     border: 1px solid #f3f1f1;
-
+    scrollbar-width: none;
     .search-item {
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 30px;
         padding: 12px 18px;
         text-decoration: none;
         color: var(--text-color);
         transition: background 0.2s ease;
 
         &:hover {
+            cursor: pointer;
             background: var(--primary-hover);
             color: #fff;
         }

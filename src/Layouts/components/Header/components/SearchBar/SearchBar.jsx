@@ -9,13 +9,7 @@ import { useDebounce } from '~/hooks';
 
 const cx = classNames.bind(styles);
 
-function SearchBar() {
-    const [searchState, setSearchState] = useState({
-        showSearch: false,
-        isExpanded: false,
-        query: '',
-    });
-
+function SearchBar({ searchState, setSearchState }) {
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searched, setSearched] = useState(false);
@@ -25,7 +19,7 @@ function SearchBar() {
     const fakeBooks = [
         {
             id: 1,
-            title: 'Clean Code',
+            title: 'Clean Code ',
             price: 350000,
             image: 'https://img.lazcdn.com/g/p/a0bc826b8fab3318f17974a0a92b04d4.jpg_720x720q80.jpg',
         },
@@ -131,23 +125,21 @@ function SearchBar() {
             offset={[50, 10]}
             render={(attrs) => (
                 <div className={cx('search-results')} tabIndex="-1" {...attrs}>
-                    <PopperWrapper>
-                        {loading ? (
-                            <div className={cx('no-results')}>Đang tìm kiếm...</div>
-                        ) : results.length > 0 ? (
-                            results.map((book) => (
-                                <div key={book.id} className={cx('search-item')}>
-                                    <img src={book.image} alt={book.title} className={cx('book-thumb')} />
-                                    <div className={cx('book-info')}>
-                                        <span className={cx('book-title')}>{book.title}</span>
-                                        <span className={cx('book-price')}>{book.price.toLocaleString('vi-VN')}₫</span>
-                                    </div>
+                    {loading ? (
+                        <div className={cx('no-results')}>Đang tìm kiếm...</div>
+                    ) : results.length > 0 ? (
+                        results.map((book) => (
+                            <div key={book.id} className={cx('search-item')}>
+                                <img src={book.image} alt={book.title} className={cx('book-thumb')} />
+                                <div className={cx('book-info')}>
+                                    <span className={cx('book-title')}>{book.title}</span>
+                                    <span className={cx('book-price')}>{book.price.toLocaleString('vi-VN')} đ</span>
                                 </div>
-                            ))
-                        ) : (
-                            searched && <div className={cx('no-results')}>Không tìm thấy sách nào</div>
-                        )}
-                    </PopperWrapper>
+                            </div>
+                        ))
+                    ) : (
+                        searched && <div className={cx('no-results')}>Không tìm thấy sách nào</div>
+                    )}
                 </div>
             )}
         >

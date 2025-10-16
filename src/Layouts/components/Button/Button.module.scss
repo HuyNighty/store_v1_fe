@@ -1,0 +1,18 @@
+.wrapper {
+    font-size: 1.8rem;
+    min-width: 100px;
+    border: 1px solid;
+    padding: 8px 14px;
+    border-radius: 4px;
+}
+
+.primary {
+    background-color: var(--white);
+    color: var(--primary-color);
+
+    &:hover {
+        cursor: pointer;
+        background-color: var(--primary-hover);
+        color: var(--white);
+    }
+}

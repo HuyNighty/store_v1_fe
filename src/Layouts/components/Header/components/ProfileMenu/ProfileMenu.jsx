@@ -8,19 +8,19 @@ import Tippy from '@tippyjs/react';
 
 const cx = classNames.bind(styles);
 
-function ProfileMenu() {
+function ProfileMenu({ onProfileInteract, onLogout }) {
     const profileMenuItems = [
-        { label: 'My Profile', icon: faUser, to: '/profile' },
-        { label: 'Orders', icon: faBox, to: '/orders' },
-        { label: 'Settings', icon: faGear, to: '/settings' },
-        { label: 'Logout', icon: faRightFromBracket, to: '/logout' },
+        { label: 'Thông tin cá nhân', icon: faUser, to: '/profile' },
+        { label: 'Đơn hàng', icon: faBox, to: '/orders' },
+        { label: 'Cài đặt', icon: faGear, to: '/settings' },
+        { label: 'Đăng xuất', icon: faRightFromBracket, onClick: onLogout },
     ];
 
     const menuContent = (
         <PopperWrapper>
             <div className={cx('profile-menu')}>
                 {profileMenuItems.map((item) => (
-                    <Link key={item.to} to={item.to} className={cx('menu-item')}>
+                    <Link key={item.to} to={item.to} className={cx('menu-item')} onClick={item.onClick}>
                         <FontAwesomeIcon icon={item.icon} />
                         <span className={cx('text-item')}>{item.label}</span>
                     </Link>
@@ -36,8 +36,9 @@ function ProfileMenu() {
             trigger="mouseenter"
             hideOnClick={true}
             interactive
-            // visible={true}
             delay={[100, 300]}
+            // visible
+            onTrigger={() => onProfileInteract()}
         >
             <div>
                 <FontAwesomeIcon icon={faUser} className={cx('icon-btn')} />
