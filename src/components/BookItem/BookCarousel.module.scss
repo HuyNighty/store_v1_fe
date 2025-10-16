@@ -1,0 +1,71 @@
+.carousel-wrapper {
+    width: 100%;
+    padding: 20px 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+
+    .title-section {
+        h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #222;
+        }
+
+        p {
+            color: #777;
+            font-size: 1rem;
+        }
+    }
+
+    .nav-buttons {
+        display: contents;
+        gap: 10px;
+
+        .nav-btn {
+            color: var(--primary-color);
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                color: var(--white);
+                background: var(--primary-hover);
+            }
+
+            &.disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
+        }
+    }
+}
+
+.fea-text {
+    color: var(--primary-color-bold);
+    font-size: 38px;
+}
+.book-list-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.book-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}

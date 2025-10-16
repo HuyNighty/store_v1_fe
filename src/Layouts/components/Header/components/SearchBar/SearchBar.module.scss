@@ -84,6 +84,8 @@
     padding: 8px 0;
     border: 1px solid #f3f1f1;
     scrollbar-width: none;
+    margin-top: 10px;
+
     .search-item {
         display: flex;
         align-items: center;
@@ -94,6 +96,7 @@
         transition: background 0.2s ease;
 
         &:hover {
+            border-radius: 4px;
             cursor: pointer;
             background: var(--primary-hover);
             color: #fff;
