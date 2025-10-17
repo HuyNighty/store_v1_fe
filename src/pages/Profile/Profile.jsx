@@ -1,4 +1,4 @@
-function Home() {
+function Profile() {
     return (
         <>
             <h1>Profile page</h1>
@@ -6,4 +6,4 @@ function Home() {
     );
 }
 
-export default Home;
+export default Profile;

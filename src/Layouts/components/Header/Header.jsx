@@ -11,7 +11,7 @@ import Logo from '../../../components/Logo';
 const cx = classNames.bind(styles);
 
 function Header() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(true);
 
     const [searchState, setSearchState] = useState({
         showSearch: false,
