@@ -1,14 +1,18 @@
-import styles from './NavLinks.module.scss';
-import classNames from 'classnames/bind';
-
-const cx = classNames.bind(styles);
+import Button from '../../../Button';
 
 function NavLinks() {
-    const links = ['Home', 'Books', 'About'];
+    const links = [
+        { text: 'Home', to: '/' },
+        { text: 'Books', to: '/books' },
+        { text: 'About', to: '/about' },
+    ];
+
     return (
-        <nav className={cx('nav')}>
-            {links.map((link) => (
-                <button key={link}>{link}</button>
+        <nav>
+            {links.map((link, index) => (
+                <Button key={index} to={link.to} text={2.4}>
+                    {link.text}
+                </Button>
             ))}
         </nav>
     );

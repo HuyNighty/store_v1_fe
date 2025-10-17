@@ -3,7 +3,7 @@
     align-items: center;
     cursor: pointer;
     text-decoration: none;
-    transition: transform var(--transition-base), color var(--transition-base);
+    transition: transform var(--transition-base), color var(--transition-base) !important;
 
     &:hover {
         transform: scale(1.08);
@@ -23,7 +23,7 @@
     justify-content: center;
     border-radius: 8px;
     margin-right: 10px;
-    transition: background-color var(--transition-base);
+    transition: background-color var(--transition-base) !important;
 }
 
 .logo-text {

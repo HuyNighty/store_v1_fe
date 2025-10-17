@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
-function Button({ to, href, primary, onClick, children, ...passProps }) {
+function Button({ to, href, primary, onClick, children, text, ...passProps }) {
     let Comp = 'button';
 
     const props = {
@@ -24,8 +24,9 @@ function Button({ to, href, primary, onClick, children, ...passProps }) {
         primary,
     });
 
+    const style = text ? { fontSize: `${text}rem` } : {};
     return (
-        <Comp className={classes} {...props}>
+        <Comp className={classes} style={style} {...props}>
             <span>{children}</span>
         </Comp>
     );

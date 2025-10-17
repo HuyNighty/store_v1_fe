@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Header.module.scss';
-import Logo from './components/Logo/Logo';
 import NavLinks from './components/NavLinks/NavLinks';
 import SearchBar from './components/SearchBar/SearchBar';
 import CartButton from './components/CartButton/CartButton';
 import ProfileMenu from './components/ProfileMenu/ProfileMenu';
 import Button from '../Button/Button';
+import Logo from '../../../components/Logo';
 
 const cx = classNames.bind(styles);
 

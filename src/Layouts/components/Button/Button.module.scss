@@ -1,18 +1,28 @@
 .wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-size: 1.8rem;
     min-width: 100px;
-    border: 1px solid;
     padding: 8px 14px;
+    background: transparent;
+    color: var(--primary-color-bold);
+    text-decoration: none;
+    cursor: pointer;
     border-radius: 4px;
-}
-
-.primary {
-    background-color: var(--white);
-    color: var(--primary-color);
 
     &:hover {
-        cursor: pointer;
-        background-color: var(--primary-hover);
-        color: var(--white);
+        color: var(--primary-color);
+    }
+
+    &.primary {
+        background-color: var(--white);
+        color: var(--primary-color);
+        border-color: 2px solid var(--primary-color);
+
+        &:hover {
+            background-color: var(--primary-hover);
+            color: var(--white);
+        }
     }
 }

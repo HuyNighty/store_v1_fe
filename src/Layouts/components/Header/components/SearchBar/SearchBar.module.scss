@@ -9,7 +9,7 @@
     width: fit-content;
 
     .search-icon {
-        color: #000;
+        color: var(--primary-color-bold);
         cursor: pointer;
         font-size: 20px;
         transition: transform 0.2s ease, color 0.2s ease;
