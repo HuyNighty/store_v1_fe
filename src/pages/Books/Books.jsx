@@ -1,102 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Books.module.scss';
 import { Search, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { BookItem } from '../../components/BookItem';
 import Tippy from '@tippyjs/react/headless';
 import { Wrapper as PopperWrapper } from '../../Layouts/Popper';
+import productApi from '../../api/productApi';
 
 const cx = classNames.bind(styles);
 
-function Books({ onNavigate }) {
+function Books() {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('Most Popular');
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [openCategory, setOpenCategory] = useState(false);
     const [openSort, setOpenSort] = useState(false);
+    const [books, setBooks] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const books = [
-        {
-            id: 1,
-            title: 'The Midnight Library',
-            author: 'Matt Haig',
-            price: 24.99,
-            category: 'Fiction',
-            image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400',
-            rating: 4.5,
-            reviews: 2847,
-        },
-        {
-            id: 2,
-            title: 'Atomic Habits',
-            author: 'James Clear',
-            price: 18.99,
-            category: 'Self-help',
-            image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-            rating: 4.8,
-            reviews: 15234,
-        },
-        {
-            id: 3,
-            title: 'The Alchemist',
-            author: 'Paulo Coelho',
-            price: 15.5,
-            category: 'Fiction',
-            image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400',
-            rating: 4.7,
-            reviews: 8921,
-        },
-        {
-            id: 4,
-            title: 'Educated',
-            author: 'Tara Westover',
-            price: 22.99,
-            category: 'Biography',
-            image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400',
-            rating: 4.6,
-            reviews: 5678,
-        },
-        {
-            id: 5,
-            title: 'Where the Crawdads Sing',
-            author: 'Delia Owens',
-            price: 19.99,
-            category: 'Fiction',
-            image: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400',
-            rating: 4.4,
-            reviews: 12345,
-        },
-        {
-            id: 6,
-            title: 'The Silent Patient',
-            author: 'Alex Michaelides',
-            price: 16.75,
-            category: 'Thriller',
-            image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400',
-            rating: 4.2,
-            reviews: 8765,
-        },
-        {
-            id: 7,
-            title: 'Dune',
-            author: 'Frank Herbert',
-            price: 29.99,
-            category: 'Sci-fi',
-            image: 'https://images.unsplash.com/photo-1554757380-2fb69b9b940c?w=400',
-            rating: 4.9,
-            reviews: 23456,
-        },
-        {
-            id: 8,
-            title: '1984',
-            author: 'George Orwell',
-            price: 14.99,
-            category: 'Fiction',
-            image: 'https://images.unsplash.com/photo-1531346680769-a1d79b57de2b?w=400',
-            rating: 4.8,
-            reviews: 18976,
-        },
-    ];
+    useEffect(() => {
+        const fetchBooks = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                const data = await productApi.getAll();
+
+                let booksData = [];
+                if (Array.isArray(data)) {
+                    booksData = data;
+                } else if (Array.isArray(data?.result)) {
+                    booksData = data.result;
+                } else if (Array.isArray(data?.data)) {
+                    booksData = data.data;
+                } else if (Array.isArray(data?.items)) {
+                    booksData = data.items;
+                }
+
+                setBooks(booksData);
+            } catch (err) {
+                console.error('Lỗi khi tải sách:', err);
+                setError('Không thể tải danh sách sách.');
+                setBooks([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchBooks();
+    }, []);
 
     const categories = [
         { id: 1, name: 'All' },
@@ -110,23 +62,25 @@ function Books({ onNavigate }) {
     const sorts = ['Most Popular', 'Highest Rated', 'Price: Low to High', 'Price: High to Low'];
 
     const filteredBooks = books.filter((book) => {
+        const search = searchQuery.toLowerCase();
+
         const matchesSearch =
-            book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            book.author.toLowerCase().includes(searchQuery.toLowerCase());
+            book.productName?.toLowerCase().includes(search) ||
+            book.bookAuthors?.some((a) => a.authorName.toLowerCase().includes(search));
+
         const matchesCategory = selectedCategory === 'All' || book.category === selectedCategory;
+
         return matchesSearch && matchesCategory;
     });
 
     const sortedBooks = [...filteredBooks].sort((a, b) => {
         switch (sortBy) {
             case 'Price: Low to High':
-                return a.price - b.price;
+                return (a.salePrice ?? a.price) - (b.salePrice ?? b.price);
             case 'Price: High to Low':
-                return b.price - a.price;
-            case 'Highest Rated':
-                return b.rating - a.rating;
+                return (b.salePrice ?? b.price) - (a.salePrice ?? a.price);
             default:
-                return b.reviews - a.reviews;
+                return 0;
         }
     });
 
@@ -153,7 +107,7 @@ function Books({ onNavigate }) {
                             />
                         </div>
 
-                        {/* Category dropdown */}
+                        {/* Category Dropdown */}
                         <Tippy
                             offset={[-90, 10]}
                             interactive
@@ -181,12 +135,12 @@ function Books({ onNavigate }) {
                         >
                             <div className={cx('select')} onClick={() => setOpenCategory(!openCategory)}>
                                 <SlidersHorizontal className={cx('icon')} />
-                                <span>{selectedCategory === 'All' ? 'All' : selectedCategory}</span>
+                                <span>{selectedCategory}</span>
                                 <ChevronDown className={cx('chevron')} />
                             </div>
                         </Tippy>
 
-                        {/* Sort dropdown */}
+                        {/* Sort Dropdown */}
                         <Tippy
                             offset={[-90, 10]}
                             placement="bottom"
@@ -228,10 +182,14 @@ function Books({ onNavigate }) {
                 </div>
 
                 {/* Books Grid */}
-                {sortedBooks.length > 0 ? (
+                {loading ? (
+                    <div className={cx('loading')}>Đang tải sách...</div>
+                ) : error ? (
+                    <div className={cx('error')}>{error}</div>
+                ) : sortedBooks.length > 0 ? (
                     <div className={cx('books-grid')}>
                         {sortedBooks.map((book) => (
-                            <BookItem key={book.id} book={book} />
+                            <BookItem key={book.productId} book={book} />
                         ))}
                     </div>
                 ) : (

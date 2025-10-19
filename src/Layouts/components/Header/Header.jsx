@@ -1,4 +1,5 @@
-import { useState } from 'react';
+// src/components/Header/Header.jsx
+import { useContext, useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Header.module.scss';
 import NavLinks from './components/NavLinks/NavLinks';
@@ -7,11 +8,14 @@ import CartButton from './components/CartButton/CartButton';
 import ProfileMenu from './components/ProfileMenu/ProfileMenu';
 import Button from '../Button/Button';
 import Logo from '../../../components/Logo';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../Context/AuthContext';
 
 const cx = classNames.bind(styles);
 
 function Header() {
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const { isAuthenticated, user, logout } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const [searchState, setSearchState] = useState({
         showSearch: false,
@@ -20,19 +24,14 @@ function Header() {
     });
 
     const closeSearch = () => {
-        setSearchState({
-            showSearch: false,
-            isExpanded: false,
-            query: '',
-        });
+        setSearchState({ showSearch: false, isExpanded: false, query: '' });
     };
 
-    const handleLogout = () => {
-        setIsLoggedIn(false);
-    };
+    const handleLoginClick = () => navigate('/login');
 
-    const handleLogin = () => {
-        setIsLoggedIn(true);
+    const handleLogout = async () => {
+        await logout();
+        navigate('/login');
     };
 
     return (
@@ -42,13 +41,13 @@ function Header() {
                 <NavLinks />
                 <div className={cx('actions')}>
                     <SearchBar searchState={searchState} setSearchState={setSearchState} />
-                    {isLoggedIn ? (
+                    {isAuthenticated ? (
                         <>
                             <CartButton />
-                            <ProfileMenu onProfileInteract={closeSearch} onLogout={handleLogout} />
+                            <ProfileMenu user={user} onProfileInteract={closeSearch} onLogout={handleLogout} />
                         </>
                     ) : (
-                        <Button primary onClick={handleLogin}>
+                        <Button primary onClick={handleLoginClick}>
                             Đăng nhập
                         </Button>
                     )}

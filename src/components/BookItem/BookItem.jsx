@@ -38,7 +38,7 @@ function BookItem({ book }) {
                     <span className={cx('book-item-reviews')}>({book.reviews} reviews)</span>
                 </div>
                 <div className={cx('book-item-footer')}>
-                    <p className={cx('book-item-price')}>{displayPrice} đ</p>
+                    <p className={cx('book-item-price')}>{displayPrice / 1000}.000 đ</p>
                     <Button className={cx('book-item-view-btn')}>Xem chi tiết</Button>
                 </div>
             </div>

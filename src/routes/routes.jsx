@@ -4,12 +4,14 @@ import Profile from '~/pages/Profile';
 import BookItem from '../pages/BookItem';
 
 import HeaderOnly from '../Layouts/HeaderOnly';
+import Login from '../pages/Login/Login';
 
 const publicRoutes = [
     { path: '/', component: Home },
     { path: '/books', component: Books },
     { path: '/profile', component: Profile, layout: HeaderOnly },
     { path: '/book-item', component: BookItem, layout: null },
+    { path: '/login', component: Login },
 ];
 
 const privateRoutes = [];

@@ -10,10 +10,10 @@ import productApi from '../../api/productApi';
 const cx = classNames.bind(styles);
 
 function BookCarousel() {
-    const [books, setBooks] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [direction, setDirection] = useState(0);
+    const [books, setBooks] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const booksPerPage = 4;
@@ -23,13 +23,27 @@ function BookCarousel() {
         const fetchBooks = async () => {
             try {
                 setLoading(true);
-                const response = await productApi.getAll();
-                const booksData = Array.isArray(response?.data) ? response.data : response?.result || [];
+                setError(null);
+
+                const data = await productApi.getAll();
+
+                let booksData = [];
+                if (Array.isArray(data)) {
+                    booksData = data;
+                } else if (Array.isArray(data?.result)) {
+                    booksData = data.result;
+                } else if (Array.isArray(data?.data)) {
+                    booksData = data.data;
+                } else if (Array.isArray(data?.items)) {
+                    booksData = data.items;
+                }
 
                 setBooks(booksData);
+                setCurrentIndex(0);
             } catch (err) {
                 console.error('Lỗi khi tải sách:', err);
                 setError('Không thể tải danh sách sách.');
+                setBooks([]);
             } finally {
                 setLoading(false);
             }

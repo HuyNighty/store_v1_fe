@@ -1,11 +1,23 @@
 import axiosClient from './axiosClient';
 
+const normalize = (res) => {
+    return res?.data?.result ?? res?.data ?? res;
+};
+
 const productApi = {
     getAll: async () => {
-        const response = await axiosClient.get('/products', {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        return response.data;
+        const res = await axiosClient.get('/products');
+        return normalize(res);
+    },
+
+    getById: async (productId) => {
+        const res = await axiosClient.get(`/products/${productId}`);
+        return normalize(res);
+    },
+
+    getMainAssetByProductId: async (productId) => {
+        const res = await axiosClient.get('/product-assets', { params: { productId, type: 'MAIN' } });
+        return normalize(res);
     },
 };
 
