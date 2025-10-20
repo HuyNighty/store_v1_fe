@@ -27,6 +27,7 @@ function Login() {
         setLoading(true);
         try {
             await login(form);
+
             navigate('/');
         } catch (err) {
             console.error(err);
@@ -44,7 +45,7 @@ function Login() {
                         <FontAwesomeIcon icon={faArrowLeft} />
                     </button>
                     <h2>Đăng nhập</h2>
-                    <div className={cx('header-spacer')}></div> {/* Spacer để cân bằng layout */}
+                    <div className={cx('header-spacer')}></div>
                 </div>
 
                 {error && <p className={cx('error')}>{error}</p>}

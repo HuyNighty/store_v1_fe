@@ -39,7 +39,7 @@ function Footer() {
                     <h4>Shop</h4>
                     <ul>
                         <li>
-                            <a href="#">All Books</a>
+                            <a href="/books">All Books</a>
                         </li>
                         <li>
                             <a href="#">Bestsellers</a>
