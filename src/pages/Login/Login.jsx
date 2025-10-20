@@ -1,10 +1,11 @@
-// src/pages/Login/Login.jsx
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './Login.module.scss';
 import { AuthContext } from '../../Context/AuthContext';
 import Button from '../../Layouts/components/Button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 const cx = classNames.bind(styles);
 
@@ -16,6 +17,9 @@ function Login() {
     const [error, setError] = useState(null);
 
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+    const handleGoHome = () => {
+        navigate('/');
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -35,7 +39,14 @@ function Login() {
     return (
         <div className={cx('login-wrapper')}>
             <form className={cx('login-form')} onSubmit={handleSubmit}>
-                <h2>Đăng nhập</h2>
+                <div className={cx('form-header')}>
+                    <button type="button" className={cx('home-button')} onClick={handleGoHome}>
+                        <FontAwesomeIcon icon={faArrowLeft} />
+                    </button>
+                    <h2>Đăng nhập</h2>
+                    <div className={cx('header-spacer')}></div> {/* Spacer để cân bằng layout */}
+                </div>
+
                 {error && <p className={cx('error')}>{error}</p>}
 
                 <input
@@ -54,9 +65,14 @@ function Login() {
                     required
                 />
 
-                <Button primary type="submit" disabled={loading}>
-                    {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
-                </Button>
+                <div className={cx('login-actions')}>
+                    <Button primary width={15} disabled={loading}>
+                        {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                    </Button>
+                    <Button outline width={15} to="/register">
+                        Đăng ký
+                    </Button>
+                </div>
             </form>
         </div>
     );

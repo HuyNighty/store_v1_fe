@@ -31,7 +31,7 @@ function Header() {
 
     const handleLogout = async () => {
         await logout();
-        navigate('/login');
+        navigate('/');
     };
 
     return (
@@ -47,7 +47,7 @@ function Header() {
                             <ProfileMenu user={user} onProfileInteract={closeSearch} onLogout={handleLogout} />
                         </>
                     ) : (
-                        <Button primary onClick={handleLoginClick}>
+                        <Button outline onClick={handleLoginClick}>
                             Đăng nhập
                         </Button>
                     )}

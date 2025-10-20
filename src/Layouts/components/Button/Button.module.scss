@@ -16,9 +16,20 @@
     }
 
     &.primary {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border-color: 2px solid var(--primary-color);
+
+        &:hover {
+            background-color: var(--primary-hover);
+            color: var(--white);
+        }
+    }
+
+    &.outline {
         background-color: var(--white);
         color: var(--primary-color);
-        border-color: 2px solid var(--primary-color);
+        border: 2px solid var(--primary-color);
 
         &:hover {
             background-color: var(--primary-hover);

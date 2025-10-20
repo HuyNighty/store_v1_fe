@@ -1,0 +1,198 @@
+.login-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: var(--background-color);
+    font-family: var(--font-family-primary);
+    animation: fadeSlideDown 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.login-form {
+    background-color: var(--white);
+    padding: 40px 50px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        position: relative;
+    }
+
+    .home-button {
+        display: flex;
+        align-items: center;
+        margin-left: -36px;
+        background: transparent;
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 1.4rem;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        text-decoration: none;
+        white-space: nowrap;
+
+        &:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(147, 125, 107, 0.2);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+
+        &:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(147, 125, 107, 0.3);
+        }
+    }
+
+    h2 {
+        text-align: center;
+        font-size: 2.4rem;
+        color: var(--primary-color-bold);
+        margin: 0;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-weight: 100;
+    }
+
+    input {
+        padding: 12px 15px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        font-size: var(--font-size-base);
+        color: var(--text-color);
+        background-color: #fafafa;
+        transition: border var(--transition-fast), box-shadow var(--transition-fast);
+
+        &:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(147, 125, 107, 0.2);
+        }
+    }
+
+    button {
+        font-size: var(--font-size-base);
+        font-family: var(--font-family-primary);
+        background-color: var(--primary-color);
+        color: var(--white);
+        padding: 12px 15px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color var(--transition-base), transform var(--transition-fast);
+
+        &:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        &:disabled {
+            background-color: #d3c9c0;
+            cursor: not-allowed;
+            transform: none;
+        }
+    }
+
+    .error {
+        color: var(--error-color);
+        font-size: 1.4rem;
+        text-align: center;
+        background-color: #fcebea;
+        border: 1px solid #f5c6cb;
+        padding: 8px;
+        border-radius: 6px;
+        margin-top: -10px;
+    }
+}
+
+.login-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+@keyframes fadeSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shine {
+    0% {
+        left: -100%;
+    }
+    50% {
+        left: 100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+// Responsive design
+@media (max-width: 480px) {
+    .login-form {
+        padding: 30px 25px;
+        width: 320px;
+
+        .form-header {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        h2 {
+            position: static;
+            transform: none;
+            order: -1;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .home-button {
+            order: 1;
+        }
+
+        .header-spacer {
+            display: none;
+        }
+    }
+}

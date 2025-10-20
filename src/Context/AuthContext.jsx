@@ -46,10 +46,13 @@ export function AuthProvider({ children }) {
     const logout = async () => {
         try {
             await authApi.logout();
-        } catch (e) {}
-        localStorage.removeItem('access_token');
-        setIsAuthenticated(false);
-        setUser(null);
+        } catch (e) {
+            console.error('[AuthContext] Logout failed:', e);
+        } finally {
+            localStorage.removeItem('access_token');
+            setIsAuthenticated(false);
+            setUser(null);
+        }
     };
 
     return <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>{children}</AuthContext.Provider>;
