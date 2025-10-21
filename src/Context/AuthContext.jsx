@@ -47,7 +47,7 @@ export function AuthProvider({ children }) {
                 raw: decoded,
             };
         } catch (error) {
-            console.error('❌ Decode JWT failed:', error);
+            console.error('Decode JWT failed:', error);
             return null;
         }
     };

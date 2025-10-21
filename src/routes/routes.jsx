@@ -5,6 +5,7 @@ import BookItem from '../pages/BookItem';
 import HeaderOnly from '../Layouts/HeaderOnly';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
+import Admin from '../pages/Admin';
 
 const publicRoutes = [
     { path: '/', component: Home },
@@ -13,6 +14,7 @@ const publicRoutes = [
     { path: '/book-item', component: BookItem, layout: null },
     { path: '/login', component: Login, layout: null },
     { path: '/register', component: Register, layout: null },
+    { path: '/admin', component: Admin, layout: HeaderOnly },
 ];
 
 const privateRoutes = [];

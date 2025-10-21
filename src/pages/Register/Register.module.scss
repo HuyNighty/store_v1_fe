@@ -154,9 +154,9 @@
         right: 12px;
         top: 50%;
         transform: translateY(-50%);
-        background: transparent;
+        background: var(--white);
         border: none;
-        color: var(--text-color-light);
+        color: #000;
         cursor: pointer;
         padding: 8px;
         border-radius: 6px;
