@@ -10,7 +10,6 @@ const cx = classNames.bind(styles);
 function Admin() {
     const { user } = useContext(AuthContext);
 
-    // normalize roles
     const roles = (() => {
         if (!user) return [];
         if (Array.isArray(user.roles)) return user.roles.map((r) => String(r).toUpperCase());
@@ -21,12 +20,11 @@ function Admin() {
 
     const isAdmin = roles.includes('ADMIN');
 
-    const [tab, setTab] = useState('product'); // product|asset|link|author|bookauthor|fullbook
+    const [tab, setTab] = useState('product');
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState(null);
     const [err, setErr] = useState(null);
 
-    // product form
     const [productForm, setProductForm] = useState({
         sku: '',
         slug: '',
@@ -39,7 +37,6 @@ function Admin() {
         featured: false,
     });
 
-    // asset form
     const [assetForm, setAssetForm] = useState({
         url: '',
         type: 'IMAGE',
@@ -50,7 +47,6 @@ function Admin() {
         sizeBytes: 0,
     });
 
-    // link (product-asset)
     const [linkForm, setLinkForm] = useState({
         productId: '',
         assetId: '',
@@ -58,7 +54,6 @@ function Admin() {
         ordinal: 0,
     });
 
-    // author
     const [authorForm, setAuthorForm] = useState({
         authorName: '',
         bio: '',
@@ -68,14 +63,12 @@ function Admin() {
         assetId: null,
     });
 
-    // book-author
     const [bookAuthorForm, setBookAuthorForm] = useState({
         productId: '',
         authorId: '',
         authorRole: 'PRIMARY',
     });
 
-    // full book (aggregate)
     const [full, setFull] = useState({
         product: {
             sku: '',

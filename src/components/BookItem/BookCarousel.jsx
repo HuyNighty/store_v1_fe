@@ -1,23 +1,28 @@
-import { useState, useEffect } from 'react';
+// src/components/BookCarousel/BookCarousel.jsx
+import React, { useState, useMemo, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import styles from './BookCarousel.module.scss';
 import BookItem from './BookItem';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import productApi from '../../api/productApi';
 
 const cx = classNames.bind(styles);
 
+function chunkArray(arr, size) {
+    const out = [];
+    for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+    return out;
+}
+
 function BookCarousel() {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [direction, setDirection] = useState(0);
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const booksPerPage = 4;
-    const maxIndex = Math.max(1, Math.ceil(books.length / booksPerPage));
+    const booksPerPage = 5;
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -51,75 +56,76 @@ function BookCarousel() {
         fetchBooks();
     }, []);
 
+    const pages = useMemo(() => chunkArray(books, booksPerPage), [books, booksPerPage]);
+    const maxIndex = Math.max(0, pages.length - 1);
+
+    useEffect(() => {
+        if (currentIndex > maxIndex) setCurrentIndex(maxIndex);
+    }, [maxIndex, currentIndex]);
+
     const handleNext = () => {
-        if (books.length <= booksPerPage) return;
-        setDirection(1);
-        setCurrentIndex((prev) => (prev + 1) % maxIndex);
+        if (pages.length <= 1) return;
+        setCurrentIndex((prev) => (prev + 1 > maxIndex ? 0 : prev + 1));
     };
 
     const handlePrev = () => {
-        if (books.length <= booksPerPage) return;
-        setDirection(-1);
-        setCurrentIndex((prev) => (prev - 1 + maxIndex) % maxIndex);
-    };
-
-    const startIndex = currentIndex * booksPerPage;
-    const visibleBooks = books.slice(startIndex, startIndex + booksPerPage);
-
-    const variants = {
-        enter: (direction) => ({
-            x: direction > 0 ? 200 : -200,
-            opacity: 0,
-        }),
-        center: {
-            x: 0,
-            opacity: 1,
-        },
-        exit: (direction) => ({
-            x: direction > 0 ? -200 : 200,
-            opacity: 0,
-        }),
+        if (pages.length <= 1) return;
+        setCurrentIndex((prev) => (prev - 1 < 0 ? maxIndex : prev - 1));
     };
 
     return (
         <div className={cx('carousel-wrapper')}>
             <div className={cx('header')}>
                 <div className={cx('nav-buttons')}>
-                    <button className={cx('nav-btn')} onClick={handlePrev}>
+                    <button
+                        className={cx('nav-btn')}
+                        onClick={handlePrev}
+                        aria-label="Previous"
+                        disabled={pages.length <= 1}
+                    >
                         <FontAwesomeIcon icon={faChevronLeft} />
                     </button>
+
                     <div className={cx('fea-text')}>Featured Books</div>
-                    <button className={cx('nav-btn')} onClick={handleNext}>
+
+                    <button
+                        className={cx('nav-btn')}
+                        onClick={handleNext}
+                        aria-label="Next"
+                        disabled={pages.length <= 1}
+                    >
                         <FontAwesomeIcon icon={faChevronRight} />
                     </button>
                 </div>
             </div>
+
             <div className={cx('text')}>
                 {loading && <div className={cx('loading')}>Đang tải sách...</div>}
                 {error && <div className={cx('error')}>{error}</div>}
-                {!books.length && <div className={cx('empty')}>Không có sách nào để hiển thị</div>}
+                {!books.length && !loading && <div className={cx('empty')}>Không có sách nào để hiển thị</div>}
             </div>
 
             <div className={cx('book-list-container')}>
-                <AnimatePresence initial={false} custom={direction}>
-                    <motion.div
-                        key={currentIndex}
-                        custom={direction}
-                        variants={variants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{
-                            x: { type: 'spring', stiffness: 100, damping: 20 },
-                            opacity: { duration: 0.2 },
-                        }}
-                        className={cx('book-list')}
-                    >
-                        {visibleBooks.map((book) => (
-                            <BookItem key={book.productId} book={book} />
-                        ))}
-                    </motion.div>
-                </AnimatePresence>
+                <motion.div
+                    className={cx('book-list-track')}
+                    animate={{ x: `-${currentIndex * 100}%` }}
+                    transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+                >
+                    {pages.length > 0 ? (
+                        pages.map((page, pIdx) => (
+                            <div className={cx('book-page')} key={`page-${pIdx}`}>
+                                {page.map((book) => (
+                                    <BookItem
+                                        key={book.productId ?? book.id ?? `${pIdx}-${book.productName}`}
+                                        book={book}
+                                    />
+                                ))}
+                            </div>
+                        ))
+                    ) : (
+                        <div className={cx('book-page', 'empty-page')} />
+                    )}
+                </motion.div>
             </div>
         </div>
     );
