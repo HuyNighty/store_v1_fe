@@ -5,6 +5,7 @@ const adminApi = {
     // PRODUCTS
     createProduct: (payload) => axiosClient.post(`/products`, payload),
     getProduct: (id) => axiosClient.get(`/products/${id}`),
+    updateProduct: (id, payload) => axiosClient.put(`/products/${id}`, payload),
     deleteProduct: (id) => axiosClient.delete(`/products/${id}`),
 
     createAsset: (payload) => axiosClient.post(`/product-assets`, payload),

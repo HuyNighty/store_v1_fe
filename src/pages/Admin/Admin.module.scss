@@ -7,6 +7,7 @@
 }
 
 .card {
+    color: #000;
     width: 100%;
     max-width: 980px;
     background: var(--white);
@@ -16,6 +17,11 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
+}
+
+.btn-crud {
+    display: flex;
+    justify-content: end;
 }
 
 .title {
