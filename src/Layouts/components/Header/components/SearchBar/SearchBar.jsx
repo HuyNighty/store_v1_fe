@@ -3,9 +3,9 @@ import { faSearch, faCircleXmark, faSpinner } from '@fortawesome/free-solid-svg-
 import HeadlessTippy from '@tippyjs/react/headless';
 import classNames from 'classnames/bind';
 import { useState, useEffect, useRef } from 'react';
-import { Wrapper as PopperWrapper } from '../../../../Popper';
 import styles from './SearchBar.module.scss';
 import { useDebounce } from '~/hooks';
+import productApi from '~/api/productApi';
 
 const cx = classNames.bind(styles);
 
@@ -13,20 +13,9 @@ function SearchBar({ searchState, setSearchState }) {
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searched, setSearched] = useState(false);
+    const [error, setError] = useState(null);
 
     const { showSearch, isExpanded, query } = searchState;
-
-    const fakeBooks = [
-        {
-            id: 1,
-            title: 'Clean Code ',
-            price: 350000,
-            image: 'https://img.lazcdn.com/g/p/a0bc826b8fab3318f17974a0a92b04d4.jpg_720x720q80.jpg',
-        },
-        { id: 2, title: 'Effective Java', price: 420000, image: '/images/effectivejava.jpg' },
-        { id: 3, title: 'Spring Boot in Action', price: 390000, image: '/images/springboot.jpg' },
-        { id: 4, title: 'Java Concurrency in Practice', price: 460000, image: '/images/java_concurrency.jpg' },
-    ];
 
     const debouncedQuery = useDebounce(query, 400);
     const inputRef = useRef(null);
@@ -57,21 +46,52 @@ function SearchBar({ searchState, setSearchState }) {
     }, [showSearch]);
 
     useEffect(() => {
-        if (!debouncedQuery.trim()) {
+        if (!debouncedQuery || !debouncedQuery.trim()) {
             setResults([]);
             setSearched(false);
+            setError(null);
+            setLoading(false);
             return;
         }
 
-        setLoading(true);
-        const timer = setTimeout(() => {
-            const filtered = fakeBooks.filter((b) => b.title.toLowerCase().includes(debouncedQuery.toLowerCase()));
-            setResults(filtered);
-            setLoading(false);
-            setSearched(true);
-        }, 500);
+        let cancelled = false;
+        const fetch = async () => {
+            try {
+                setLoading(true);
+                setError(null);
 
-        return () => clearTimeout(timer);
+                const resp = await productApi.searchByName(debouncedQuery.trim());
+                // axios usually wraps data in resp.data
+                const data = resp?.data ?? resp;
+
+                // normalise array payload
+                let arr = [];
+                if (Array.isArray(data)) arr = data;
+                else if (Array.isArray(data.result)) arr = data.result;
+                else if (Array.isArray(data.data)) arr = data.data;
+                else if (Array.isArray(data.items)) arr = data.items;
+
+                if (!cancelled) {
+                    setResults(arr);
+                    setSearched(true);
+                }
+            } catch (err) {
+                if (!cancelled) {
+                    console.error('Search error', err);
+                    setError('Có lỗi khi tìm kiếm. Thử lại.');
+                    setResults([]);
+                    setSearched(true);
+                }
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        };
+
+        fetch();
+
+        return () => {
+            cancelled = true;
+        };
     }, [debouncedQuery]);
 
     const closeSearch = () => {
@@ -122,18 +142,30 @@ function SearchBar({ searchState, setSearchState }) {
             visible={showSearch && (loading || results.length > 0 || (searched && results.length === 0))}
             interactive
             placement="bottom-end"
-            offset={[50, 10]}
+            offset={[0, 8]}
             render={(attrs) => (
                 <div className={cx('search-results')} tabIndex="-1" {...attrs}>
                     {loading ? (
-                        <div className={cx('no-results')}>Đang tìm kiếm...</div>
+                        <div className={cx('no-results')}>
+                            <FontAwesomeIcon icon={faSpinner} spin /> Đang tìm kiếm...
+                        </div>
+                    ) : error ? (
+                        <div className={cx('no-results')}>{error}</div>
                     ) : results.length > 0 ? (
                         results.map((book) => (
-                            <div key={book.id} className={cx('search-item')}>
-                                <img src={book.image} alt={book.title} className={cx('book-thumb')} />
+                            <div key={book.id ?? book.productId ?? book.productId} className={cx('search-item')}>
+                                <img
+                                    src={book.url ?? book.image ?? book.thumbnail}
+                                    alt={book.productName ?? book.title}
+                                    className={cx('book-thumb')}
+                                />
                                 <div className={cx('book-info')}>
-                                    <span className={cx('book-title')}>{book.title}</span>
-                                    <span className={cx('book-price')}>{book.price.toLocaleString('vi-VN')} đ</span>
+                                    <span className={cx('book-title')}>{book.productName ?? book.title}</span>
+                                    {book.price != null && (
+                                        <span className={cx('book-price')}>
+                                            {Number(book.price).toLocaleString('vi-VN')} đ
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         ))

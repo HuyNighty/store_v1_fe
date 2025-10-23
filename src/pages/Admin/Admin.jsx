@@ -1,4 +1,3 @@
-// src/pages/Admin/Admin.jsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Admin.module.scss';
@@ -8,7 +7,6 @@ import Button from '../../Layouts/components/Button';
 
 const cx = classNames.bind(styles);
 
-/* Small reusable fields */
 function FormField({ id, label, name, value, onChange, type = 'text', placeholder, error, step, min }) {
     return (
         <div className={cx('form-group', { invalid: !!error })}>
@@ -38,15 +36,42 @@ function CheckboxField({ id, label, name, checked, onChange }) {
     );
 }
 
-/* Admin main */
+const normalizeListResponse = (resp) => {
+    const data = resp?.data ?? resp;
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.result)) return data.result;
+    if (Array.isArray(data?.data)) return data.data;
+    if (Array.isArray(data?.items)) return data.items;
+    return [];
+};
+
+const normalizeProduct = (p) => ({
+    id: p.id ?? p.productId ?? p.idProduct,
+    sku: p.sku,
+    productName: p.productName ?? p.product_name,
+    price: p.price,
+    salePrice: p.salePrice,
+    stockQuantity: p.stockQuantity,
+    weightG: p.weightG,
+    isActive: p.isActive ?? p.active ?? p.is_active,
+    featured: p.featured,
+    ...p,
+});
+
 function Admin() {
+    // data
     const [products, setProducts] = useState([]);
     const [loadingList, setLoadingList] = useState(false);
     const [listError, setListError] = useState('');
 
-    // modal / form state
+    // UI / filters / search
+    const [filter, setFilter] = useState('all'); // 'all' | 'active' | 'inactive'
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchDebounce, setSearchDebounce] = useState(''); // actual debounced query
+
+    // modal/form
     const [showForm, setShowForm] = useState(false);
-    const [editingId, setEditingId] = useState(null); // null = create, otherwise edit id
+    const [editingId, setEditingId] = useState(null);
     const [formModel, setFormModel] = useState({
         sku: '',
         slug: '',
@@ -62,25 +87,13 @@ function Admin() {
     const [formLoading, setFormLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
 
-    // fetch products
+    // fetch all products
     const fetchProducts = useCallback(async () => {
         try {
             setLoadingList(true);
             setListError('');
-            const resp = await productApi.getAll(); // returns axios response data
-            const data = resp?.data ?? resp; // support both axios and raw
-            // normalize arrays under data/result/items
-            console.log('API Response:', data);
-            let list = [];
-            if (Array.isArray(data)) list = data;
-            else if (Array.isArray(data.result)) list = data.result;
-            else if (Array.isArray(data.data)) list = data.data;
-            else if (Array.isArray(data.items)) list = data.items;
-            // Normalize ID field
-            list = list.map((product) => ({
-                id: product.id ?? product.productId ?? product.idProduct,
-                ...product,
-            }));
+            const resp = await productApi.getAll();
+            const list = normalizeListResponse(resp).map(normalizeProduct);
             setProducts(list);
         } catch (err) {
             console.error('Failed to fetch products', err);
@@ -95,15 +108,42 @@ function Admin() {
         fetchProducts();
     }, [fetchProducts]);
 
-    // Auto-clear success message after 3 seconds
+    // debounce searchQuery -> searchDebounce
     useEffect(() => {
-        if (successMessage) {
-            const timer = setTimeout(() => setSuccessMessage(''), 3000);
-            return () => clearTimeout(timer);
+        const t = setTimeout(() => setSearchDebounce(searchQuery.trim()), 350);
+        return () => clearTimeout(t);
+    }, [searchQuery]);
+
+    // optional: if you want server-side search instead of client-side,
+    // replace the useMemo below with an effect that calls productApi.searchByName(searchDebounce).
+
+    // filteredProducts: apply filter + local-search (case-insensitive)
+    const filteredProducts = useMemo(() => {
+        const q = (searchDebounce || '').toLowerCase();
+        let list = products;
+
+        if (filter === 'active') {
+            list = list.filter((p) => p.isActive === true || String(p.isActive) === 'true' || p.isActive === 1);
+        } else if (filter === 'inactive') {
+            list = list.filter((p) => !(p.isActive === true || String(p.isActive) === 'true' || p.isActive === 1));
         }
+
+        if (!q) return list;
+
+        return list.filter((p) => {
+            const name = (p.productName ?? '').toString().toLowerCase();
+            const sku = (p.sku ?? '').toString().toLowerCase();
+            return name.includes(q) || sku.includes(q);
+        });
+    }, [products, filter, searchDebounce]);
+
+    // show success toast shorter
+    useEffect(() => {
+        if (!successMessage) return;
+        const id = setTimeout(() => setSuccessMessage(''), 3000);
+        return () => clearTimeout(id);
     }, [successMessage]);
 
-    // open create form
     const handleOpenCreate = () => {
         setEditingId(null);
         setFormErrors({});
@@ -119,12 +159,11 @@ function Admin() {
             featured: false,
         });
         setShowForm(true);
-        setSuccessMessage('');
     };
 
-    // open edit form (prefill)
     const handleOpenEdit = (item) => {
         setEditingId(item.id);
+        setFormErrors({});
         setFormModel({
             sku: item.sku ?? '',
             slug: item.slug ?? '',
@@ -136,27 +175,9 @@ function Admin() {
             isActive: item.isActive ?? true,
             featured: item.featured ?? false,
         });
-        setFormErrors({});
         setShowForm(true);
-        setSuccessMessage('');
     };
 
-    // delete product
-    const handleDelete = async (id) => {
-        const conf = window.confirm('Bạn có chắc muốn xóa sản phẩm này?');
-        if (!conf) return;
-        try {
-            await adminApi.deleteProduct(id);
-            setSuccessMessage('Xóa thành công.');
-            // remove from local list
-            setProducts((prev) => prev.filter((p) => p.id !== id));
-        } catch (err) {
-            console.error('Delete error', err);
-            alert('Xóa thất bại. Thử lại.');
-        }
-    };
-
-    // handle form input change
     const handleFormChange = (e) => {
         const { name, value, type, checked } = e.target;
         const val = type === 'checkbox' ? checked : value;
@@ -164,31 +185,16 @@ function Admin() {
         setFormErrors((prev) => ({ ...prev, [name]: '' }));
     };
 
-    // prepare payload (same logic as trước)
-    const preparePayload = (m) => ({
-        ...m,
-        sku: m.sku?.trim(),
-        slug: m.slug?.trim(),
-        productName: m.productName?.trim(),
-        price: m.price === '' ? null : Number(m.price),
-        salePrice: m.salePrice === '' ? null : Number(m.salePrice),
-        stockQuantity: m.stockQuantity === '' ? null : Number(m.stockQuantity),
-        weightG: m.weightG === '' ? null : Number(m.weightG),
-    });
-
-    // Client-side validation
-    const validateForm = (model) => {
-        const errors = {};
-        if (!model.sku?.trim()) errors.sku = 'SKU is required';
-        if (!model.productName?.trim()) errors.productName = 'Product name is required';
-        if (model.price === '' || isNaN(model.price)) errors.price = 'Price must be a valid number';
-        if (model.stockQuantity === '' || isNaN(model.stockQuantity))
-            errors.stockQuantity = 'Stock quantity must be a valid number';
-        // Add more validations as needed (e.g., for slug, weightG, etc.)
-        return errors;
+    const validateForm = (m) => {
+        const errs = {};
+        if (!m.sku?.trim()) errs.sku = 'SKU is required';
+        if (!m.productName?.trim()) errs.productName = 'Product name is required';
+        if (m.price === '' || isNaN(m.price)) errs.price = 'Price must be a valid number';
+        if (m.stockQuantity === '' || isNaN(m.stockQuantity))
+            errs.stockQuantity = 'Stock quantity must be a valid number';
+        return errs;
     };
 
-    // submit form (create or update)
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         setFormErrors({});
@@ -202,70 +208,129 @@ function Admin() {
             return;
         }
 
-        const payload = preparePayload(formModel);
+        const payload = {
+            ...formModel,
+            sku: formModel.sku?.trim(),
+            slug: formModel.slug?.trim(),
+            productName: formModel.productName?.trim(),
+            price: formModel.price === '' ? null : Number(formModel.price),
+            salePrice: formModel.salePrice === '' ? null : Number(formModel.salePrice),
+            stockQuantity: formModel.stockQuantity === '' ? null : Number(formModel.stockQuantity),
+            weightG: formModel.weightG === '' ? null : Number(formModel.weightG),
+        };
 
         try {
             if (editingId) {
-                // update
                 await adminApi.updateProduct(editingId, payload);
                 setSuccessMessage('Cập nhật sản phẩm thành công.');
             } else {
-                // create
                 await adminApi.createProduct(payload);
                 setSuccessMessage('Tạo sản phẩm thành công.');
             }
-
-            // refresh list (simple approach)
             await fetchProducts();
             setShowForm(false);
         } catch (err) {
-            // handle validation errors from backend
+            console.error('Submit error', err);
             const resp = err?.response?.data;
-            let errors = { _server: 'An error occurred. Please try again.' };
+            let errs = { _server: 'An error occurred. Please try again.' };
             if (resp) {
-                if (typeof resp.result === 'object') errors = resp.result;
-                else if (resp.message) errors._server = resp.message;
-                else if (resp.error) errors._server = resp.error;
+                if (typeof resp.result === 'object') errs = resp.result;
+                else if (resp.message) errs._server = resp.message;
             }
-            setFormErrors(errors);
+            setFormErrors(errs);
         } finally {
             setFormLoading(false);
         }
     };
 
-    // Memoize table rows for performance
-    const productRows = useMemo(
-        () =>
-            products.map((p, idx) => (
-                <tr key={p.id} style={{ borderTop: '1px solid #eee' }}>
-                    <td style={{ padding: 8 }}>{idx + 1}</td>
-                    <td style={{ padding: 8 }}>{p.sku}</td>
-                    <td style={{ padding: 8 }}>{p.productName}</td>
-                    <td style={{ padding: 8 }}>{p.price}</td>
-                    <td style={{ padding: 8 }}>{p.stockQuantity}</td>
-                    <td style={{ padding: 8 }}>{p.isActive ? 'Yes' : 'No'}</td>
-                    <td style={{ padding: 8 }}>{p.featured ? 'Yes' : 'No'}</td>
-                    <td>
-                        <div className={cx('btn-crud')} style={{ display: 'flex', gap: 8 }}>
-                            <Button onClick={() => handleOpenEdit(p)}>Edit</Button>
-                            <Button onClick={() => handleDelete(p.id)}>Delete</Button>
-                        </div>
-                    </td>
-                </tr>
-            )),
-        [products, handleOpenEdit, handleDelete],
-    );
+    const handleDelete = async (id) => {
+        const conf = window.confirm('Bạn có chắc muốn xóa (soft-delete) sản phẩm này?');
+        if (!conf) return;
+
+        // optimistic remove
+        const prev = products;
+        setProducts((p) => p.filter((x) => x.id !== id));
+        setSuccessMessage('');
+        try {
+            // Prefer backend soft-delete via DELETE if implemented
+            await adminApi.deleteProduct(id);
+            setSuccessMessage('Xóa thành công.');
+            // refresh to ensure server state consistency
+            await fetchProducts();
+        } catch (err) {
+            console.warn('delete fallback/update', err);
+            // fallback: try update isActive=false
+            try {
+                await adminApi.updateProduct(id, { isActive: false });
+                setSuccessMessage('Xóa (soft-delete) thành công.');
+                await fetchProducts();
+            } catch (err2) {
+                console.error('Delete failed - rollback', err2);
+                setProducts(prev); // rollback
+                alert('Xóa thất bại. Thử lại.');
+            }
+        }
+    };
 
     return (
         <div className={cx('wrapper')}>
             <div className={cx('card')}>
                 <h2 className={cx('title')}>Admin — Products</h2>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
+                {/* Toolbar */}
+                <div
+                    className={cx('toolbar')}
+                    style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}
+                >
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                         <Button onClick={handleOpenCreate}>+ Add Product</Button>
+
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                            <Button
+                                outline
+                                onClick={() => setFilter('all')}
+                                style={{ opacity: filter === 'all' ? 1 : 0.75 }}
+                            >
+                                All
+                            </Button>
+                            <Button
+                                outline
+                                onClick={() => setFilter('active')}
+                                style={{ opacity: filter === 'active' ? 1 : 0.75 }}
+                            >
+                                Active
+                            </Button>
+                            <Button
+                                outline
+                                onClick={() => setFilter('inactive')}
+                                style={{ opacity: filter === 'inactive' ? 1 : 0.75 }}
+                            >
+                                Inactive
+                            </Button>
+                        </div>
                     </div>
-                    <div style={{ color: '#6b7280' }}>{loadingList ? 'Loading...' : `${products.length} sản phẩm`}</div>
+
+                    {/* Search input */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, justifyContent: 'center' }}>
+                        <input
+                            className={cx('input')}
+                            type="text"
+                            placeholder="Tìm theo tên hoặc SKU..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{
+                                width: 360,
+                                maxWidth: '60%',
+                                padding: '8px 10px',
+                                borderRadius: 8,
+                                border: '1px solid rgba(0,0,0,0.08)',
+                            }}
+                        />
+                    </div>
+
+                    <div style={{ color: '#6b7280' }}>
+                        {loadingList ? 'Loading...' : `${filteredProducts.length} / ${products.length} sản phẩm`}
+                    </div>
                 </div>
 
                 {listError && <div className={cx('server-error', 'message')}>{listError}</div>}
@@ -282,28 +347,38 @@ function Admin() {
                                 <th style={{ textAlign: 'left', padding: 8 }}>Stock</th>
                                 <th style={{ textAlign: 'left', padding: 8 }}>Active</th>
                                 <th style={{ textAlign: 'left', padding: 8 }}>Featured</th>
-                                <th
-                                    style={{
-                                        textAlign: 'left',
-                                        padding: 8,
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        marginLeft: 50,
-                                    }}
-                                >
-                                    Actions
-                                </th>
+                                <th style={{ textAlign: 'left', padding: 8 }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {products.length === 0 && !loadingList ? (
+                            {!filteredProducts.length && !loadingList ? (
                                 <tr>
                                     <td colSpan="8" style={{ padding: 12 }}>
                                         Không có sản phẩm
                                     </td>
                                 </tr>
                             ) : (
-                                productRows
+                                filteredProducts.map((p, idx) => (
+                                    <tr key={p.id ?? idx} style={{ borderTop: '1px solid #eee' }}>
+                                        <td style={{ padding: 8 }}>{idx + 1}</td>
+                                        <td style={{ padding: 8 }}>{p.sku}</td>
+                                        <td style={{ padding: 8 }}>{p.productName}</td>
+                                        <td style={{ padding: 8 }}>{p.price}</td>
+                                        <td style={{ padding: 8 }}>{p.stockQuantity}</td>
+                                        <td style={{ padding: 8 }}>{p.isActive ? 'Yes' : 'No'}</td>
+                                        <td style={{ padding: 8 }}>{p.featured ? 'Yes' : 'No'}</td>
+                                        <td style={{ padding: 8 }}>
+                                            <div style={{ display: 'flex', gap: 8 }}>
+                                                <Button primary onClick={() => handleOpenEdit(p)}>
+                                                    Edit
+                                                </Button>
+                                                <Button outline onClick={() => handleDelete(p.id)}>
+                                                    Delete
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
                             )}
                         </tbody>
                     </table>
@@ -316,7 +391,7 @@ function Admin() {
                 )}
             </div>
 
-            {/* Modal form (simple) */}
+            {/* Modal form */}
             {showForm && (
                 <div
                     role="dialog"
@@ -331,7 +406,7 @@ function Admin() {
                         zIndex: 60,
                     }}
                 >
-                    <div style={{ width: 1200, maxWidth: '95%', background: 'white', borderRadius: 10, padding: 18 }}>
+                    <div style={{ width: 1100, maxWidth: '95%', background: 'white', borderRadius: 10, padding: 18 }}>
                         <h3 id="modal-title">{editingId ? 'Edit Product' : 'Add Product'}</h3>
 
                         {formErrors._server && (
@@ -339,7 +414,10 @@ function Admin() {
                         )}
 
                         <form onSubmit={handleFormSubmit}>
-                            <div className={cx('input')}>
+                            <div
+                                className={cx('input')}
+                                style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}
+                            >
                                 <FormField
                                     name="sku"
                                     label="SKU"
@@ -352,15 +430,15 @@ function Admin() {
                                     name="slug"
                                     label="Slug"
                                     value={formModel.slug}
-                                    placeholder="Slug"
+                                    placeholder="slug-lowercase"
                                     onChange={handleFormChange}
                                     error={formErrors.slug}
                                 />
                                 <FormField
                                     name="productName"
                                     label="Product Name"
-                                    placeholder="Product Name"
                                     value={formModel.productName}
+                                    placeholder="Product Name"
                                     onChange={handleFormChange}
                                     error={formErrors.productName}
                                 />
@@ -368,48 +446,35 @@ function Admin() {
                                     name="price"
                                     label="Price"
                                     type="number"
-                                    placeholder="Price"
                                     value={formModel.price}
                                     onChange={handleFormChange}
                                     error={formErrors.price}
-                                    step="10000"
-                                    min="0"
                                 />
                                 <FormField
                                     name="salePrice"
                                     label="Sale Price"
-                                    placeholder="Sale Price"
                                     type="number"
                                     value={formModel.salePrice}
                                     onChange={handleFormChange}
                                     error={formErrors.salePrice}
-                                    step="10000"
-                                    min="0"
                                 />
                                 <FormField
                                     name="stockQuantity"
                                     label="Stock Quantity"
-                                    placeholder="Stock Quantity"
                                     type="number"
                                     value={formModel.stockQuantity}
                                     onChange={handleFormChange}
                                     error={formErrors.stockQuantity}
-                                    step="1"
-                                    min="0"
                                 />
                                 <FormField
                                     name="weightG"
                                     label="Weight (g)"
-                                    placeholder="Weight"
                                     type="number"
                                     value={formModel.weightG}
                                     onChange={handleFormChange}
                                     error={formErrors.weightG}
-                                    step="10"
-                                    min="0"
                                 />
-
-                                <div className={cx('full')} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                     <CheckboxField
                                         name="isActive"
                                         label="Active"
@@ -424,7 +489,15 @@ function Admin() {
                                     />
                                 </div>
 
-                                <div className={cx('actions')}>
+                                <div
+                                    className={cx('actions')}
+                                    style={{
+                                        gridColumn: '1 / -1',
+                                        display: 'flex',
+                                        justifyContent: 'flex-end',
+                                        gap: 12,
+                                    }}
+                                >
                                     <Button type="button" onClick={() => setShowForm(false)} disabled={formLoading}>
                                         Cancel
                                     </Button>

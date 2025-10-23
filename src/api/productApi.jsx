@@ -19,6 +19,8 @@ const productApi = {
         const res = await axiosClient.get('/product-assets', { params: { productId, type: 'MAIN' } });
         return normalize(res);
     },
+
+    searchByName: (keyword) => axiosClient.get('/products/search', { params: { keyword } }),
 };
 
 export default productApi;

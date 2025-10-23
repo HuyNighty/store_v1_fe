@@ -20,6 +20,16 @@ function Books() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        const isActiveTrue = (v) => {
+            // handle boolean, numbers, strings
+            if (v === true) return true;
+            if (v === false) return false;
+            if (typeof v === 'number') return v === 1;
+            if (typeof v === 'string') return v.toLowerCase() === 'true' || v === '1';
+            // fallback: treat truthy values as active
+            return Boolean(v);
+        };
+
         const fetchBooks = async () => {
             try {
                 setLoading(true);
@@ -37,6 +47,16 @@ function Books() {
                 } else if (Array.isArray(data?.items)) {
                     booksData = data.items;
                 }
+
+                // FILTER: chỉ giữ product active
+                booksData = booksData.filter((b) => {
+                    // Some APIs nest fields (e.g., b.product.isActive), adapt if needed
+                    const val = b.isActive ?? b.active ?? b.is_active ?? b.activeFlag;
+                    return isActiveTrue(val);
+                });
+
+                // Optionally only featured (uncomment if needed)
+                // booksData = booksData.filter(b => b.featured === true || String(b.featured) === 'true' || b.featured === 1);
 
                 setBooks(booksData);
             } catch (err) {

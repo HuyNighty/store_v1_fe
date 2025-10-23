@@ -124,6 +124,11 @@
     border: 1px solid rgba(176, 26, 26, 0.08);
 }
 
+.input {
+    background-color: #fff;
+    color: #000;
+}
+
 .checkbox {
     display: inline-flex;
     align-items: center;
@@ -147,7 +152,7 @@
     width: var(--checkbox-size);
     height: var(--checkbox-size);
     border-radius: var(--checkbox-radius);
-    border: 20px solid var(--primary-color);
+    border: 20px solid var(--checkbox-checked-bg);
     background: transparent;
     transition: border-color var(--transition-fast), background var(--transition-fast), transform 0.08s;
     cursor: pointer;
@@ -156,7 +161,7 @@
 
 .checkbox input[type='checkbox']:checked {
     background: var(--checkbox-checked-bg);
-    border-color: var(--checkbox-checked-bg);
+    border-color: var(--primary-color);
 }
 
 .checkbox input[type='checkbox']::after {
