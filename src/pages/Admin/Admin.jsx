@@ -1,768 +1,249 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useCallback } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Admin.module.scss';
-import { AuthContext } from '../../Context/AuthContext';
+
 import adminApi from '../../api/adminApi';
-import { createFullBookItem } from '../../service/adminService';
+import Button from '../../Layouts/components/Button';
 
 const cx = classNames.bind(styles);
 
+function FormField({ id, label, name, value, placeholder, type = 'text', onChange, error, step, min }) {
+    return (
+        <div className={cx('form-group', { invalid: !!error })}>
+            {label && <label htmlFor={id ?? name}>{label}</label>}
+            <input
+                id={id ?? name}
+                name={name}
+                type={type}
+                placeholder={placeholder}
+                value={value}
+                onChange={onChange}
+                step={step}
+                min={min}
+                aria-invalid={!!error}
+                inputMode={type === 'number' ? 'decimal' : undefined}
+            />
+            {error && <p className={cx('error')}>{error}</p>}
+        </div>
+    );
+}
+
+function CheckboxField({ id, label, name, checked, onChange }) {
+    return (
+        <label className={cx('checkbox')} htmlFor={id ?? name}>
+            <input
+                id={id ?? name}
+                type="checkbox"
+                name={name}
+                checked={!!checked}
+                onChange={onChange}
+                aria-checked={!!checked}
+            />
+            <span>{label}</span>
+        </label>
+    );
+}
+const slugRegex = /^[a-z0-9-]+$/;
+
+const preparePayload = (product) => ({
+    ...product,
+    sku: product.sku?.trim() || null,
+    slug: product.slug?.trim() || null,
+    productName: product.productName?.trim() || null,
+    price: product.price === '' || product.price == null ? null : Number(product.price),
+    salePrice: product.salePrice === '' || product.salePrice == null ? null : Number(product.salePrice),
+    stockQuantity: product.stockQuantity === '' || product.stockQuantity == null ? null : Number(product.stockQuantity),
+    weightG: product.weightG === '' || product.weightG == null ? null : Number(product.weightG),
+});
+
 function Admin() {
-    const { user } = useContext(AuthContext);
-
-    const roles = (() => {
-        if (!user) return [];
-        if (Array.isArray(user.roles)) return user.roles.map((r) => String(r).toUpperCase());
-        if (typeof user.scope === 'string') return user.scope.split(/\s+/).map((r) => r.toUpperCase());
-        if (typeof user.role === 'string') return [user.role.toUpperCase()];
-        return [];
-    })();
-
-    const isAdmin = roles.includes('ADMIN');
-
-    const [tab, setTab] = useState('product');
-    const [loading, setLoading] = useState(false);
-    const [msg, setMsg] = useState(null);
-    const [err, setErr] = useState(null);
-
-    const [productForm, setProductForm] = useState({
+    const [product, setProduct] = useState({
         sku: '',
         slug: '',
         productName: '',
         price: '',
         salePrice: '',
-        stockQuantity: 0,
+        stockQuantity: '',
         weightG: '',
         isActive: true,
         featured: false,
     });
 
-    const [assetForm, setAssetForm] = useState({
-        url: '',
-        type: 'IMAGE',
-        fileName: '',
-        mimeType: 'image/jpeg',
-        width: 0,
-        height: 0,
-        sizeBytes: 0,
-    });
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [successMsg, setSuccessMsg] = useState('');
 
-    const [linkForm, setLinkForm] = useState({
-        productId: '',
-        assetId: '',
-        type: 'COVER',
-        ordinal: 0,
-    });
+    const handleChange = useCallback((e) => {
+        const { name, type, value, checked } = e.target;
+        const next = type === 'checkbox' ? checked : value;
+        setProduct((prev) => ({ ...prev, [name]: next }));
+        setErrors((prev) => ({ ...prev, [name]: '' }));
+        setSuccessMsg('');
+    }, []);
 
-    const [authorForm, setAuthorForm] = useState({
-        authorName: '',
-        bio: '',
-        bornDate: '',
-        deathDate: '',
-        nationality: 'VIETNAMESE',
-        assetId: null,
-    });
-
-    const [bookAuthorForm, setBookAuthorForm] = useState({
-        productId: '',
-        authorId: '',
-        authorRole: 'PRIMARY',
-    });
-
-    const [full, setFull] = useState({
-        product: {
-            sku: '',
-            slug: '',
-            productName: '',
-            price: '',
-            salePrice: '',
-            stockQuantity: 0,
-            weightG: '',
-            isActive: true,
-            featured: false,
-        },
-        assets: [],
-        assetLinks: [],
-        authors: [],
-        bookAuthors: [],
-    });
-
-    const clearStatus = () => {
-        setMsg(null);
-        setErr(null);
+    const validateClient = (p) => {
+        const errs = {};
+        if (!p.sku || !p.sku.trim()) errs.sku = 'SKU is required';
+        if (!p.slug || !p.slug.trim()) errs.slug = 'Slug is required';
+        else if (!slugRegex.test(p.slug.trim()))
+            errs.slug = 'Slug must contain only lowercase letters, numbers and dashes';
+        if (!p.productName || !p.productName.trim()) errs.productName = 'Product name is required';
+        return errs;
     };
 
-    const handleChange = (setter) => (e) => {
-        const { name, value, type, checked } = e.target;
-        setter((p) => ({ ...p, [name]: type === 'checkbox' ? checked : value }));
-    };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (loading) return;
 
-    const submitProduct = async (e) => {
-        e?.preventDefault();
-        clearStatus();
-        setLoading(true);
-        try {
-            const payload = {
-                sku: productForm.sku,
-                slug: productForm.slug,
-                productName: productForm.productName,
-                price: Number(productForm.price),
-                salePrice: productForm.salePrice ? Number(productForm.salePrice) : null,
-                stockQuantity: Number(productForm.stockQuantity),
-                weightG: productForm.weightG ? Number(productForm.weightG) : null,
-                isActive: Boolean(productForm.isActive),
-                featured: Boolean(productForm.featured),
-            };
-            const res = await adminApi.createProduct(payload);
-            setMsg(JSON.stringify(res?.data ?? res, null, 2));
-        } catch (error) {
-            setErr(error.response?.data?.message || error.message || 'Tạo product thất bại');
-        } finally {
-            setLoading(false);
+        setErrors({});
+        setSuccessMsg('');
+
+        const clientErrs = validateClient(product);
+        if (Object.keys(clientErrs).length) {
+            setErrors(clientErrs);
+            return;
         }
-    };
 
-    const submitAsset = async (e) => {
-        e?.preventDefault();
-        clearStatus();
+        const payload = preparePayload(product);
+
         setLoading(true);
         try {
-            const payload = {
-                url: assetForm.url,
-                type: assetForm.type,
-                fileName: assetForm.fileName,
-                mimeType: assetForm.mimeType,
-                width: Number(assetForm.width),
-                height: Number(assetForm.height),
-                sizeBytes: Number(assetForm.sizeBytes),
-            };
-            const res = await adminApi.createAsset(payload);
-            setMsg(JSON.stringify(res?.data ?? res, null, 2));
-        } catch (error) {
-            setErr(error.response?.data?.message || error.message || 'Tạo asset thất bại');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const submitLink = async (e) => {
-        e?.preventDefault();
-        clearStatus();
-        setLoading(true);
-        try {
-            const payload = {
-                productId: Number(linkForm.productId),
-                assetId: Number(linkForm.assetId),
-                type: linkForm.type,
-                ordinal: Number(linkForm.ordinal || 0),
-            };
-            const res = await adminApi.createProductAssetLink(payload);
-            setMsg(JSON.stringify(res?.data ?? res, null, 2));
-        } catch (error) {
-            setErr(error.response?.data?.message || error.message || 'Tạo product-asset link thất bại');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const submitAuthor = async (e) => {
-        e?.preventDefault();
-        clearStatus();
-        setLoading(true);
-        try {
-            const payload = {
-                authorName: authorForm.authorName,
-                bio: authorForm.bio,
-                bornDate: authorForm.bornDate || null,
-                deathDate: authorForm.deathDate || null,
-                nationality: authorForm.nationality,
-                assetId: authorForm.assetId ? Number(authorForm.assetId) : null,
-            };
-            const res = await adminApi.createAuthor(payload);
-            setMsg(JSON.stringify(res?.data ?? res, null, 2));
-        } catch (error) {
-            setErr(error.response?.data?.message || error.message || 'Tạo author thất bại');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const submitBookAuthor = async (e) => {
-        e?.preventDefault();
-        clearStatus();
-        setLoading(true);
-        try {
-            const payload = {
-                productId: Number(bookAuthorForm.productId),
-                authorId: Number(bookAuthorForm.authorId),
-                authorRole: bookAuthorForm.authorRole,
-            };
-            const res = await adminApi.createBookAuthor(payload);
-            setMsg(JSON.stringify(res?.data ?? res, null, 2));
-        } catch (error) {
-            setErr(error.response?.data?.message || error.message || 'Tạo book-author thất bại');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const submitFullBook = async (e) => {
-        e?.preventDefault();
-        clearStatus();
-        setLoading(true);
-        try {
-            // use adminService.createFullBookItem
-            const payload = {
-                product: {
-                    sku: full.product.sku,
-                    slug: full.product.slug,
-                    productName: full.product.productName,
-                    price: Number(full.product.price),
-                    salePrice: full.product.salePrice ? Number(full.product.salePrice) : null,
-                    stockQuantity: Number(full.product.stockQuantity || 0),
-                    weightG: full.product.weightG ? Number(full.product.weightG) : null,
-                    isActive: Boolean(full.product.isActive),
-                    featured: Boolean(full.product.featured),
-                },
-                assets: full.assets.map((a) => ({ ...a })), // AssetRequest-like
-                productAssetLinks: full.assetLinks,
-                authors: full.authors.map((a) => ({ ...a })),
-                bookAuthors: full.bookAuthors,
-            };
-
-            const result = await createFullBookItem(payload);
-            if (result.success) {
-                setMsg('Tạo đầy đủ BookItem thành công: ' + JSON.stringify(result.created, null, 2));
+            await adminApi.createProduct(payload);
+            setSuccessMsg('Product created successfully!');
+            setProduct({
+                sku: '',
+                slug: '',
+                productName: '',
+                price: '',
+                salePrice: '',
+                stockQuantity: '',
+                weightG: '',
+                isActive: true,
+                featured: false,
+            });
+        } catch (err) {
+            const resp = err?.response?.data;
+            if (resp?.result && typeof resp.result === 'object') {
+                setErrors(resp.result);
+            } else if (resp?.message) {
+                setErrors({ _server: resp.message });
             } else {
-                setErr(
-                    'Tạo thất bại: ' +
-                        (result.error?.message || 'Unknown error') +
-                        '\nPartial: ' +
-                        JSON.stringify(result.createdPartial || {}, null, 2),
-                );
+                setErrors({ _server: 'Failed to create product. Please try again.' });
             }
-        } catch (error) {
-            setErr(error.response?.data?.message || error.message || 'Tạo full book thất bại');
         } finally {
             setLoading(false);
         }
     };
-
-    if (!isAdmin) {
-        return (
-            <div className={cx('wrapper')}>
-                <h2>Access denied</h2>
-                <p>Bạn không có quyền truy cập trang Admin.</p>
-            </div>
-        );
-    }
 
     return (
         <div className={cx('wrapper')}>
-            <h1>Admin Dashboard</h1>
+            <div className={cx('card')}>
+                <h2 className={cx('title')}>Admin — Create Product</h2>
 
-            <div className={cx('controls')}>
-                <div className={cx('tabs')}>
-                    <button className={cx({ active: tab === 'product' })} onClick={() => setTab('product')}>
-                        Product
-                    </button>
-                    <button className={cx({ active: tab === 'asset' })} onClick={() => setTab('asset')}>
-                        Asset
-                    </button>
-                    <button className={cx({ active: tab === 'link' })} onClick={() => setTab('link')}>
-                        Link
-                    </button>
-                    <button className={cx({ active: tab === 'author' })} onClick={() => setTab('author')}>
-                        Author
-                    </button>
-                    <button className={cx({ active: tab === 'bookauthor' })} onClick={() => setTab('bookauthor')}>
-                        BookAuthor
-                    </button>
-                    <button className={cx({ active: tab === 'fullbook' })} onClick={() => setTab('fullbook')}>
-                        Create Full Book
-                    </button>
-                </div>
+                {successMsg && <div className={cx('message', 'success')}>{successMsg}</div>}
+                {errors._server && <div className={cx('message', 'server-error')}>{errors._server}</div>}
 
-                <div className={cx('panel')}>
-                    {tab === 'product' && (
-                        <form onSubmit={submitProduct} className={cx('form')}>
-                            <label>
-                                SKU{' '}
-                                <input
-                                    name="sku"
-                                    value={productForm.sku}
-                                    onChange={handleChange(setProductForm)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Slug{' '}
-                                <input
-                                    name="slug"
-                                    value={productForm.slug}
-                                    onChange={handleChange(setProductForm)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Product name{' '}
-                                <input
-                                    name="productName"
-                                    value={productForm.productName}
-                                    onChange={handleChange(setProductForm)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Price{' '}
-                                <input
-                                    type="number"
-                                    name="price"
-                                    value={productForm.price}
-                                    onChange={handleChange(setProductForm)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Sale price{' '}
-                                <input
-                                    type="number"
-                                    name="salePrice"
-                                    value={productForm.salePrice}
-                                    onChange={handleChange(setProductForm)}
-                                />
-                            </label>
-                            <label>
-                                Stock{' '}
-                                <input
-                                    type="number"
-                                    name="stockQuantity"
-                                    value={productForm.stockQuantity}
-                                    onChange={handleChange(setProductForm)}
-                                />
-                            </label>
-                            <label>
-                                Weight (g){' '}
-                                <input
-                                    type="number"
-                                    name="weightG"
-                                    value={productForm.weightG}
-                                    onChange={handleChange(setProductForm)}
-                                />
-                            </label>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    name="isActive"
-                                    checked={productForm.isActive}
-                                    onChange={handleChange(setProductForm)}
-                                />{' '}
-                                Active
-                            </label>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    name="featured"
-                                    checked={productForm.featured}
-                                    onChange={handleChange(setProductForm)}
-                                />{' '}
-                                Featured
-                            </label>
-                            <div className={cx('form-actions')}>
-                                <button type="submit" disabled={loading}>
-                                    Create Product
-                                </button>
-                            </div>
-                        </form>
-                    )}
+                <form onSubmit={handleSubmit}>
+                    <div className={cx('input')}>
+                        <FormField
+                            name="sku"
+                            label="SKU"
+                            placeholder="SKU"
+                            value={product.sku}
+                            onChange={handleChange}
+                            error={errors.sku}
+                        />
 
-                    {tab === 'asset' && (
-                        <form onSubmit={submitAsset} className={cx('form')}>
-                            <label>
-                                URL{' '}
-                                <input
-                                    name="url"
-                                    value={assetForm.url}
-                                    onChange={handleChange(setAssetForm)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                File name{' '}
-                                <input
-                                    name="fileName"
-                                    value={assetForm.fileName}
-                                    onChange={handleChange(setAssetForm)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                MIME type{' '}
-                                <input
-                                    name="mimeType"
-                                    value={assetForm.mimeType}
-                                    onChange={handleChange(setAssetForm)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Type{' '}
-                                <select name="type" value={assetForm.type} onChange={handleChange(setAssetForm)}>
-                                    <option>IMAGE</option>
-                                    <option>VIDEO</option>
-                                </select>
-                            </label>
-                            <label>
-                                Width{' '}
-                                <input
-                                    type="number"
-                                    name="width"
-                                    value={assetForm.width}
-                                    onChange={handleChange(setAssetForm)}
-                                />
-                            </label>
-                            <label>
-                                Height{' '}
-                                <input
-                                    type="number"
-                                    name="height"
-                                    value={assetForm.height}
-                                    onChange={handleChange(setAssetForm)}
-                                />
-                            </label>
-                            <label>
-                                Size bytes{' '}
-                                <input
-                                    type="number"
-                                    name="sizeBytes"
-                                    value={assetForm.sizeBytes}
-                                    onChange={handleChange(setAssetForm)}
-                                />
-                            </label>
-                            <div className={cx('form-actions')}>
-                                <button type="submit" disabled={loading}>
-                                    Create Asset
-                                </button>
-                            </div>
-                        </form>
-                    )}
+                        <FormField
+                            name="slug"
+                            label="Slug"
+                            placeholder="lowercase, numbers, dashes"
+                            value={product.slug}
+                            onChange={handleChange}
+                            error={errors.slug}
+                        />
 
-                    {tab === 'link' && (
-                        <form onSubmit={submitLink} className={cx('form')}>
-                            <label>
-                                Product ID{' '}
-                                <input
-                                    name="productId"
-                                    value={linkForm.productId}
-                                    onChange={handleChange(setLinkForm)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Asset ID{' '}
-                                <input
-                                    name="assetId"
-                                    value={linkForm.assetId}
-                                    onChange={handleChange(setLinkForm)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Type <input name="type" value={linkForm.type} onChange={handleChange(setLinkForm)} />
-                            </label>
-                            <label>
-                                Ordinal{' '}
-                                <input
-                                    type="number"
-                                    name="ordinal"
-                                    value={linkForm.ordinal}
-                                    onChange={handleChange(setLinkForm)}
-                                />
-                            </label>
-                            <div className={cx('form-actions')}>
-                                <button type="submit" disabled={loading}>
-                                    Link Product-Asset
-                                </button>
-                            </div>
-                        </form>
-                    )}
+                        <FormField
+                            name="productName"
+                            label="Product Name"
+                            placeholder="Product name"
+                            value={product.productName}
+                            onChange={handleChange}
+                            error={errors.productName}
+                            id="productName"
+                        />
+                        <div className={cx('form-group', 'full')} style={{ display: 'none' }} />
 
-                    {tab === 'author' && (
-                        <form onSubmit={submitAuthor} className={cx('form')}>
-                            <label>
-                                Name{' '}
-                                <input
-                                    name="authorName"
-                                    value={authorForm.authorName}
-                                    onChange={handleChange(setAuthorForm)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Bio{' '}
-                                <textarea name="bio" value={authorForm.bio} onChange={handleChange(setAuthorForm)} />
-                            </label>
-                            <label>
-                                Born date{' '}
-                                <input
-                                    type="date"
-                                    name="bornDate"
-                                    value={authorForm.bornDate}
-                                    onChange={handleChange(setAuthorForm)}
-                                />
-                            </label>
-                            <label>
-                                Death date{' '}
-                                <input
-                                    type="date"
-                                    name="deathDate"
-                                    value={authorForm.deathDate}
-                                    onChange={handleChange(setAuthorForm)}
-                                />
-                            </label>
-                            <label>
-                                Nationality{' '}
-                                <input
-                                    name="nationality"
-                                    value={authorForm.nationality}
-                                    onChange={handleChange(setAuthorForm)}
-                                />
-                            </label>
-                            <label>
-                                AssetId (avatar){' '}
-                                <input
-                                    name="assetId"
-                                    value={authorForm.assetId || ''}
-                                    onChange={handleChange(setAuthorForm)}
-                                />
-                            </label>
-                            <div className={cx('form-actions')}>
-                                <button type="submit" disabled={loading}>
-                                    Create Author
-                                </button>
-                            </div>
-                        </form>
-                    )}
+                        <FormField
+                            name="price"
+                            label="Price"
+                            type="number"
+                            placeholder="Price"
+                            value={product.price}
+                            onChange={handleChange}
+                            step="0.01"
+                            min="0"
+                            error={errors.price}
+                        />
 
-                    {tab === 'bookauthor' && (
-                        <form onSubmit={submitBookAuthor} className={cx('form')}>
-                            <label>
-                                Product ID{' '}
-                                <input
-                                    name="productId"
-                                    value={bookAuthorForm.productId}
-                                    onChange={handleChange(setBookAuthorForm)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Author ID{' '}
-                                <input
-                                    name="authorId"
-                                    value={bookAuthorForm.authorId}
-                                    onChange={handleChange(setBookAuthorForm)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Author role{' '}
-                                <input
-                                    name="authorRole"
-                                    value={bookAuthorForm.authorRole}
-                                    onChange={handleChange(setBookAuthorForm)}
-                                />
-                            </label>
-                            <div className={cx('form-actions')}>
-                                <button type="submit" disabled={loading}>
-                                    Create BookAuthor
-                                </button>
-                            </div>
-                        </form>
-                    )}
+                        <FormField
+                            name="salePrice"
+                            label="Sale Price"
+                            type="number"
+                            placeholder="Sale price"
+                            value={product.salePrice}
+                            onChange={handleChange}
+                            step="0.01"
+                            min="0"
+                            error={errors.salePrice}
+                        />
 
-                    {tab === 'fullbook' && (
-                        <form onSubmit={submitFullBook} className={cx('form fullbook')}>
-                            <h3>Product</h3>
-                            <label>
-                                SKU{' '}
-                                <input
-                                    name="sku"
-                                    value={full.product.sku}
-                                    onChange={(e) =>
-                                        setFull((p) => ({ ...p, product: { ...p.product, sku: e.target.value } }))
-                                    }
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Slug{' '}
-                                <input
-                                    name="slug"
-                                    value={full.product.slug}
-                                    onChange={(e) =>
-                                        setFull((p) => ({ ...p, product: { ...p.product, slug: e.target.value } }))
-                                    }
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Product name{' '}
-                                <input
-                                    name="productName"
-                                    value={full.product.productName}
-                                    onChange={(e) =>
-                                        setFull((p) => ({
-                                            ...p,
-                                            product: { ...p.product, productName: e.target.value },
-                                        }))
-                                    }
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Price{' '}
-                                <input
-                                    type="number"
-                                    name="price"
-                                    value={full.product.price}
-                                    onChange={(e) =>
-                                        setFull((p) => ({ ...p, product: { ...p.product, price: e.target.value } }))
-                                    }
-                                    required
-                                />
-                            </label>
+                        <FormField
+                            name="stockQuantity"
+                            label="Stock Quantity"
+                            type="number"
+                            placeholder="Stock quantity"
+                            value={product.stockQuantity}
+                            onChange={handleChange}
+                            step="1"
+                            min="0"
+                            error={errors.stockQuantity}
+                        />
 
-                            <h3>Assets (add list)</h3>
-                            <div className={cx('list-area')}>
-                                {full.assets.map((a, i) => (
-                                    <div key={i} className={cx('small-row')}>
-                                        <input
-                                            placeholder="url"
-                                            value={a.url}
-                                            onChange={(e) => {
-                                                const next = [...full.assets];
-                                                next[i] = { ...next[i], url: e.target.value };
-                                                setFull((p) => ({ ...p, assets: next }));
-                                            }}
-                                        />
-                                        <input
-                                            placeholder="fileName"
-                                            value={a.fileName}
-                                            onChange={(e) => {
-                                                const next = [...full.assets];
-                                                next[i] = { ...next[i], fileName: e.target.value };
-                                                setFull((p) => ({ ...p, assets: next }));
-                                            }}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setFull((p) => ({
-                                                    ...p,
-                                                    assets: p.assets.filter((_, idx) => idx !== i),
-                                                }))
-                                            }
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
-                                ))}
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setFull((p) => ({
-                                            ...p,
-                                            assets: [
-                                                ...p.assets,
-                                                {
-                                                    url: '',
-                                                    type: 'IMAGE',
-                                                    fileName: '',
-                                                    mimeType: 'image/jpeg',
-                                                    width: 0,
-                                                    height: 0,
-                                                    sizeBytes: 0,
-                                                },
-                                            ],
-                                        }))
-                                    }
-                                >
-                                    Add Asset
-                                </button>
-                            </div>
+                        <FormField
+                            name="weightG"
+                            label="Weight (g)"
+                            type="number"
+                            placeholder="Weight in grams"
+                            value={product.weightG}
+                            onChange={handleChange}
+                            step="0.01"
+                            min="0"
+                            error={errors.weightG}
+                        />
 
-                            <h3>Authors (add list)</h3>
-                            <div className={cx('list-area')}>
-                                {full.authors.map((a, i) => (
-                                    <div key={i} className={cx('small-row')}>
-                                        <input
-                                            placeholder="authorName"
-                                            value={a.authorName}
-                                            onChange={(e) => {
-                                                const next = [...full.authors];
-                                                next[i] = { ...next[i], authorName: e.target.value };
-                                                setFull((p) => ({ ...p, authors: next }));
-                                            }}
-                                        />
-                                        <input
-                                            placeholder="nationality"
-                                            value={a.nationality}
-                                            onChange={(e) => {
-                                                const next = [...full.authors];
-                                                next[i] = { ...next[i], nationality: e.target.value };
-                                                setFull((p) => ({ ...p, authors: next }));
-                                            }}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setFull((p) => ({
-                                                    ...p,
-                                                    authors: p.authors.filter((_, idx) => idx !== i),
-                                                }))
-                                            }
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
-                                ))}
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setFull((p) => ({
-                                            ...p,
-                                            authors: [
-                                                ...p.authors,
-                                                {
-                                                    authorName: '',
-                                                    bio: '',
-                                                    bornDate: null,
-                                                    deathDate: null,
-                                                    nationality: 'VIETNAMESE',
-                                                    assetId: null,
-                                                },
-                                            ],
-                                        }))
-                                    }
-                                >
-                                    Add Author
-                                </button>
-                            </div>
+                        <div className={cx('full')}>
+                            <CheckboxField
+                                name="isActive"
+                                label="Active"
+                                checked={product.isActive}
+                                onChange={handleChange}
+                            />
+                            <CheckboxField
+                                name="featured"
+                                label="Featured"
+                                checked={product.featured}
+                                onChange={handleChange}
+                            />
+                        </div>
 
-                            <div className={cx('form-actions')}>
-                                <button type="submit" disabled={loading}>
-                                    Create Full Book (sequence)
-                                </button>
-                            </div>
-                        </form>
-                    )}
-                </div>
-
-                <div className={cx('status')}>
-                    {loading && <p className={cx('loading')}>Processing...</p>}
-                    {msg && <pre className={cx('msg')}>{msg}</pre>}
-                    {err && <pre className={cx('err')}>{err}</pre>}
-                </div>
+                        <div className={cx('actions')}>
+                            <Button primary disabled={loading}>
+                                {loading ? 'Adding...' : 'Add Product'}
+                            </Button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     );

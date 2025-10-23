@@ -22,7 +22,7 @@ function BookCarousel() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const booksPerPage = 5;
+    const booksPerPage = 4;
 
     useEffect(() => {
         const fetchBooks = async () => {

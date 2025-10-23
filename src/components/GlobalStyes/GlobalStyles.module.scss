@@ -49,6 +49,15 @@ body {
 
     // Shadow
     --shadow-header: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    // Check
+    --checkbox-size: 20px;
+    --checkbox-radius: 50%;
+    --checkbox-border: 2px solid var(--primary-color);
+    --checkbox-checked-bg: #ccc;
+    --checkbox-dot-size: 20px;
+    --checkbox-hover-border: var(--primary-hover);
+    --checkbox-focus-ring: 4px;
 }
 
 h1 {
