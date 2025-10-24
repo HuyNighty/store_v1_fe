@@ -2,15 +2,17 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import { Fragment } from 'react';
 
-import { publicRoutes } from './routes/routes';
+import { publicRoutes, adminRoutes } from './routes/routes';
 import DefaultLayout from './Layouts/DefaultLayout';
 
 function App() {
+    const allRoutes = [...publicRoutes, ...adminRoutes];
+
     return (
         <>
             <Router>
                 <Routes>
-                    {publicRoutes.map((route, key) => {
+                    {allRoutes.map((route, key) => {
                         const Page = route.component;
 
                         let Layout = DefaultLayout;

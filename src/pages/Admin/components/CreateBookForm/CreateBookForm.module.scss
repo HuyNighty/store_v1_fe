@@ -1,0 +1,369 @@
+// src/components/CreateBookForm/CreateBookForm.module.scss
+.form {
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    font-family: var(--font-family-primary);
+    color: var(--text-color);
+    animation: fadeIn 0.4s ease-out;
+}
+
+// Header
+.header {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color-bold);
+    border-left: 5px solid var(--primary-color);
+    padding-left: 12px;
+    margin-bottom: 8px;
+}
+
+// Section Titles
+.sectionTitle {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--primary-color-bold);
+}
+
+// Field Groups
+.fieldGroup {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.inputWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+// Thêm vào CreateBookForm.module.scss
+.checkboxGroup {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1.3rem;
+    cursor: pointer;
+
+    input[type='checkbox'] {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.authorDetails {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.dateInput,
+.numberInput {
+    @extend %baseInput;
+}
+
+.selectInput {
+    @extend %baseInput;
+    cursor: pointer;
+}
+
+.urlPreview {
+    margin-top: 4px;
+    padding: 6px 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+// Base input styles
+%baseInput {
+    color: #000;
+    font-size: 1.4rem;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: #fff;
+    transition: all 0.25s ease;
+    outline: none;
+    font-family: inherit;
+
+    &:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(147, 125, 107, 0.15);
+    }
+
+    &::placeholder {
+        color: rgba(0, 0, 0, 0.3);
+    }
+
+    &.error {
+        border-color: #dc2626;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+}
+
+// Specific input types
+input[type='text'],
+input[type='number'] {
+    @extend %baseInput;
+}
+
+.urlInput,
+.authorInput {
+    @extend %baseInput;
+    width: 100%;
+}
+
+.bioTextarea {
+    @extend %baseInput;
+    min-height: 120px;
+    resize: vertical;
+    width: 100%;
+}
+
+// Cover Section
+.coverSection {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.fileRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.fileInput {
+    display: none;
+}
+
+.fileButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary-color);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.3rem;
+
+    &:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+    }
+}
+
+.fileName {
+    font-size: 1.3rem;
+    color: #374151;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+// OR Separator
+.or {
+    text-align: center;
+    font-size: 1.25rem;
+    color: #888;
+    position: relative;
+    margin: 8px 0;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 45%;
+        height: 1px;
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    &::before {
+        left: 0;
+    }
+
+    &::after {
+        right: 0;
+    }
+}
+
+// Author Section
+.authorSection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+// Divider
+.divider {
+    border: none;
+    border-top: 1px dashed rgba(0, 0, 0, 0.1);
+    margin: 8px 0;
+}
+
+// Actions
+.actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-start;
+    margin-top: 16px;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+    }
+}
+
+.submitButton,
+.resetButton {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.4rem;
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
+}
+
+.submitButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+// Error States
+.errorText {
+    color: #dc2626;
+    font-size: 1.2rem;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+// Messages
+.message {
+    font-size: 1.3rem;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.success {
+    background: rgba(147, 125, 107, 0.08);
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color-bold);
+}
+
+.error {
+    background: rgba(220, 38, 38, 0.05);
+    border: 1px solid #dc2626;
+    color: #b91c1c;
+}
+
+// Animation
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+    .form {
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .header {
+        font-size: 1.8rem;
+    }
+
+    .sectionTitle {
+        font-size: 1.5rem;
+    }
+
+    .fieldGroup {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .fileRow {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .fileName {
+        max-width: 100%;
+        text-align: center;
+    }
+
+    .or {
+        margin: 12px 0;
+
+        &::before,
+        &::after {
+            width: 40%;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .form {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .header {
+        font-size: 1.6rem;
+        padding-left: 8px;
+    }
+
+    input[type='text'],
+    input[type='number'],
+    .urlInput,
+    .authorInput,
+    .bioTextarea {
+        font-size: 1.6rem; // Better for mobile touch
+        padding: 14px 16px;
+    }
+}

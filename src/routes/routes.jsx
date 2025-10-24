@@ -6,6 +6,8 @@ import HeaderOnly from '../Layouts/HeaderOnly';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Admin from '../pages/Admin';
+import Products from '../pages/Admin/components/Product';
+import CreateBookForm from '../pages/Admin/components/CreateBookForm';
 
 const publicRoutes = [
     { path: '/', component: Home },
@@ -23,6 +25,9 @@ const guestRoutes = [];
 
 const userRoutes = [];
 
-const adminRoutes = [];
+const adminRoutes = [
+    { path: '/admin-products', component: Products, layout: null },
+    { path: '/admin-books', component: CreateBookForm, layout: null },
+];
 
 export { publicRoutes, privateRoutes, guestRoutes, userRoutes, adminRoutes };
