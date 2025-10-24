@@ -1,0 +1,211 @@
+.checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+
+    &:hover:not(.disabled) {
+        .checkmark {
+            border-color: var(--primary-color);
+        }
+    }
+
+    &.disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+
+        .checkmark {
+            background-color: var(--gray-light);
+            border-color: var(--gray);
+        }
+    }
+
+    // Sizes
+    &.small {
+        font-size: 1.2rem;
+
+        .checkmark {
+            width: 16px;
+            height: 16px;
+
+            &::after {
+                width: 8px;
+                height: 8px;
+            }
+        }
+
+        .label {
+            font-size: 1.2rem;
+        }
+    }
+
+    &.medium {
+        font-size: 1.4rem;
+
+        .checkmark {
+            width: 18px;
+            height: 18px;
+
+            &::after {
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+        .label {
+            font-size: 1.4rem;
+        }
+    }
+
+    &.large {
+        font-size: 1.6rem;
+
+        .checkmark {
+            width: 20px;
+            height: 20px;
+
+            &::after {
+                width: 12px;
+                height: 12px;
+            }
+        }
+
+        .label {
+            font-size: 1.6rem;
+        }
+    }
+
+    // Variants
+    &.primary {
+        .checkmark {
+            border-color: var(--primary-color);
+
+            &::after {
+                background-color: var(--primary-color);
+            }
+        }
+
+        &:hover:not(.disabled) .checkmark {
+            border-color: var(--primary-hover);
+        }
+    }
+
+    &.success {
+        .checkmark {
+            border-color: var(--success-color);
+
+            &::after {
+                background-color: var(--success-color);
+            }
+        }
+
+        &:hover:not(.disabled) .checkmark {
+            border-color: var(--success-hover);
+        }
+    }
+
+    &.warning {
+        .checkmark {
+            border-color: var(--warning-color);
+
+            &::after {
+                background-color: var(--warning-color);
+            }
+        }
+
+        &:hover:not(.disabled) .checkmark {
+            border-color: var(--warning-hover);
+        }
+    }
+
+    &.danger {
+        .checkmark {
+            border-color: var(--danger-color);
+
+            &::after {
+                background-color: var(--danger-color);
+            }
+        }
+
+        &:hover:not(.disabled) .checkmark {
+            border-color: var(--danger-hover);
+        }
+    }
+}
+
+// Hide default checkbox
+.checkbox input[type='checkbox'] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    width: 0;
+    height: 0;
+}
+
+// Custom checkmark
+.checkmark {
+    position: relative;
+    display: inline-block;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--white);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        border-radius: 2px;
+        background-color: var(--primary-color);
+        transition: transform 0.2s ease;
+    }
+}
+
+// Checked state
+.checkbox input[type='checkbox']:checked + .checkmark {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+
+    &::after {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+// Checked state for variants
+.checkbox.primary input[type='checkbox']:checked + .checkmark {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+}
+
+.checkbox.success input[type='checkbox']:checked + .checkmark {
+    border-color: var(--success-color);
+    background-color: var(--success-color);
+}
+
+.checkbox.warning input[type='checkbox']:checked + .checkmark {
+    border-color: var(--warning-color);
+    background-color: var(--warning-color);
+}
+
+.checkbox.danger input[type='checkbox']:checked + .checkmark {
+    border-color: var(--danger-color);
+    background-color: var(--danger-color);
+}
+
+// Label
+.label {
+    color: var(--text-color);
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+// Focus state
+.checkbox input[type='checkbox']:focus + .checkmark {
+    box-shadow: 0 0 0 3px rgba(147, 125, 107, 0.15);
+    border-color: var(--primary-color);
+}

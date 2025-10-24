@@ -29,6 +29,8 @@ body {
     --background-color: #f6f4ef;
     --white: #fff;
     --error-color: #b01a1a;
+    --secondary-color: #6c757d;
+    --secondary-hover: #545b62;
 
     // Font
     --font-family-primary: 'Instrument Serif', serif;
@@ -36,6 +38,16 @@ body {
     --font-size-logo: 2.6rem;
     --font-size-nav: 2.2rem;
     --font-size-icon: 1.8rem;
+
+    /* Status Colors */
+    --success-color: #28a745;
+    --success-hover: #1e7e34;
+    --danger-color: #dc3545;
+    --danger-hover: #bd2130;
+    --warning-color: #ffc107;
+    --warning-hover: #d39e00;
+    --info-color: #17a2b8;
+    --info-hover: #138496;
 
     // Layout base
     --header-height: 60px;
@@ -58,6 +70,13 @@ body {
     --checkbox-dot-size: 20px;
     --checkbox-hover-border: var(--primary-hover);
     --checkbox-focus-ring: 4px;
+
+    /* Neutral Colors */
+    --white: #ffffff;
+    --gray-light: #f8f9fa;
+    --gray: #6c757d;
+    --border-color: #dee2e6;
+    --text-color: #333333;
 }
 
 h1 {

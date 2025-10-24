@@ -5,7 +5,8 @@ import adminApi from '../../../../api/adminApi';
 import Button from '../../../../Layouts/components/Button';
 import productApi from '../../../../api/productApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import Checkbox from '../../../../Layouts/components/Checkbox';
 
 const cx = classNames.bind(styles);
 
@@ -26,15 +27,6 @@ function FormField({ id, label, name, value, onChange, type = 'text', placeholde
             />
             {error && <p className={cx('error')}>{error}</p>}
         </div>
-    );
-}
-
-function CheckboxField({ id, label, name, checked, onChange }) {
-    return (
-        <label className={cx('checkbox')} htmlFor={id ?? name}>
-            <input id={id ?? name} type="checkbox" name={name} checked={!!checked} onChange={onChange} />
-            <span>{label}</span>
-        </label>
     );
 }
 
@@ -278,7 +270,7 @@ function Products() {
         <div className={cx('wrapper')}>
             <div className={cx('card')}>
                 <div className={cx('header-content')}>
-                    <Button to="/admin" className={cx('back')}>
+                    <Button to="/admin" back>
                         <FontAwesomeIcon icon={faArrowLeft} />
                     </Button>
                     <h2 className={cx('title')}>Admin — Products</h2>
@@ -482,13 +474,13 @@ function Products() {
                                     error={formErrors.weightG}
                                 />
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <CheckboxField
+                                    <Checkbox
                                         name="isActive"
                                         label="Active"
                                         checked={formModel.isActive}
                                         onChange={handleFormChange}
                                     />
-                                    <CheckboxField
+                                    <Checkbox
                                         name="featured"
                                         label="Featured"
                                         checked={formModel.featured}

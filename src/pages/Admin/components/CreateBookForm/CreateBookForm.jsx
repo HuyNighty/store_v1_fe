@@ -1,148 +1,276 @@
-// src/components/CreateBookForm/CreateBookForm.jsx
 import React, { useState } from 'react';
-import { createFullBook } from '../../../../utils/createFullBook';
+import { createFullBook, validateFullBookCreation } from '../../../../utils/createFullBook';
 import Button from '../../../../Layouts/components/Button';
+import Checkbox from '../../../../Layouts/components/Checkbox';
+import QuantityInput from '../../../../Layouts/components/QuantityInput';
 import styles from './CreateBookForm.module.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import classNames from 'classnames/bind';
+
+const cx = classNames.bind(styles);
+
+// FormField Component
+function FormField({ id, label, name, value, onChange, type = 'text', placeholder, error, required = false }) {
+    return (
+        <div className={cx('form-group', { invalid: !!error })}>
+            {label && (
+                <label htmlFor={id ?? name}>
+                    {label} {required && <span className={cx('required')}>*</span>}
+                </label>
+            )}
+            <input
+                id={id ?? name}
+                name={name}
+                type={type}
+                placeholder={placeholder}
+                value={value ?? ''}
+                onChange={onChange}
+                aria-invalid={!!error}
+            />
+            {error && <p className={cx('error')}>{error}</p>}
+        </div>
+    );
+}
+
+function NumberField({
+    label,
+    name,
+    value,
+    onChange,
+    error,
+    required = false,
+    step = 1,
+    min = 0,
+    max = 999999,
+    unit = '',
+}) {
+    return (
+        <div className={cx('form-group', { invalid: !!error })}>
+            <label htmlFor={name}>
+                {label} {required && <span className={cx('required')}>*</span>}
+            </label>
+            <div className={cx('number-input-container')}>
+                <QuantityInput
+                    value={value || 0}
+                    onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+                    min={min}
+                    max={max}
+                    step={step}
+                    size="medium"
+                />
+                {unit && <span className={cx('unit')}>{unit}</span>}
+            </div>
+            {error && <p className={cx('error')}>{error}</p>}
+        </div>
+    );
+}
+
+const NATIONALITY_OPTIONS = [
+    { value: 'VN', label: 'Vietnamese' },
+    { value: 'US', label: 'American' },
+    { value: 'UK', label: 'British' },
+    { value: 'FR', label: 'French' },
+    { value: 'JP', label: 'Japanese' },
+    { value: 'CN', label: 'Chinese' },
+    { value: 'KR', label: 'Korean' },
+    { value: 'RU', label: 'Russian' },
+    { value: 'OTHER', label: 'Other' },
+];
 
 function CreateBookForm() {
-    // Initial states
-    const initialProductState = {
+    // Initial State
+    const initialFormState = {
+        // Product data
         sku: '',
         slug: '',
         productName: '',
         price: '',
         salePrice: '',
-        stockQuantity: '',
+        stockQuantity: 0,
         weightG: '',
         isActive: true,
         featured: false,
-    };
 
-    const initialCoverState = {
+        // Asset data
         url: '',
         fileName: '',
-        file: null,
         mimeType: 'image/jpeg',
-        width: null,
-        height: null,
-        sizeBytes: null,
-    };
+        width: 800,
+        height: 600,
+        sizeBytes: 102400,
 
-    const initialAuthorState = {
+        // Author data
         authorName: '',
-        bio: '',
-        bornDate: '',
-        deathDate: '',
-        nationality: 'OTHER', // Default value
-        assetId: null,
+        authorBio: '',
+        authorBornDate: '',
+        authorDeathDate: '',
+        authorNationality: 'OTHER',
     };
 
-    // State hooks
-    const [product, setProduct] = useState(initialProductState);
-    const [cover, setCover] = useState(initialCoverState);
-    const [author, setAuthor] = useState(initialAuthorState);
+    // State Management
+    const [formData, setFormData] = useState(initialFormState);
+    const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [fieldErrors, setFieldErrors] = useState({});
 
     // Handlers
     const handleFileChange = (e) => {
-        const file = e.target.files?.[0] ?? null;
-        if (file) {
-            setCover((prevCover) => ({
-                ...prevCover,
-                file,
-                fileName: file.name,
-                mimeType: file.type,
-                sizeBytes: file.size,
+        const selectedFile = e.target.files?.[0] ?? null;
+        setFile(selectedFile);
+
+        if (selectedFile) {
+            setFormData((prev) => ({
+                ...prev,
+                fileName: selectedFile.name,
+                mimeType: selectedFile.type,
+                sizeBytes: selectedFile.size,
             }));
         }
     };
 
-    const handleProductChange = (field, value) => {
-        setProduct((prev) => ({ ...prev, [field]: value }));
+    const handleInputChange = (field, value) => {
+        setFormData((prev) => ({ ...prev, [field]: value }));
+        // Clear error when user starts typing
+        if (fieldErrors[field]) {
+            setFieldErrors((prev) => ({ ...prev, [field]: '' }));
+        }
     };
 
-    const handleCoverChange = (field, value) => {
-        setCover((prev) => ({ ...prev, [field]: value }));
+    const handleFormInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        const val = type === 'checkbox' ? checked : value;
+        handleInputChange(name, val);
     };
 
-    const handleAuthorChange = (field, value) => {
-        setAuthor((prev) => ({ ...prev, [field]: value }));
+    const handleCheckboxChange = (field) => (e) => {
+        handleInputChange(field, e.target.checked);
     };
 
     const resetForm = () => {
-        setProduct(initialProductState);
-        setCover(initialCoverState);
-        setAuthor(initialAuthorState);
+        setFormData(initialFormState);
+        setFile(null);
         setMessage('');
         setFieldErrors({});
     };
 
-    const preparePayload = () => {
-        const productPayload = {
-            sku: product.sku,
-            slug: product.slug,
-            productName: product.productName,
-            price: product.price ? Number(product.price) : null,
-            salePrice: product.salePrice ? Number(product.salePrice) : null,
-            stockQuantity: product.stockQuantity ? Number(product.stockQuantity) : 0,
-            weightG: product.weightG ? Number(product.weightG) : null,
-            isActive: product.isActive,
-            featured: product.featured,
-        };
+    // Validation
+    const validateForm = () => {
+        const errors = {};
 
-        const assetPayload = cover.file
-            ? {
-                  file: cover.file,
-                  fileName: cover.fileName,
-                  mimeType: cover.mimeType,
-              }
-            : cover.url
-            ? {
-                  url: cover.url,
-                  fileName: cover.fileName || cover.url.split('/').pop(),
-                  mimeType: cover.mimeType,
-                  width: 800, // Default values for required fields
-                  height: 600,
-                  sizeBytes: 102400,
-              }
-            : null;
+        if (!formData.sku?.trim()) {
+            errors.sku = 'Vui lòng điền vào trường này.';
+        }
 
-        const authorPayload = author.authorName
-            ? {
-                  authorName: author.authorName,
-                  bio: author.bio,
-                  bornDate: author.bornDate || null,
-                  deathDate: author.deathDate || null,
-                  nationality: author.nationality,
-                  assetId: author.assetId,
-              }
-            : null;
+        if (!formData.slug?.trim()) {
+            errors.slug = 'Vui lòng điền vào trường này.';
+        }
 
-        return { productPayload, assetPayload, authorPayload };
+        if (!formData.productName?.trim()) {
+            errors.productName = 'Vui lòng điền vào trường này.';
+        }
+
+        if (!formData.price || isNaN(formData.price) || parseFloat(formData.price) < 0) {
+            errors.price = 'Giá phải là số hợp lệ.';
+        }
+
+        if (formData.stockQuantity === '' || isNaN(formData.stockQuantity) || parseInt(formData.stockQuantity) < 0) {
+            errors.stockQuantity = 'Số lượng tồn kho phải là số hợp lệ.';
+        }
+
+        if (formData.weightG && (isNaN(formData.weightG) || parseFloat(formData.weightG) < 0)) {
+            errors.weightG = 'Trọng lượng phải là số hợp lệ.';
+        }
+
+        if (formData.url && !isValidUrl(formData.url)) {
+            errors.url = 'Vui lòng nhập URL hợp lệ.';
+        }
+
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
     };
 
+    const isValidUrl = (string) => {
+        try {
+            new URL(string);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    };
+
+    // Request Preparation
+    const prepareFullBookRequest = () => {
+        const request = {
+            // Product data
+            sku: formData.sku,
+            slug: formData.slug,
+            productName: formData.productName,
+            price: parseFloat(formData.price) || 0,
+            salePrice: parseFloat(formData.salePrice) || 0,
+            stockQuantity: parseInt(formData.stockQuantity) || 0,
+            weightG: parseFloat(formData.weightG) || 0,
+            isActive: formData.isActive,
+            featured: formData.featured,
+
+            // Asset data (optional)
+            ...(formData.url && {
+                url: formData.url,
+                fileName: formData.fileName || formData.url.split('/').pop(),
+                mimeType: formData.mimeType,
+                width: formData.width,
+                height: formData.height,
+                sizeBytes: formData.sizeBytes,
+            }),
+
+            // Author data (optional)
+            ...(formData.authorName && {
+                authorName: formData.authorName,
+                authorBio: formData.authorBio,
+                authorBornDate: formData.authorBornDate || null,
+                authorDeathDate: formData.authorDeathDate || null,
+                authorNationality: formData.authorNationality,
+            }),
+        };
+
+        console.log('📦 Prepared full book request:', request);
+        return request;
+    };
+
+    // Form Submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
-        setFieldErrors({});
         setLoading(true);
 
+        if (!validateForm()) {
+            setMessage('Vui lòng sửa các lỗi validation bên dưới.');
+            setLoading(false);
+            return;
+        }
+
         try {
-            const payload = preparePayload();
-            console.log('📤 Submitting payload:', payload);
-            const result = await createFullBook(payload);
+            const fullBookRequest = prepareFullBookRequest();
+
+            const validation = validateFullBookCreation(fullBookRequest);
+            if (!validation.isValid) {
+                setMessage('Validation failed: ' + validation.errors.join(', '));
+                setLoading(false);
+                return;
+            }
+
+            const result = await createFullBook(fullBookRequest);
 
             if (result.success) {
-                setMessage(`Book created successfully. productId=${result.created.productId ?? 'unknown'}`);
+                setMessage('Tạo sách thành công!');
                 resetForm();
             } else {
                 handleSubmissionError(result);
             }
         } catch (error) {
             console.error('Submission error:', error);
-            setMessage(`Error: ${error?.message ?? 'Unknown error occurred'}`);
+            setMessage(`Lỗi: ${error?.message ?? 'Đã xảy ra lỗi không xác định.'}`);
         } finally {
             setLoading(false);
         }
@@ -151,214 +279,245 @@ function CreateBookForm() {
     const handleSubmissionError = (result) => {
         console.log('🔍 Error result:', result);
 
-        if (result.validationErrors) {
-            setFieldErrors(result.validationErrors);
-            setMessage('Validation failed: ' + result.validationErrors.join(', '));
-        } else if (result.errorDetails?.response?.message) {
-            setMessage(`Backend error: ${result.errorDetails.response.message}`);
+        if (result.errorDetails?.response?.message) {
+            setMessage(`Lỗi: ${result.errorDetails.response.message}`);
         } else if (result.error?.message) {
-            setMessage(`Error: ${result.error.message}`);
-        } else if (result.allow) {
-            setMessage(`Server rejects POST /assets. Allowed methods: ${result.allow}.`);
+            setMessage(`Lỗi: ${result.error.message}`);
         } else {
-            setMessage('Creation failed (unknown reason).');
+            setMessage('Tạo thất bại. Vui lòng thử lại.');
         }
     };
 
-    // Render helpers
-    const renderInput = (placeholder, value, onChange, type = 'text', required = false, errorKey = '') => (
-        <div className={styles.inputWrapper}>
-            <input
-                type={type}
-                placeholder={placeholder}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                required={required}
-                className={fieldErrors[errorKey] ? styles.error : ''}
-            />
-            {fieldErrors[errorKey] && <div className={styles.errorText}>{fieldErrors[errorKey]}</div>}
-        </div>
-    );
-
+    // Render Methods
     const renderProductFields = () => (
-        <div className={styles.fieldGroup}>
-            {renderInput('SKU', product.sku, (value) => handleProductChange('sku', value), 'text', true, 'sku')}
-            {renderInput(
-                'Slug (lowercase-dash)',
-                product.slug,
-                (value) => handleProductChange('slug', value),
-                'text',
-                true,
-                'slug',
-            )}
-            {renderInput(
-                'Product name',
-                product.productName,
-                (value) => handleProductChange('productName', value),
-                'text',
-                true,
-                'productName',
-            )}
-            {renderInput(
-                'Price',
-                product.price,
-                (value) => handleProductChange('price', value),
-                'number',
-                true,
-                'price',
-            )}
-            {renderInput('Sale Price', product.salePrice, (value) => handleProductChange('salePrice', value), 'number')}
-            {renderInput(
-                'Stock Quantity',
-                product.stockQuantity,
-                (value) => handleProductChange('stockQuantity', value),
-                'number',
-            )}
-            {renderInput('Weight (grams)', product.weightG, (value) => handleProductChange('weightG', value), 'number')}
-
-            {/* Active & Featured checkboxes */}
-            <div className={styles.checkboxGroup}>
-                <label className={styles.checkboxLabel}>
-                    <input
-                        type="checkbox"
-                        checked={product.isActive}
-                        onChange={(e) => handleProductChange('isActive', e.target.checked)}
-                    />
-                    Active
-                </label>
-                <label className={styles.checkboxLabel}>
-                    <input
-                        type="checkbox"
-                        checked={product.featured}
-                        onChange={(e) => handleProductChange('featured', e.target.checked)}
-                    />
-                    Featured
-                </label>
+        <>
+            <div className={cx('fieldGroup')}>
+                <FormField
+                    name="sku"
+                    label="SKU"
+                    value={formData.sku}
+                    placeholder="SKU"
+                    onChange={handleFormInputChange}
+                    error={fieldErrors.sku}
+                    required
+                />
+                <FormField
+                    name="slug"
+                    label="Slug"
+                    value={formData.slug}
+                    placeholder="slug-lowercase"
+                    onChange={handleFormInputChange}
+                    error={fieldErrors.slug}
+                    required
+                />
+                <FormField
+                    name="productName"
+                    label="Product Name"
+                    value={formData.productName}
+                    placeholder="Product Name"
+                    onChange={handleFormInputChange}
+                    error={fieldErrors.productName}
+                    required
+                />
             </div>
-        </div>
+            <div className={cx('number-field')}>
+                {/* Price với QuantityInput */}
+                <NumberField
+                    name="price"
+                    label="Price"
+                    value={formData.price}
+                    onChange={handleFormInputChange}
+                    error={fieldErrors.price}
+                    required
+                    step={1000}
+                    min={0}
+                    max={100000000}
+                />
+
+                {/* Sale Price với QuantityInput */}
+                <NumberField
+                    name="salePrice"
+                    label="Sale Price"
+                    value={formData.salePrice}
+                    onChange={handleFormInputChange}
+                    error={fieldErrors.salePrice}
+                    step={1000}
+                    min={0}
+                    max={100000000}
+                />
+
+                {/* Stock Quantity với QuantityInput */}
+                <NumberField
+                    name="stockQuantity"
+                    label="Stock Quantity"
+                    value={formData.stockQuantity}
+                    onChange={handleFormInputChange}
+                    error={fieldErrors.stockQuantity}
+                    required
+                    step={1}
+                    min={0}
+                    max={9999}
+                />
+
+                {/* Weight với QuantityInput */}
+                <NumberField
+                    name="weightG"
+                    label="Weight G"
+                    value={formData.weightG}
+                    onChange={handleFormInputChange}
+                    error={fieldErrors.weightG}
+                    step={50}
+                    min={0}
+                    max={100000}
+                />
+
+                <div className={cx('checkboxGroup')}>
+                    <Checkbox
+                        name="isActive"
+                        label="Active"
+                        checked={formData.isActive}
+                        onChange={handleCheckboxChange('isActive')}
+                        variant="success"
+                        size="medium"
+                    />
+                    <Checkbox
+                        name="featured"
+                        label="Featured"
+                        checked={formData.featured}
+                        onChange={handleCheckboxChange('featured')}
+                        variant="primary"
+                        size="medium"
+                    />
+                </div>
+            </div>
+        </>
     );
 
     const renderCoverFields = () => (
-        <div className={styles.coverSection}>
-            <div className={styles.fileRow}>
+        <div className={cx('coverSection')}>
+            <div className={cx('fileRow')}>
                 <input
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
                     id="cover-upload"
-                    className={styles.fileInput}
+                    className={cx('fileInput')}
                 />
-                <label htmlFor="cover-upload" className={styles.fileButton}>
+                <label htmlFor="cover-upload" className={cx('fileButton')}>
                     📁 Upload Cover
                 </label>
-                {cover.fileName && <span className={styles.fileName}>{cover.fileName}</span>}
+                {file && <span className={cx('fileName')}>{file.name}</span>}
             </div>
 
-            <div className={styles.or}>OR</div>
+            <div className={cx('or')}>OR</div>
 
-            <input
+            <FormField
+                name="url"
+                label="Cover URL"
+                value={formData.url}
                 placeholder="Cover URL (if no file)"
-                value={cover.url}
-                onChange={(e) => handleCoverChange('url', e.target.value)}
-                className={styles.urlInput}
+                onChange={handleFormInputChange}
+                error={fieldErrors.url}
             />
-
-            {cover.url && (
-                <div className={styles.urlPreview}>
-                    <small>URL Preview: {cover.url}</small>
-                </div>
-            )}
         </div>
     );
 
     const renderAuthorFields = () => (
-        <div className={styles.authorSection}>
-            <input
+        <div className={cx('authorSection')}>
+            <FormField
+                name="authorName"
+                label="Author Name"
+                value={formData.authorName}
                 placeholder="Author name"
-                value={author.authorName}
-                onChange={(e) => handleAuthorChange('authorName', e.target.value)}
-                className={styles.authorInput}
-            />
-            <textarea
-                placeholder="Bio"
-                value={author.bio}
-                onChange={(e) => handleAuthorChange('bio', e.target.value)}
-                className={styles.bioTextarea}
+                onChange={handleFormInputChange}
             />
 
-            <div className={styles.authorDetails}>
-                <input
-                    placeholder="Born Date (YYYY-MM-DD)"
-                    value={author.bornDate}
-                    onChange={(e) => handleAuthorChange('bornDate', e.target.value)}
-                    className={styles.dateInput}
-                    type="date"
-                />
-                <input
-                    placeholder="Death Date (YYYY-MM-DD)"
-                    value={author.deathDate}
-                    onChange={(e) => handleAuthorChange('deathDate', e.target.value)}
-                    className={styles.dateInput}
-                    type="date"
+            <div className={cx('form-group')}>
+                <label htmlFor="authorBio">Bio</label>
+                <textarea
+                    id="authorBio"
+                    name="authorBio"
+                    placeholder="Bio"
+                    value={formData.authorBio}
+                    onChange={handleFormInputChange}
+                    className={cx('bioTextarea')}
                 />
             </div>
 
-            <select
-                value={author.nationality}
-                onChange={(e) => handleAuthorChange('nationality', e.target.value)}
-                className={styles.selectInput}
-            >
-                <option value="UNKNOWN">Select Nationality</option>
-                <option value="AMERICAN">American</option>
-                <option value="BRITISH">British</option>
-                <option value="FRENCH">French</option>
-                <option value="GERMAN">German</option>
-                <option value="JAPANESE">Japanese</option>
-                <option value="CHINESE">Chinese</option>
-                <option value="VIETNAMESE">Vietnamese</option>
-                <option value="KOREAN">Korean</option>
-                <option value="RUSSIAN">Russian</option>
-                <option value="OTHER">Other</option>
-            </select>
+            <div className={cx('authorDetails')}>
+                <FormField
+                    name="authorBornDate"
+                    label="Born Date"
+                    type="date"
+                    value={formData.authorBornDate}
+                    onChange={handleFormInputChange}
+                />
+                <FormField
+                    name="authorDeathDate"
+                    label="Death Date"
+                    type="date"
+                    value={formData.authorDeathDate}
+                    onChange={handleFormInputChange}
+                />
+            </div>
 
-            <input
-                placeholder="Author Asset ID (optional)"
-                value={author.assetId || ''}
-                onChange={(e) => handleAuthorChange('assetId', e.target.value ? parseInt(e.target.value) : null)}
-                className={styles.numberInput}
-                type="number"
-            />
+            <div className={cx('form-group')}>
+                <label htmlFor="authorNationality">Nationality</label>
+                <select
+                    id="authorNationality"
+                    name="authorNationality"
+                    value={formData.authorNationality}
+                    onChange={handleFormInputChange}
+                    className={cx('selectInput')}
+                >
+                    <option value="OTHER">Select Nationality</option>
+                    {NATIONALITY_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </select>
+            </div>
         </div>
     );
 
     return (
-        <form className={styles.form} onSubmit={handleSubmit}>
-            <h3 className={styles.header}>Create Book</h3>
+        <form className={cx('form')} onSubmit={handleSubmit}>
+            <div className={cx('headerContainer')}>
+                <Button to="/admin" back>
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                </Button>
+                <h3 className={cx('header')}>Create Book</h3>
+            </div>
 
             {renderProductFields()}
 
-            <h4 className={styles.sectionTitle}>Cover</h4>
+            <h4 className={cx('sectionTitle')}>Cover (Optional)</h4>
             {renderCoverFields()}
 
-            <hr className={styles.divider} />
+            <hr className={cx('divider')} />
 
-            <h4 className={styles.sectionTitle}>Author (optional)</h4>
+            <h4 className={cx('sectionTitle')}>Author (Optional)</h4>
             {renderAuthorFields()}
 
-            <div className={styles.actions}>
-                <Button type="submit" disabled={loading} className={styles.submitButton}>
+            <div className={cx('actions')}>
+                <Button type="submit" disabled={loading} className={cx('submitButton')} primary={!loading}>
                     {loading ? 'Creating...' : 'Create Book'}
                 </Button>
-                <Button type="button" onClick={resetForm} className={styles.resetButton}>
+                <Button type="button" onClick={resetForm} className={cx('resetButton')} outline>
                     Reset
                 </Button>
             </div>
 
             {message && (
                 <div
-                    className={`${styles.message} ${
-                        Object.keys(fieldErrors).length > 0 ? styles.error : styles.success
-                    }`}
+                    className={cx('message', {
+                        error:
+                            Object.keys(fieldErrors).length > 0 ||
+                            message.includes('Lỗi') ||
+                            message.includes('failed'),
+                        success: Object.keys(fieldErrors).length === 0 && message.includes('thành công'),
+                    })}
                 >
                     {message}
                 </div>

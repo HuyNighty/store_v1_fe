@@ -1,4 +1,4 @@
-// src/components/CreateBookForm/CreateBookForm.module.scss
+// Form Container
 .form {
     width: 100%;
     max-width: 920px;
@@ -15,6 +15,14 @@
     animation: fadeIn 0.4s ease-out;
 }
 
+// Header Container
+.headerContainer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
 // Header
 .header {
     margin: 0;
@@ -23,7 +31,6 @@
     color: var(--primary-color-bold);
     border-left: 5px solid var(--primary-color);
     padding-left: 12px;
-    margin-bottom: 8px;
 }
 
 // Section Titles
@@ -41,100 +48,100 @@
     gap: 16px;
 }
 
-.inputWrapper {
+.number-field {
+    gap: 20px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+}
+
+// Form Group (giống Products)
+.form-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-}
-// Thêm vào CreateBookForm.module.scss
-.checkboxGroup {
-    display: flex;
-    gap: 16px;
-    margin-top: 8px;
-}
-
-.checkboxLabel {
-    display: flex;
-    align-items: center;
     gap: 6px;
-    font-size: 1.3rem;
-    cursor: pointer;
 
-    input[type='checkbox'] {
-        width: 16px;
-        height: 16px;
+    label {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+
+    input,
+    textarea,
+    select {
+        color: #000;
+        height: 44px;
+        padding: 0 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        background: #fff;
+        transition: border var(--transition-base), box-shadow var(--transition-base);
+        outline: none;
+        font-size: 1.4rem;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 6px 20px rgba(147, 125, 107, 0.08);
+    }
+
+    .helper {
+        font-size: 1.2rem;
+        color: #6b7280;
     }
 }
 
+.form-group.invalid input,
+.form-group.invalid textarea,
+.form-group.invalid select {
+    border-color: var(--error-color);
+    box-shadow: 0 0 0 6px rgba(176, 26, 26, 0.06);
+}
+
+.form-group input::placeholder {
+    color: rgba(17, 24, 39, 0.35);
+}
+
+.error {
+    color: var(--error-color);
+    font-size: 1.2rem;
+    margin: 4px 0 0 0;
+}
+
+.required {
+    color: var(--error-color);
+    margin-left: 2px;
+}
+
+// Checkbox Group
+.checkboxGroup {
+    display: flex;
+    gap: 20px;
+    margin-top: 8px;
+    grid-column: 1 / -1;
+    align-items: center;
+}
+
+// Author Details
 .authorDetails {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
 
-.dateInput,
-.numberInput {
-    @extend %baseInput;
-}
-
+// Specific input types
 .selectInput {
-    @extend %baseInput;
     cursor: pointer;
 }
 
-.urlPreview {
-    margin-top: 4px;
-    padding: 6px 8px;
-    background: #f8f9fa;
-    border-radius: 4px;
-    font-size: 1.2rem;
-    color: #666;
-}
-
-// Base input styles
-%baseInput {
-    color: #000;
-    font-size: 1.4rem;
-    padding: 12px 16px;
-    border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    background: #fff;
-    transition: all 0.25s ease;
-    outline: none;
-    font-family: inherit;
-
-    &:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(147, 125, 107, 0.15);
-    }
-
-    &::placeholder {
-        color: rgba(0, 0, 0, 0.3);
-    }
-
-    &.error {
-        border-color: #dc2626;
-        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-    }
-}
-
-// Specific input types
-input[type='text'],
-input[type='number'] {
-    @extend %baseInput;
-}
-
-.urlInput,
-.authorInput {
-    @extend %baseInput;
-    width: 100%;
-}
-
 .bioTextarea {
-    @extend %baseInput;
     min-height: 120px;
     resize: vertical;
     width: 100%;
+    padding: 12px !important;
 }
 
 // Cover Section
@@ -264,14 +271,6 @@ input[type='number'] {
     transform: none;
 }
 
-// Error States
-.errorText {
-    color: #dc2626;
-    font-size: 1.2rem;
-    margin-top: 4px;
-    font-weight: 500;
-}
-
 // Messages
 .message {
     font-size: 1.3rem;
@@ -280,18 +279,18 @@ input[type='number'] {
     margin-top: 8px;
     transition: all 0.3s ease;
     font-weight: 500;
-}
 
-.success {
-    background: rgba(147, 125, 107, 0.08);
-    border: 1px solid var(--primary-color);
-    color: var(--primary-color-bold);
-}
+    &.success {
+        background: rgba(147, 125, 107, 0.08);
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color-bold);
+    }
 
-.error {
-    background: rgba(220, 38, 38, 0.05);
-    border: 1px solid #dc2626;
-    color: #b91c1c;
+    &.error {
+        background: rgba(220, 38, 38, 0.05);
+        border: 1px solid #dc2626;
+        color: #b91c1c;
+    }
 }
 
 // Animation
@@ -323,6 +322,12 @@ input[type='number'] {
 
     .fieldGroup {
         grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .checkboxGroup {
+        flex-direction: column;
+        align-items: flex-start;
         gap: 12px;
     }
 
@@ -358,12 +363,10 @@ input[type='number'] {
         padding-left: 8px;
     }
 
-    input[type='text'],
-    input[type='number'],
-    .urlInput,
-    .authorInput,
-    .bioTextarea {
-        font-size: 1.6rem; // Better for mobile touch
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 1.6rem;
         padding: 14px 16px;
     }
 }
