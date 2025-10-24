@@ -3,10 +3,8 @@ import Header from '../components/Header';
 function HeaderOnly({ children }) {
     return (
         <>
-            <>
-                <Header />
-                {children}
-            </>
+            <Header />
+            {children}
         </>
     );
 }

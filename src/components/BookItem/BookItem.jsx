@@ -1,18 +1,59 @@
 import classNames from 'classnames/bind';
 import styles from './BookItem.module.scss';
 import Button from '../../Layouts/components/Button';
+import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
 function BookItem({ book }) {
+    const navigate = useNavigate();
+
     console.log(book);
 
     if (!book) return null;
 
-    const { productId, productName, productAssets = [], featured, bookAuthors = [], salePrice, price } = book;
+    const {
+        productId,
+        productName,
+        productAssets = [],
+        featured,
+        bookAuthors = [],
+        salePrice,
+        price,
+        rating,
+        reviews,
+        stockQuantity,
+        weightG,
+        sku,
+        slug,
+    } = book;
 
     const imageUrl = productAssets[0]?.url || '/images/default-book.jpg';
     const displayPrice = salePrice ?? price;
+
+    const handleViewDetails = () => {
+        // Chuyển hướng đến trang chi tiết và truyền toàn bộ dữ liệu book
+        navigate('/book-item', {
+            state: {
+                book: {
+                    productId,
+                    productName,
+                    productAssets,
+                    featured,
+                    bookAuthors,
+                    salePrice,
+                    price,
+                    rating,
+                    reviews,
+                    stockQuantity,
+                    weightG,
+                    sku,
+                    slug,
+                    imageUrl,
+                },
+            },
+        });
+    };
 
     return (
         <div key={productId} className={cx('book-item')}>
@@ -34,12 +75,14 @@ function BookItem({ book }) {
                     <p className={cx('book-item-author')}>Tác giả: Đang cập nhật</p>
                 )}
                 <div className={cx('book-item-rating')}>
-                    <div className={cx('book-item-stars')}>{book.rating} ⭐</div>
-                    <span className={cx('book-item-reviews')}>({book.reviews} reviews)</span>
+                    <div className={cx('book-item-stars')}>{rating || 0} ⭐</div>
+                    <span className={cx('book-item-reviews')}>({reviews || 0} reviews)</span>
                 </div>
                 <div className={cx('book-item-footer')}>
                     <p className={cx('book-item-price')}>{displayPrice / 1000}.000 đ</p>
-                    <Button className={cx('book-item-view-btn')}>Xem chi tiết</Button>
+                    <Button small outline className={cx('book-item-view-btn')} onClick={handleViewDetails}>
+                        Xem chi tiết
+                    </Button>
                 </div>
             </div>
         </div>
