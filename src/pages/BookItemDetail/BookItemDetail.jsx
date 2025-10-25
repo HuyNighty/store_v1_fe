@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './BookItemDetail.module.scss';
 import Button from '../../Layouts/components/Button';
+import QuantityInput from '../../Layouts/components/QuantityInput';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faShoppingCart, faHeart, faShare } from '@fortawesome/free-solid-svg-icons';
+import { useCart } from '../../contexts/CartContext';
+import { useToast } from '../../contexts/Toast/ToastContext';
 
 const cx = classNames.bind(styles);
 
@@ -12,8 +15,11 @@ function BookItemDetail() {
     const location = useLocation();
     const navigate = useNavigate();
     const { book } = location.state || {};
+    const { addToCart, isItemInCart, getItemQuantity, updateCartItem } = useCart();
+    const { addToast } = useToast();
+    const [quantity, setQuantity] = useState(1);
+    const [addingToCart, setAddingToCart] = useState(false);
 
-    // Nếu không có dữ liệu book, chuyển hướng về trang chủ
     if (!book) {
         return (
             <div className={cx('container')}>
@@ -39,26 +45,59 @@ function BookItemDetail() {
         reviews = 0,
         stockQuantity = 0,
         weightG = 0,
-        imageUrl,
+        url,
     } = book;
 
     const displayPrice = salePrice ?? price;
-    const mainImage = productAssets[0]?.url || imageUrl || '/images/default-book.jpg';
+    const mainImage = productAssets[0]?.url || url || '/images/default-book.jpg';
     const additionalImages = productAssets.slice(1);
+    const isInCart = isItemInCart(productId);
+    const cartQuantity = getItemQuantity(productId);
 
     const handleBack = () => {
         navigate(-1);
     };
 
-    const handleAddToCart = () => {
-        console.log('Thêm vào giỏ hàng:', productId);
-        alert('Đã thêm vào giỏ hàng!');
+    const handleAddToCart = async () => {
+        setAddingToCart(true);
+        try {
+            const result = await addToCart(productId, quantity);
+            if (result.success) {
+                addToast(result.message || 'Đã thêm vào giỏ hàng!', 'success');
+            } else {
+                addToast(result.error || 'Thêm vào giỏ hàng thất bại', 'error');
+            }
+        } catch (error) {
+            addToast('Có lỗi xảy ra khi thêm vào giỏ hàng', 'error');
+        } finally {
+            setAddingToCart(false);
+        }
+    };
+
+    const handleUpdateCart = async () => {
+        setAddingToCart(true);
+        try {
+            // QUAN TRỌNG: Cộng dồn số lượng mới vào số lượng cũ
+            const newTotalQuantity = cartQuantity + quantity;
+            const result = await updateCartItem(productId, newTotalQuantity);
+
+            if (result.success) {
+                addToast(result.message || 'Đã cập nhật giỏ hàng!', 'success');
+                setQuantity(1); // Reset về 1 sau khi cập nhật thành công
+            } else {
+                addToast(result.error || 'Cập nhật giỏ hàng thất bại', 'error');
+            }
+        } catch (error) {
+            addToast('Có lỗi xảy ra khi cập nhật giỏ hàng', 'error');
+        } finally {
+            setAddingToCart(false);
+        }
     };
 
     const handleBuyNow = () => {
+        addToast('Chuyển đến trang thanh toán!', 'info');
         // Logic mua ngay
         console.log('Mua ngay:', productId);
-        alert('Chuyển đến trang thanh toán!');
     };
 
     return (
@@ -93,6 +132,8 @@ function BookItemDetail() {
 
                 {/* Product Info Section */}
                 <div className={cx('info-section')}>
+                    <h1 className={cx('product-title')}>{productName}</h1>
+
                     {/* Authors */}
                     <div className={cx('authors-section')}>
                         <h3>Tác giả</h3>
@@ -132,6 +173,19 @@ function BookItemDetail() {
                         )}
                     </div>
 
+                    {/* Quantity Selector */}
+                    <div className={cx('quantity-section')}>
+                        <label>Số lượng: </label>
+                        <QuantityInput
+                            value={quantity}
+                            onChange={setQuantity}
+                            min={1}
+                            max={stockQuantity}
+                            size="medium"
+                        />
+                        {isInCart && <p className={cx('cart-notice')}>Đã có {cartQuantity} sản phẩm trong giỏ hàng</p>}
+                    </div>
+
                     {/* Stock & Weight */}
                     <div className={cx('details-section')}>
                         <div className={cx('detail-item')}>
@@ -148,16 +202,29 @@ function BookItemDetail() {
 
                     {/* Action Buttons */}
                     <div className={cx('action-buttons')}>
-                        <Button
-                            primary
-                            large
-                            onClick={handleAddToCart}
-                            disabled={stockQuantity === 0}
-                            className={cx('add-to-cart-btn')}
-                        >
-                            <FontAwesomeIcon icon={faShoppingCart} />
-                            Thêm vào giỏ hàng
-                        </Button>
+                        {isInCart ? (
+                            <Button
+                                primary
+                                large
+                                onClick={handleUpdateCart}
+                                disabled={stockQuantity === 0 || addingToCart}
+                                className={cx('update-cart-btn')}
+                            >
+                                <FontAwesomeIcon icon={faShoppingCart} />
+                                {addingToCart ? 'Đang cập nhật...' : 'Cập nhật giỏ hàng'}
+                            </Button>
+                        ) : (
+                            <Button
+                                primary
+                                large
+                                onClick={handleAddToCart}
+                                disabled={stockQuantity === 0 || addingToCart}
+                                className={cx('add-to-cart-btn')}
+                            >
+                                <FontAwesomeIcon icon={faShoppingCart} />
+                                {addingToCart ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
+                            </Button>
+                        )}
                         <Button
                             outline
                             large

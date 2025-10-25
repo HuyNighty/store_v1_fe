@@ -9,7 +9,7 @@ import ProfileMenu from './components/ProfileMenu/ProfileMenu';
 import Button from '../Button/Button';
 import Logo from '../../../components/Logo';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../../Context/AuthContext';
+import { AuthContext } from '../../../contexts/AuthContext';
 
 const cx = classNames.bind(styles);
 

@@ -206,7 +206,7 @@
     font-weight: 100;
 
     .detail-item {
-        color: #000;
+        color: var(--primary-color);
         display: flex;
         justify-content: space-between;
         padding: 8px 0;
@@ -224,8 +224,16 @@
     }
 }
 
+.quantity-section {
+    color: var(--primary-color);
+    font-weight: 100;
+}
+
 .action-buttons {
     margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 
     .add-to-cart-btn,
     .buy-now-btn {
@@ -242,6 +250,10 @@
         gap: 10px;
         justify-content: center;
     }
+}
+
+.update-cart-btn {
+    display: flex;
 }
 
 .additional-info {

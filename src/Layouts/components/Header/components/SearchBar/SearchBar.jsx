@@ -3,6 +3,7 @@ import { faSearch, faCircleXmark, faSpinner } from '@fortawesome/free-solid-svg-
 import HeadlessTippy from '@tippyjs/react/headless';
 import classNames from 'classnames/bind';
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './SearchBar.module.scss';
 import { useDebounce } from '~/hooks';
 import productApi from '~/api/productApi';
@@ -10,6 +11,7 @@ import productApi from '~/api/productApi';
 const cx = classNames.bind(styles);
 
 function SearchBar({ searchState, setSearchState }) {
+    const navigate = useNavigate();
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searched, setSearched] = useState(false);
@@ -94,6 +96,52 @@ function SearchBar({ searchState, setSearchState }) {
         };
     }, [debouncedQuery]);
 
+    // Helper function to get main image URL
+    const getMainImage = (book) => {
+        // Nếu có productAssets và không rỗng
+        if (book.productAssets && book.productAssets.length > 0) {
+            return book.productAssets[0].url;
+        }
+        // Fallback image
+        return '/images/default-book.jpg';
+    };
+
+    // Helper function to calculate discount percentage
+    const getDiscountPercent = (book) => {
+        if (book.salePrice && book.price && book.salePrice < book.price) {
+            return Math.round((1 - book.salePrice / book.price) * 100);
+        }
+        return 0;
+    };
+
+    // Function để chuyển hướng đến trang chi tiết sách - GIỐNG BookItem
+    const handleBookClick = (book) => {
+        console.log('Navigating to book detail:', book.productId);
+        closeSearch();
+
+        // Chuyển hướng đến trang chi tiết và truyền toàn bộ dữ liệu book - GIỐNG BookItem
+        navigate('/book-item', {
+            state: {
+                book: {
+                    productId: book.productId,
+                    productName: book.productName,
+                    productAssets: book.productAssets || [],
+                    featured: book.featured,
+                    bookAuthors: book.bookAuthors || [],
+                    salePrice: book.salePrice,
+                    price: book.price,
+                    rating: book.rating,
+                    reviews: book.reviews,
+                    stockQuantity: book.stockQuantity,
+                    weightG: book.weightG,
+                    sku: book.sku,
+                    slug: book.slug,
+                    imageUrl: getMainImage(book), // Thêm imageUrl giống BookItem
+                },
+            },
+        });
+    };
+
     const closeSearch = () => {
         setSearchState({
             showSearch: false,
@@ -152,23 +200,63 @@ function SearchBar({ searchState, setSearchState }) {
                     ) : error ? (
                         <div className={cx('no-results')}>{error}</div>
                     ) : results.length > 0 ? (
-                        results.map((book) => (
-                            <div key={book.id ?? book.productId ?? book.productId} className={cx('search-item')}>
-                                <img
-                                    src={book.url ?? book.image ?? book.thumbnail}
-                                    alt={book.productName ?? book.title}
-                                    className={cx('book-thumb')}
-                                />
-                                <div className={cx('book-info')}>
-                                    <span className={cx('book-title')}>{book.productName ?? book.title}</span>
-                                    {book.price != null && (
-                                        <span className={cx('book-price')}>
-                                            {Number(book.price).toLocaleString('vi-VN')} đ
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                        ))
+                        <div className={cx('results-list')}>
+                            {results.map((book) => {
+                                const discountPercent = getDiscountPercent(book);
+                                const hasDiscount = discountPercent > 0;
+
+                                return (
+                                    <div
+                                        key={book.productId || book.id}
+                                        className={cx('search-item')}
+                                        onClick={() => handleBookClick(book)}
+                                    >
+                                        <img
+                                            src={getMainImage(book)}
+                                            alt={book.productName}
+                                            className={cx('book-thumb')}
+                                            onError={(e) => {
+                                                e.target.src = '/images/default-book.jpg';
+                                            }}
+                                        />
+                                        <div className={cx('book-info')}>
+                                            <span className={cx('book-title')}>{book.productName}</span>
+
+                                            {book.bookAuthors && book.bookAuthors.length > 0 && (
+                                                <span className={cx('book-author')}>
+                                                    {book.bookAuthors[0].authorName}
+                                                </span>
+                                            )}
+
+                                            {/* Price Display với discount style */}
+                                            <div className={cx('price-section')}>
+                                                {hasDiscount ? (
+                                                    <div className={cx('sale-price-container')}>
+                                                        <div className={cx('price-row')}>
+                                                            <span className={cx('sale-price')}>
+                                                                {book.salePrice?.toLocaleString('vi-VN')} đ
+                                                            </span>
+                                                            <span className={cx('discount-badge')}>
+                                                                -{discountPercent}%
+                                                            </span>
+                                                        </div>
+                                                        <div className={cx('price-row')}>
+                                                            <span className={cx('original-price')}>
+                                                                {book.price?.toLocaleString('vi-VN')} đ
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <span className={cx('normal-price')}>
+                                                        {book.price?.toLocaleString('vi-VN')} đ
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     ) : (
                         searched && <div className={cx('no-results')}>Không tìm thấy sách nào</div>
                     )}
