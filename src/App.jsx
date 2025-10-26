@@ -6,69 +6,46 @@ import { CartProvider } from './contexts/CartContext';
 import { ToastProvider } from './contexts/Toast/ToastContext';
 
 function App() {
+    const renderElement = (route) => {
+        const PageComponent = route.component;
+        let Layout = route.layout || DefaultLayout;
+
+        if (route.layout === null) {
+            Layout = React.Fragment;
+        }
+
+        if (!PageComponent) {
+            console.error(`Component for route ${route.path} is undefined`);
+            return <div>Error: Component not found</div>;
+        }
+
+        return (
+            <Layout>
+                <PageComponent />
+            </Layout>
+        );
+    };
+
     return (
         <CartProvider>
             <ToastProvider>
                 <Router>
                     <div className="App">
                         <Routes>
-                            {publicRoutes.map((route, index) => {
-                                const Page = route.component;
-                                let Layout = DefaultLayout;
-
-                                if (route.layout) {
-                                    Layout = route.layout;
-                                } else if (route.layout === null) {
-                                    Layout = React.Fragment;
-                                }
-
-                                return (
-                                    <Route
-                                        key={index}
-                                        path={route.path}
-                                        element={
-                                            <Layout>
-                                                <Page />
-                                            </Layout>
-                                        }
-                                    />
-                                );
-                            })}
+                            {publicRoutes.map((route, index) => (
+                                <Route key={route.path || index} path={route.path} element={renderElement(route)} />
+                            ))}
 
                             {privateRoutes.map((route, index) => (
-                                <Route
-                                    key={index}
-                                    path={route.path}
-                                    element={
-                                        <route.layout>
-                                            <route.component />
-                                        </route.layout>
-                                    }
-                                />
+                                <Route key={route.path || index} path={route.path} element={renderElement(route)} />
                             ))}
 
                             {adminRoutes.map((route, index) => (
-                                <Route
-                                    key={index}
-                                    path={route.path}
-                                    element={
-                                        <route.layout>
-                                            <route.component />
-                                        </route.layout>
-                                    }
-                                />
+                                <Route key={route.path || index} path={route.path} element={renderElement(route)} />
                             ))}
 
                             {userRoutes.map((route, index) => (
-                                <Route
-                                    key={index}
-                                    path={route.path}
-                                    element={
-                                        <route.layout>
-                                            <route.component />
-                                        </route.layout>
-                                    }
-                                />
+                                <Route key={route.path || index} path={route.path} element={renderElement(route)} />
                             ))}
                         </Routes>
                     </div>

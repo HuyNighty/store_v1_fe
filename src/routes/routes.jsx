@@ -15,7 +15,7 @@ import Cart from '../pages/Cart';
 const publicRoutes = [
     { path: '/', component: Home },
     { path: '/books', component: Books },
-    { path: '/profile', component: Profile, layout: HeaderOnly },
+    { path: '/profile', component: Profile },
     { path: '/book-item', component: BookItemDetail },
     { path: '/login', component: Login, layout: null },
     { path: '/register', component: Register, layout: null },

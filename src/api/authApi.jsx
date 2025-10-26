@@ -16,6 +16,7 @@ const authApi = {
             },
         ),
     me: () => axiosClient.get('/auth/user-info'),
+    info: () => axiosClient.get('/auth/my-info'),
 };
 
 export default authApi;
