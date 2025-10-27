@@ -105,30 +105,27 @@ function BookCarousel() {
             {/* Header với navigation buttons */}
             <div className={cx('header')}>
                 <div className={cx('nav-buttons')}>
-                    <Button
-                        shine
+                    <button
                         className={cx('nav-btn')}
                         onClick={handlePrev}
                         aria-label="Previous"
                         disabled={pages.length <= 1 || isTransitioning}
                     >
                         <FontAwesomeIcon icon={faChevronLeft} />
-                    </Button>
+                    </button>
 
                     <div className={cx('fea-text')}>Featured Books</div>
 
-                    <Button
-                        shine
+                    <button
                         className={cx('nav-btn')}
                         onClick={handleNext}
                         aria-label="Next"
                         disabled={pages.length <= 1 || isTransitioning}
                     >
                         <FontAwesomeIcon icon={faChevronRight} />
-                    </Button>
+                    </button>
                 </div>
             </div>
-
             {/* Status messages */}
             <div className={cx('text')}>
                 <AnimatePresence mode="wait">
@@ -164,45 +161,31 @@ function BookCarousel() {
                     )}
                 </AnimatePresence>
             </div>
-
             {/* Book list với smooth animation */}
             <div className={cx('book-list-container')}>
-                <AnimatePresence mode="wait">
-                    {books.length > 0 ? (
-                        <motion.div
-                            key={currentIndex}
-                            className={cx('book-list-track')}
-                            initial={{ opacity: 0, x: 100 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -100 }}
-                            transition={{ type: 'spring', stiffness: 120, damping: 20, duration: 0.5 }}
-                        >
-                            <div className={cx('book-page')}>
-                                {pages[currentIndex]?.map((book, index) => (
+                <motion.div
+                    className={cx('book-list-track')}
+                    animate={{ x: `-${currentIndex * 100}%` }}
+                    transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+                >
+                    {pages.length > 0 ? (
+                        pages.map((page, pIdx) => (
+                            <div className={cx('book-page')} key={`page-${pIdx}`}>
+                                {page.map((book) => (
                                     <BookItem
-                                        key={
-                                            book.productId ?? book.id ?? `${currentIndex}-${book.productName}-${index}`
-                                        }
+                                        key={book.productId ?? book.id ?? `${pIdx}-${book.productName}`}
                                         book={book}
                                     />
                                 ))}
                             </div>
-                        </motion.div>
+                        ))
                     ) : (
-                        !loading && (
-                            <motion.div
-                                className={cx('book-page', 'empty-page')}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.3 }}
-                            />
-                        )
+                        <div className={cx('book-page', 'empty-page')} />
                     )}
-                </AnimatePresence>
+                </motion.div>
             </div>
-
             {/* Progress indicators */}
-            {pages.length > 1 && (
+            {/* {pages.length > 1 && (
                 <div className={cx('carousel-progress')}>
                     {pages.map((_, index) => (
                         <button
@@ -215,15 +198,14 @@ function BookCarousel() {
                     ))}
                 </div>
             )}
-
-            {/* Auto-play indicator */}
+            Auto-play indicator
             {pages.length > 1 && (
                 <div className={cx('auto-play-indicator')}>
                     <div className={cx('indicator-dot', { active: true })} />
                     <div className={cx('indicator-dot', { active: false })} />
                     <div className={cx('indicator-dot', { active: false })} />
                 </div>
-            )}
+            )} */}
         </div>
     );
 }

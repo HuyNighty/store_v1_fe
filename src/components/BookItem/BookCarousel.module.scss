@@ -1,107 +1,69 @@
-// BookCarousel.module.scss
 .carousel-wrapper {
     width: 100%;
     padding: 20px 0;
     overflow: hidden;
     position: relative;
     box-sizing: border-box;
-    animation: fadeIn 0.8s ease-out both;
 }
 
 .header {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
-    animation: fadeSlideDown 0.6s ease-out both 0.2s;
-}
 
-.nav-buttons {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    animation: fadeUp 0.6s ease-out both 0.3s;
-
-    .nav-btn {
-        color: var(--primary-color);
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        animation: scaleIn 0.4s ease-out both;
-
-        &:hover:not(:disabled) {
-            color: var(--white);
-            background: var(--primary-hover);
-            transform: scale(1.1);
-            box-shadow: 0 4px 15px rgba(149, 125, 107, 0.3);
-            animation: pulse 0.5s ease;
+    .title-section {
+        h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #222;
         }
 
-        &:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-            animation: none;
+        p {
+            color: #777;
+            font-size: 1rem;
         }
+    }
 
-        // Animation cho từng button
-        &:first-child {
-            animation-delay: 0.4s;
-        }
+    .nav-buttons {
+        display: contents;
+        gap: 10px;
 
-        &:last-child {
-            animation-delay: 0.5s;
+        .nav-btn {
+            color: var(--primary-color);
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                color: var(--white);
+                background: var(--primary-hover);
+            }
+
+            &.disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
         }
     }
 }
 
 .fea-text {
     color: var(--primary-color-bold);
-    font-size: 3.8rem;
-    font-weight: 700;
-    text-align: center;
-    margin: 0 20px;
-    animation: fadeUp 0.8s ease-out both 0.4s;
-    font-family: var(--font-family-primary);
-
-    // Gradient text effect
-    background: linear-gradient(135deg, var(--primary-color-bold), var(--primary-hover));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 38px;
 }
 
 .text {
     color: var(--primary-color-bold);
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
-    animation: fadeUp 0.8s ease-out both 0.5s;
-
-    .loading {
-        color: var(--primary-color);
-        font-size: 1.6rem;
-        animation: pulse 1.5s infinite;
-    }
-
-    .error {
-        color: var(--danger-color);
-        font-size: 1.6rem;
-        animation: bounceIn 0.8s both;
-    }
-
-    .empty {
-        color: var(--secondary-color);
-        font-size: 1.6rem;
-        animation: fadeIn 0.8s both;
-    }
 }
 
 .book-list-container {
@@ -109,7 +71,6 @@
     width: 100%;
     overflow: hidden;
     min-height: 480px;
-    animation: fadeIn 0.8s ease-out both 0.6s;
 }
 
 .book-list-track {
@@ -127,25 +88,6 @@
     align-items: stretch;
     box-sizing: border-box;
     padding: 8px 0;
-
-    // Animation cho các book items
-    &:global {
-        .book-item {
-            animation: scaleIn 0.5s ease-out both;
-
-            // Stagger animation cho các item
-            @for $i from 1 through 8 {
-                &:nth-child(#{$i}) {
-                    animation-delay: 0.1s * $i + 0.6s;
-                }
-            }
-
-            &:hover {
-                animation: float 3s ease-in-out infinite;
-                transform: translateY(-5px);
-            }
-        }
-    }
 }
 
 .book-page > :global(.book-item),
@@ -157,149 +99,14 @@
 
 .empty-page {
     min-height: 420px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn 0.8s ease-out both;
-
-    &::before {
-        content: '📚';
-        font-size: 4rem;
-        animation: bounceIn 1s ease-out both, float 4s ease-in-out infinite 1s;
-    }
 }
 
-// Progress indicators
-.carousel-progress {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 25px;
-    animation: fadeUp 0.6s ease-out both 0.8s;
-
-    .progress-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: var(--border-color);
-        cursor: pointer;
-        transition: all 0.3s ease;
-        animation: scaleIn 0.4s ease-out both;
-
-        @for $i from 1 through 10 {
-            &:nth-child(#{$i}) {
-                animation-delay: 0.1s * $i + 0.8s;
-            }
-        }
-
-        &.active {
-            background: var(--primary-color);
-            transform: scale(1.3);
-            animation: pulse 2s infinite;
-        }
-
-        &:hover:not(.active) {
-            background: var(--primary-hover);
-            transform: scale(1.1);
-        }
-    }
-}
-
-// Auto-play indicator
-.auto-play-indicator {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    margin-top: 15px;
-    animation: fadeIn 0.6s ease-out both 1s;
-
-    .indicator-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--border-color);
-        animation: pulse 1.5s infinite;
-
-        &:nth-child(1) {
-            animation-delay: 0s;
-        }
-        &:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        &:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        &.active {
-            background: var(--primary-color);
-        }
-    }
-}
-
-// Loading spinner
-.loading-spinner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-    animation: pulse 1.5s infinite;
-
-    .spinner {
-        width: 40px;
-        height: 40px;
-        border: 3px solid var(--border-color);
-        border-top: 3px solid var(--primary-color);
-        border-radius: 50%;
-        animation: rotate 1s linear infinite;
-    }
-}
-
-// Success message
-.success-message {
-    text-align: center;
-    padding: 20px;
-    color: var(--success-color);
-    animation: bounceIn 0.8s both;
-
-    &::before {
-        content: '✓ ';
-        font-weight: bold;
-    }
-}
-
-// Hover effects
-.carousel-wrapper:hover {
-    .nav-btn:not(:disabled) {
-        animation: pulse 0.5s ease;
-    }
-}
-
-// Responsive Design với animations
 @media (max-width: 1100px) {
     .book-page > * {
         max-width: calc(100% / 3);
-
-        &:global {
-            .book-item {
-                animation: scaleIn 0.4s ease-out both;
-
-                @for $i from 1 through 6 {
-                    &:nth-child(#{$i}) {
-                        animation-delay: 0.1s * $i + 0.5s;
-                    }
-                }
-            }
-        }
     }
-
     .book-list-container {
         min-height: 420px;
-    }
-
-    .fea-text {
-        font-size: 3.2rem;
-        animation: fadeUp 0.7s ease-out both 0.4s;
     }
 }
 
@@ -307,34 +114,8 @@
     .book-page {
         gap: 16px;
     }
-
     .book-page > * {
         max-width: calc(100% / 2);
-
-        &:global {
-            .book-item {
-                animation: scaleIn 0.3s ease-out both;
-
-                @for $i from 1 through 4 {
-                    &:nth-child(#{$i}) {
-                        animation-delay: 0.1s * $i + 0.4s;
-                    }
-                }
-            }
-        }
-    }
-
-    .nav-buttons {
-        gap: 20px;
-
-        .nav-btn {
-            width: 45px;
-            height: 45px;
-        }
-    }
-
-    .fea-text {
-        font-size: 2.8rem;
     }
 }
 
@@ -342,86 +123,20 @@
     .book-page {
         gap: 14px;
     }
-
     .book-list-container {
         min-height: 380px;
-    }
-
-    .fea-text {
-        font-size: 2.4rem;
-        animation: fadeUp 0.6s ease-out both 0.4s;
     }
 }
 
 @media (max-width: 480px) {
     .book-page {
         gap: 10px;
-        flex-direction: column;
-        align-items: center;
     }
-
     .book-page > * {
         max-width: 100%;
-        flex: 0 0 auto;
-        width: 100%;
-        max-width: 300px;
-
-        &:global {
-            .book-item {
-                animation: slideInRight 0.4s ease-out both;
-
-                @for $i from 1 through 2 {
-                    &:nth-child(#{$i}) {
-                        animation-delay: 0.1s * $i + 0.3s;
-                    }
-                }
-            }
-        }
+        flex: 0 0 100%;
     }
-
     .book-list-container {
-        min-height: auto;
+        min-height: 360px;
     }
-
-    .carousel-wrapper {
-        padding: 15px 0;
-        animation: fadeIn 0.6s ease-out both;
-    }
-
-    .nav-buttons {
-        gap: 15px;
-
-        .nav-btn {
-            width: 40px;
-            height: 40px;
-        }
-    }
-
-    .fea-text {
-        font-size: 2rem;
-        margin: 0 10px;
-    }
-}
-
-// Custom page transition animations
-.page-enter {
-    opacity: 0;
-    transform: translateX(50px);
-}
-
-.page-enter-active {
-    opacity: 1;
-    transform: translateX(0);
-    transition: all 0.5s ease-out;
-}
-
-.page-exit {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.page-exit-active {
-    opacity: 0;
-    transform: translateX(-50px);
-    transition: all 0.5s ease-out;
 }

@@ -1,44 +1,505 @@
+// Profile Menu với animations
 .profile-menu {
     display: flex;
     flex-direction: column;
-    border-radius: 8px;
-    padding: 6px 0;
-    min-width: 160px;
+    border-radius: 12px;
+    padding: 8px 10px 8px 0;
+    min-width: 180px;
+    background: var(--white);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    transform-origin: top right;
+
+    // Slide in animation
+    &.slide-in {
+        animation: slideInRight 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    }
+
+    // Fade in animation
+    &.fade-in {
+        animation: fadeIn 0.3s ease-out both;
+    }
+
+    // Bounce in animation
+    &.bounce-in {
+        animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) both;
+    }
 }
 
 .menu-item {
-    padding: 10px 16px;
+    padding: 12px 20px;
     font-size: 1.6rem;
     color: var(--text-color);
     text-decoration: none;
-    transition: background-color var(--transition-fast), color var(--transition-fast);
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
 
+    // Stagger animation cho các item
+    @for $i from 1 through 6 {
+        &:nth-child(#{$i}) {
+            animation: fadeUp 0.4s ease-out both;
+            animation-delay: 0.1s * $i;
+        }
+    }
+
+    // Hover effects
     &:hover {
-        border-radius: 10%;
-        background-color: var(--primary-hover);
-        color: #fff;
+        background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
+        color: var(--white);
+        transform: translateX(8px);
+        box-shadow: 0 4px 15px rgba(149, 125, 107, 0.2);
+        border-radius: 10px;
+
+        // Icon color change on hover
+        .menu-icon {
+            color: var(--white);
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        // Ripple effect
+        &::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateY(-50%);
+            animation: shine 0.8s ease;
+        }
+    }
+
+    // Active state
+    &:active {
+        transform: translateX(8px) scale(0.98);
+    }
+
+    // Pulse animation for important items
+    &.pulse {
+        animation: pulse 2s infinite;
+
+        &:hover {
+            animation: pulse 1s infinite;
+        }
+    }
+
+    // Slide animation variant
+    &.slide {
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width var(--transition-base);
+        }
+
+        &:hover::after {
+            width: 100%;
+        }
+    }
+
+    // Border draw animation
+    &.border-draw {
+        border: 1px solid transparent;
+        position: relative;
+
+        &::before,
+        &::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            transition: all 0.3s ease;
+        }
+
+        &::before {
+            top: 0;
+            left: 0;
+            border-top: 1px solid var(--primary-color);
+            border-right: 1px solid var(--primary-color);
+        }
+
+        &::after {
+            bottom: 0;
+            right: 0;
+            border-bottom: 1px solid var(--primary-color);
+            border-left: 1px solid var(--primary-color);
+        }
+
+        &:hover::before,
+        &:hover::after {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    // Float animation
+    &.float {
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        &:hover {
+            transform: translateY(-4px) translateX(8px);
+            box-shadow: 0 8px 25px rgba(149, 125, 107, 0.3);
+        }
+    }
+}
+
+.menu-icon {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    transition: all var(--transition-base);
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // Icon animations
+    &.spin:hover {
+        animation: rotate 0.6s ease;
+    }
+
+    &.bounce:hover {
+        animation: bounce 0.8s ease;
+    }
+
+    &.pulse {
+        animation: pulse 2s infinite;
     }
 }
 
 .text-item {
-    margin-left: 16px;
+    margin-left: 0;
+    font-weight: 500;
+    transition: transform var(--transition-base);
+
+    .menu-item:hover & {
+        transform: translateX(4px);
+    }
 }
 
+// Icon button với nhiều animation variants
 .icon-btn {
     background: none;
     border: none;
     cursor: pointer;
     width: var(--icon-size);
-    height: 20px;
+    height: var(--icon-size);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: var(--font-size-icon);
     color: var(--text-color);
-    transition: color var(--transition-base), transform var(--transition-base);
+    border-radius: 50%;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
 
+    // Base hover effects
     &:hover {
         color: var(--primary-hover);
-        transform: scale(1.15);
+        background: rgba(149, 125, 107, 0.1);
+
+        // Ripple effect
+        &::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(149, 125, 107, 0.2);
+            transform: translate(-50%, -50%);
+            animation: ripple 0.6s ease-out;
+        }
+    }
+
+    // Scale animation variant
+    &.scale {
+        &:hover {
+            transform: scale(1.25);
+            box-shadow: 0 4px 15px rgba(149, 125, 107, 0.2);
+        }
+
+        &:active {
+            transform: scale(1.15);
+        }
+    }
+
+    // Rotate animation variant
+    &.rotate {
+        &:hover {
+            transform: rotate(15deg) scale(1.2);
+        }
+
+        &.reverse:hover {
+            transform: rotate(-15deg) scale(1.2);
+        }
+    }
+
+    // Bounce animation variant
+    &.bounce {
+        &:hover {
+            animation: bounce 0.6s ease;
+        }
+    }
+
+    // Pulse animation variant
+    &.pulse {
+        animation: pulse 2s infinite;
+
+        &:hover {
+            animation: pulse 1s infinite;
+        }
+    }
+
+    // Glow animation variant
+    &.glow {
+        &:hover {
+            color: var(--primary-hover);
+            box-shadow: 0 0 10px rgba(149, 125, 107, 0.3), 0 0 20px rgba(149, 125, 107, 0.2),
+                0 0 30px rgba(149, 125, 107, 0.1);
+        }
+    }
+
+    // Slide animation variant
+    &.slide {
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(149, 125, 107, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        &:hover::before {
+            left: 100%;
+        }
+    }
+
+    // 3D lift animation
+    &.lift3d {
+        transform-style: preserve-3d;
+        perspective: 500px;
+
+        &:hover {
+            transform: translateY(-2px) rotateX(10deg);
+            box-shadow: 0 6px 20px rgba(149, 125, 107, 0.3);
+        }
+    }
+
+    // Magnetic animation
+    &.magnetic {
+        &:hover {
+            transform: scale(1.2);
+
+            &::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, rgba(149, 125, 107, 0.1) 0%, transparent 70%);
+                transform: translate(-50%, -50%) scale(1.5);
+                border-radius: 50%;
+            }
+        }
+    }
+
+    // Active state
+    &:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+
+    // Disabled state
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+        animation: none !important;
+
+        &:hover {
+            background: transparent;
+            color: var(--text-color);
+        }
+    }
+}
+
+// Menu divider với animation
+.menu-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+    margin: 6px 16px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+        animation: shine 3s infinite linear;
+    }
+
+    // Animated divider
+    &.animated {
+        background: var(--border-color);
+
+        &::before {
+            animation: shine 2s infinite linear;
+        }
+    }
+
+    // Pulse divider
+    &.pulse {
+        animation: pulse 3s infinite;
+    }
+}
+
+// Menu header với animation
+.menu-header {
+    padding: 12px 20px 8px;
+    font-size: 1.4rem;
+    color: var(--secondary-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    animation: fadeUp 0.4s ease-out both;
+
+    &.slide-in {
+        animation: slideInLeft 0.5s ease-out both;
+    }
+}
+
+// Badge trong menu item
+.menu-badge {
+    background: var(--primary-color);
+    color: var(--white);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-left: auto;
+    animation: scaleIn 0.3s ease-out both;
+
+    &.pulse {
+        animation: pulse 2s infinite, scaleIn 0.3s ease-out both;
+    }
+
+    &.bounce {
+        animation: bounce 1s infinite, scaleIn 0.3s ease-out both;
+    }
+}
+
+// Additional animations
+@keyframes ripple {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 200%;
+        height: 200%;
+        opacity: 0;
+    }
+}
+
+@keyframes menuSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes staggerItem {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+// Responsive animations
+@media (max-width: 768px) {
+    .profile-menu {
+        min-width: 160px;
+        animation: slideInRight 0.3s ease-out both;
+    }
+
+    .menu-item {
+        padding: 10px 16px;
+
+        &:hover {
+            transform: translateX(4px);
+        }
+    }
+
+    .icon-btn {
+        width: 36px;
+        height: 36px;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+    .profile-menu {
+        background: transparent;
+        border-color: transparent;
+    }
+
+    .menu-item {
+        color: var(--primary-color-bold);
+
+        &:hover {
+            background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
+            color: var(--white);
+        }
+    }
+
+    .icon-btn {
+        color: #e0e0e0;
+
+        &:hover {
+            color: var(--primary-hover);
+            background: rgba(149, 125, 107, 0.15);
+        }
     }
 }
