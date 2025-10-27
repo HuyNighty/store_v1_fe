@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './SearchBar.module.scss';
 import { useDebounce } from '~/hooks';
 import productApi from '~/api/productApi';
+import Button from '../../../Button';
 
 const cx = classNames.bind(styles);
 
@@ -280,9 +281,9 @@ function SearchBar({ searchState, setSearchState }) {
                 />
 
                 {!!query && !loading && (
-                    <button className={cx('clear')} onClick={handleClear}>
+                    <Button shine className={cx('clear')} onClick={handleClear}>
                         <FontAwesomeIcon icon={faCircleXmark} />
-                    </button>
+                    </Button>
                 )}
 
                 {loading && <FontAwesomeIcon className={cx('loading')} icon={faSpinner} />}

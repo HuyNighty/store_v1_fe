@@ -104,7 +104,7 @@ function BookItemDetail() {
         <div className={cx('container')}>
             {/* Header */}
             <div className={cx('header')}>
-                <Button back onClick={handleBack}>
+                <Button shine outline back onClick={handleBack}>
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Button>
                 <h1>Chi tiết sách</h1>
@@ -204,6 +204,7 @@ function BookItemDetail() {
                     <div className={cx('action-buttons')}>
                         {isInCart ? (
                             <Button
+                                shine
                                 primary
                                 large
                                 onClick={handleUpdateCart}
@@ -215,6 +216,7 @@ function BookItemDetail() {
                             </Button>
                         ) : (
                             <Button
+                                shine
                                 primary
                                 large
                                 onClick={handleAddToCart}
@@ -226,6 +228,7 @@ function BookItemDetail() {
                             </Button>
                         )}
                         <Button
+                            shine
                             outline
                             large
                             onClick={handleBuyNow}

@@ -316,10 +316,10 @@ function Register() {
                 </div>
 
                 <div className={cx('register-actions')}>
-                    <Button primary width={15} height={4.5} disabled={disabledSubmit}>
+                    <Button shine primary width={15} height={4.5} disabled={disabledSubmit}>
                         {loading ? 'Đang đăng ký...' : 'Đăng ký'}
                     </Button>
-                    <Button outline width={15} to="/login" type="button">
+                    <Button shine outline width={15} to="/login" type="button">
                         Đăng nhập
                     </Button>
                 </div>

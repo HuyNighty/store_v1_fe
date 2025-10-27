@@ -8,10 +8,10 @@ import Button from '../../Layouts/components/Button';
 function Admin() {
     return (
         <div className={cx('wrapper')}>
-            <Button primary to="/admin-products">
+            <Button shine primary to="/admin-products">
                 Add Product
             </Button>
-            <Button primary to="/admin-books">
+            <Button shine primary to="/admin-books">
                 Add Book
             </Button>
         </div>

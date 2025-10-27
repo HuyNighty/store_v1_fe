@@ -67,10 +67,10 @@ function Login() {
                 />
 
                 <div className={cx('login-actions')}>
-                    <Button primary width={15} disabled={loading}>
+                    <Button shine primary width={15} disabled={loading}>
                         {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                     </Button>
-                    <Button outline width={15} to="/register">
+                    <Button shine outline width={15} to="/register">
                         Đăng ký
                     </Button>
                 </div>

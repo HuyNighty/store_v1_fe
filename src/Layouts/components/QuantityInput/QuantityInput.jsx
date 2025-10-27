@@ -3,6 +3,7 @@ import classNames from 'classnames/bind';
 import styles from './QuantityInput.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
+import Button from '../Button';
 
 const cx = classNames.bind(styles);
 
@@ -48,14 +49,15 @@ function QuantityInput({ value = 0, onChange, min = 0, max = 9999, step = 1, dis
 
     return (
         <div className={cx('quantity-input', size, { disabled })}>
-            <button
+            <Button
+                shine
                 type="button"
                 className={cx('quantity-btn', 'decrement')}
                 onClick={handleDecrement}
                 disabled={disabled || value <= min}
             >
                 <FontAwesomeIcon icon={faMinus} />
-            </button>
+            </Button>
 
             <input
                 type="text"

@@ -80,7 +80,7 @@ function BookItem({ book }) {
                 </div>
                 <div className={cx('book-item-footer')}>
                     <p className={cx('book-item-price')}>{displayPrice / 1000}.000 đ</p>
-                    <Button small outline className={cx('book-item-view-btn')} onClick={handleViewDetails}>
+                    <Button small outline shine className={cx('book-item-view-btn')} onClick={handleViewDetails}>
                         Xem chi tiết
                     </Button>
                 </div>

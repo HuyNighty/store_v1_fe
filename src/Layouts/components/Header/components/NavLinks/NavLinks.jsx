@@ -37,7 +37,7 @@ function NavLinks() {
         <nav className={cx('nav')}>
             <div className={cx('links')}>
                 {links.map((link, idx) => (
-                    <Button key={idx} to={link.to} text={2.4}>
+                    <Button shine key={idx} to={link.to} text={2.4}>
                         {link.text}
                     </Button>
                 ))}

@@ -1,3 +1,4 @@
+// Button.js
 import classNames from 'classnames/bind';
 import styles from './Button.module.scss';
 import { Link } from 'react-router-dom';
@@ -14,8 +15,8 @@ function Button({
     success,
     warning,
     info,
-    back, // variant cho nút back
-    home, // variant cho nút home
+    back,
+    home,
     small,
     large,
     disabled,
@@ -25,6 +26,18 @@ function Button({
     width,
     height,
     className,
+    // Animation props
+    pulse,
+    bounce,
+    shine,
+    float,
+    scale,
+    glow,
+    ripple,
+    slide,
+    borderDraw,
+    lift3d,
+    magnetic,
     ...passProps
 }) {
     let Comp = 'button';
@@ -66,6 +79,18 @@ function Button({
             small,
             large,
             disabled,
+            // Animation classes
+            pulse,
+            bounce,
+            shine,
+            float,
+            scale,
+            glow,
+            ripple,
+            slide,
+            borderDraw,
+            lift3d,
+            magnetic,
         },
         className,
     );
@@ -78,7 +103,7 @@ function Button({
 
     return (
         <Comp className={classes} style={style} {...props}>
-            <span>{children}</span>
+            {magnetic ? <span className={cx('magnetic-content')}>{children}</span> : <span>{children}</span>}
         </Comp>
     );
 }

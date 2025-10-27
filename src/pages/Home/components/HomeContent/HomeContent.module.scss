@@ -1,19 +1,27 @@
+// HomeContent.module.scss
 .hero {
-    width: 100%;
-    height: 60vh;
+    width: 100vw;
+    height: 90vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    background: transparent;
+    background: linear-gradient(rgba(101, 85, 72, 0.4), rgba(149, 125, 107, 0.3)),
+        url('https://i.pinimg.com/736x/3b/30/b6/3b30b6bc5b1a89ce7857999dd0672ef0.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     padding: 0 20px;
     box-sizing: border-box;
     border-bottom: 1px solid #d9d5d5;
     overflow: hidden;
     position: relative;
     animation: fadeSlideDown 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    border-radius: 10px;
 
+    // Shine effect
     &::before {
         content: '';
         position: absolute;
@@ -21,34 +29,58 @@
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.6), transparent 70%);
-        animation: shine 4s infinite linear;
+        background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.4), transparent 70%);
+        animation: shine 6s infinite linear;
         pointer-events: none;
+        z-index: 1;
+    }
+
+    // Overlay để text dễ đọc hơn
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.2) 100%);
+        z-index: 0;
+    }
+
+    .hero-inner {
+        position: relative;
+        z-index: 2;
+        max-width: 1200px;
     }
 
     .title {
         font-size: 6.8rem;
         font-weight: 700;
-        color: #111;
+        color: var(--white);
         margin-bottom: 1.2rem;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
         opacity: 0;
         transform: translateY(30px);
         animation: fadeUp 0.8s ease-out forwards 0.2s;
+        font-family: var(--font-family-primary);
 
         span {
-            color: var(--primary-color);
+            color: var(--white);
+            display: block;
         }
     }
 
     .subtitle {
         font-size: 1.8rem;
-        color: #555;
+        color: var(--white);
         max-width: 700px;
         margin: 0 auto 3.2rem auto;
         line-height: 1.6;
         opacity: 0;
         transform: translateY(20px);
         animation: fadeUp 0.8s ease-out forwards 0.4s;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+        font-family: var(--font-family-primary);
     }
 
     .actions {
@@ -67,34 +99,129 @@
         border-radius: 999px;
         cursor: pointer;
         transition: all 0.3s ease;
+        font-family: var(--font-family-primary);
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        &:hover::before {
+            left: 100%;
+        }
 
         &-primary {
             background: var(--primary-color);
             color: var(--white);
             border: none;
+            box-shadow: 0 4px 15px rgba(101, 85, 72, 0.3);
 
             &:hover {
-                transform: scale(1.05);
+                transform: translateY(-2px) scale(1.05);
                 background: var(--primary-hover);
-                box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+                box-shadow: 0 8px 25px rgba(101, 85, 72, 0.4);
             }
         }
 
         &-outline {
             background: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
+            color: var(--white);
+            border: 2px solid var(--white);
+            backdrop-filter: blur(10px);
 
             &:hover {
-                transform: scale(1.05);
-                background: var(--primary-hover);
-                color: var(--white);
-                box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+                transform: translateY(-2px) scale(1.05);
+                background: var(--white);
+                color: var(--primary-color-bold);
+                box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
             }
         }
     }
 }
 
+// Fallback nếu ảnh không load
+.hero.no-bg {
+    background: linear-gradient(135deg, var(--primary-color-bold), var(--primary-color));
+
+    &::after {
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.1));
+    }
+}
+
+// Responsive Design
+@media (max-width: 1200px) {
+    .hero {
+        height: 55vh;
+
+        .title {
+            font-size: 5.5rem;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        height: 50vh;
+        background-attachment: scroll; // Bỏ parallax trên mobile
+        padding: 0 15px;
+
+        .title {
+            font-size: 4rem;
+
+            span {
+                display: inline; // Hiển thị trên cùng 1 dòng
+            }
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .actions {
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            font-size: 1.4rem;
+            padding: 1rem 2.2rem;
+            width: 200px;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        height: 45vh;
+
+        .title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            font-size: 1.3rem;
+            padding: 0.9rem 2rem;
+        }
+    }
+}
+
+// Animations
 @keyframes fadeSlideDown {
     from {
         opacity: 0;
@@ -121,10 +248,29 @@
     0% {
         left: -100%;
     }
-    50% {
+    20% {
         left: 100%;
     }
     100% {
         left: 100%;
     }
+}
+
+// Additional effects
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.hero .title {
+    animation: fadeUp 0.8s ease-out forwards 0.2s, float 6s ease-in-out infinite 1s;
+}
+
+.hero .subtitle {
+    animation: fadeUp 0.8s ease-out forwards 0.4s, float 6s ease-in-out infinite 1.2s;
 }

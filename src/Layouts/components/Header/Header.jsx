@@ -47,7 +47,7 @@ function Header() {
                             <ProfileMenu user={user} onProfileInteract={closeSearch} onLogout={handleLogout} />
                         </>
                     ) : (
-                        <Button outline onClick={handleLoginClick}>
+                        <Button outline shine onClick={handleLoginClick}>
                             Đăng nhập
                         </Button>
                     )}
