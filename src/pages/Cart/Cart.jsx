@@ -78,7 +78,7 @@ function Cart() {
         }
 
         console.log('Showing remove confirmation for:', productName);
-        addToast(`Xác nhận xóa "${productName}"?`, 'warning', 5000, () => {
+        addToast(`Xác nhận xóa "${productName}"?`, 'warning', 4000, () => {
             console.log('Confirm remove called for:', productName);
             confirmRemove(productId, productName);
         });
@@ -117,7 +117,7 @@ function Cart() {
         }
 
         console.log('Showing clear cart confirmation');
-        addToast(`Xác nhận xóa ${cartItems.length} sản phẩm?`, 'warning', 5000, () => {
+        addToast(`Xác nhận xóa ${cartItems.length} sản phẩm?`, 'warning', 4000, () => {
             console.log('Confirm clear cart called');
             confirmClearCart();
         });

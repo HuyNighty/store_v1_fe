@@ -49,15 +49,14 @@ function QuantityInput({ value = 0, onChange, min = 0, max = 9999, step = 1, dis
 
     return (
         <div className={cx('quantity-input', size, { disabled })}>
-            <Button
-                shine
+            <button
                 type="button"
                 className={cx('quantity-btn', 'decrement')}
                 onClick={handleDecrement}
                 disabled={disabled || value <= min}
             >
                 <FontAwesomeIcon icon={faMinus} />
-            </Button>
+            </button>
 
             <input
                 type="text"

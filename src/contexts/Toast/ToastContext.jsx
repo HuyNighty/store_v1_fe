@@ -25,7 +25,7 @@ export const ToastProvider = ({ children }) => {
                 message,
                 type,
                 visible: true,
-                progress: 100,
+                progress: 500,
                 onConfirm,
             },
         ]);
