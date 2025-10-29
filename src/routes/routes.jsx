@@ -12,6 +12,7 @@ import FooterOnly from '../Layouts/FooterOnly';
 // import Footer from '../Layouts/DefaultLayout/Footer';
 import Cart from '../pages/Cart';
 import Checkout from '../pages/Checkout';
+import UserOrders from '../pages/UserOrders';
 
 const publicRoutes = [
     { path: '/', component: Home },
@@ -28,7 +29,10 @@ const privateRoutes = [];
 
 const guestRoutes = [];
 
-const userRoutes = [{ path: '/checkout', component: Checkout, layout: null }];
+const userRoutes = [
+    { path: '/checkout', component: Checkout, layout: null },
+    { path: '/orders', component: UserOrders, layout: HeaderOnly },
+];
 
 const adminRoutes = [
     { path: '/admin-products', component: Products, layout: null },
