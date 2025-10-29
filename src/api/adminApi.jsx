@@ -23,6 +23,15 @@ const adminApi = {
     // BOOK-AUTHORS (association)
     createBookAuthor: (payload) => axiosClient.post(`/book-authors`, payload),
     deleteBookAuthor: (id) => axiosClient.delete(`/book-authors/${id}`),
+
+    // Cập nhật trạng thái đơn hàng (Admin)
+    updateOrderStatus: (orderId, statusData) => axiosClient.patch(`/orders/admin/${orderId}/status`, statusData),
+
+    // Lấy đơn hàng của user cụ thể (Admin)
+    getOrdersByUser: (userId) => axiosClient.get(`/orders/admin/users/${userId}`),
+
+    // Lấy chi tiết đơn hàng của user (Admin)
+    getOrderByUser: (userId, orderId) => axiosClient.get(`/orders/admin/users/${userId}/orders/${orderId}`),
 };
 
 export default adminApi;

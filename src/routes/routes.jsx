@@ -11,6 +11,7 @@ import CreateBookForm from '../pages/Admin/components/CreateBookForm';
 import FooterOnly from '../Layouts/FooterOnly';
 // import Footer from '../Layouts/DefaultLayout/Footer';
 import Cart from '../pages/Cart';
+import Checkout from '../pages/Checkout';
 
 const publicRoutes = [
     { path: '/', component: Home },
@@ -27,7 +28,7 @@ const privateRoutes = [];
 
 const guestRoutes = [];
 
-const userRoutes = [];
+const userRoutes = [{ path: '/checkout', component: Checkout, layout: null }];
 
 const adminRoutes = [
     { path: '/admin-products', component: Products, layout: null },
