@@ -8,6 +8,13 @@
     animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.home-content {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    width: 98.7%;
+}
+
 @keyframes fadeSlideUp {
     from {
         opacity: 0;

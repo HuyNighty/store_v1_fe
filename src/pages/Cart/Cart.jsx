@@ -42,6 +42,42 @@ function Cart() {
         navigate('/checkout');
     };
 
+    // Hàm xem chi tiết sản phẩm
+    const handleViewProductDetails = (item) => {
+        if (processingRef.current) return;
+
+        console.log('Viewing product details:', item.productName);
+
+        // Chuyển hướng đến trang chi tiết sản phẩm
+        navigate('/book-item', {
+            state: {
+                book: {
+                    productId: item.productId,
+                    productName: item.productName,
+                    productAssets: item.url ? [{ url: item.url }] : [],
+                    featured: item.featured,
+                    bookAuthors: item.authorName ? [{ authorName: item.authorName }] : [],
+                    salePrice: item.salePrice,
+                    price: item.unitPrice || item.price,
+                    rating: item.rating,
+                    reviews: item.reviews,
+                    stockQuantity: item.stockQuantity,
+                    weightG: item.weightG,
+                    sku: item.sku,
+                    slug: item.slug,
+                    imageUrl: item.url,
+                    description: item.description,
+                    category: item.category,
+                    publisher: item.publisher,
+                    publishedDate: item.publishedDate,
+                    pages: item.pages,
+                    language: item.language,
+                    isbn: item.isbn,
+                },
+            },
+        });
+    };
+
     const handleQuantityChange = async (productId, newQuantity) => {
         if (processingRef.current) {
             addToast('Đang xử lý, vui lòng đợi...', 'warning', 1500);
@@ -256,7 +292,20 @@ function Cart() {
                         const isOnSale = item.salePrice && item.price && item.salePrice < item.price;
 
                         return (
-                            <div key={item.cartItemId || item.productId} className={cx('cart-item')}>
+                            <div
+                                key={item.cartItemId || item.productId}
+                                className={cx('cart-item')}
+                                onClick={(e) => {
+                                    // Chỉ xem chi tiết khi click vào phần chính, không phải các nút điều khiển
+                                    if (
+                                        !e.target.closest(`.${cx('item-controls')}`) &&
+                                        !e.target.closest(`.${cx('remove-btn')}`) &&
+                                        !e.target.closest(`.${cx('quantity-input')}`)
+                                    ) {
+                                        handleViewProductDetails(item);
+                                    }
+                                }}
+                            >
                                 <div className={cx('item-image')}>
                                     <img
                                         src={mainImage}
@@ -266,6 +315,7 @@ function Cart() {
                                         }}
                                     />
                                     {item.featured && <span className={cx('featured-badge')}>Nổi bật</span>}
+                                    {/* View details overlay */}
                                 </div>
 
                                 <div className={cx('item-details')}>
@@ -307,15 +357,17 @@ function Cart() {
                                         </span>
                                     </div>
 
-                                    <Button
-                                        icon
-                                        onClick={() => handleRemoveItem(item.productId, item.productName)}
-                                        className={cx('remove-btn')}
-                                        title="Xóa sản phẩm"
-                                        disabled={isProcessing}
-                                    >
-                                        <FontAwesomeIcon icon={faTrash} />
-                                    </Button>
+                                    <div className={cx('control-buttons')}>
+                                        <Button
+                                            icon
+                                            onClick={() => handleRemoveItem(item.productId, item.productName)}
+                                            className={cx('remove-btn')}
+                                            title="Xóa sản phẩm"
+                                            disabled={isProcessing}
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} />
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         );

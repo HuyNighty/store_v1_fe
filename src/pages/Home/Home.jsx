@@ -9,7 +9,9 @@ function Home() {
     return (
         <>
             <div className={cx('wrapper')}>
-                <HomeContent />
+                <div className={cx('home-content')}>
+                    <HomeContent />
+                </div>
                 <BookCarousel />
             </div>
         </>
