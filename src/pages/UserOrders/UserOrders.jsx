@@ -74,6 +74,22 @@ function UserOrders() {
         }
     };
 
+    const handleDeleteOrder = async (orderId, orderNumber) => {
+        if (!window.confirm(`Bạn có chắc muốn xóa đơn hàng #${orderNumber}? Hành động này không thể hoàn tác.`)) {
+            return;
+        }
+
+        try {
+            await orderApi.deleteOrder(orderId);
+            addToast('Đã xóa đơn hàng thành công', 'success');
+
+            setOrders((prevOrders) => prevOrders.filter((order) => order.orderId !== orderId));
+        } catch (error) {
+            console.error('Error deleting order:', error);
+            addToast('Lỗi khi xóa đơn hàng', 'error');
+        }
+    };
+
     if (loading) {
         return (
             <div className={cx('container')}>
@@ -144,6 +160,12 @@ function UserOrders() {
                                         // onClick={() => handleConfirmReceived(order.orderId)}
                                     >
                                         Xác nhận đã nhận
+                                    </Button>
+                                )}
+
+                                {order.statusOrder === 'CANCELLED' && (
+                                    <Button danger onClick={() => handleDeleteOrder(order.orderId, order.orderNumber)}>
+                                        Xóa đơn hàng
                                     </Button>
                                 )}
                             </div>

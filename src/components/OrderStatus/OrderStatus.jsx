@@ -49,7 +49,7 @@ const STATUS_CONFIG = {
         description: 'Đơn hàng đã hoàn tất',
         progress: 100,
     },
-    CANCELED: {
+    CANCELLED: {
         label: 'Đã hủy',
         icon: faTimesCircle,
         color: 'danger',
@@ -73,7 +73,7 @@ function OrderStatus({ status, showProgress = true, size = 'medium' }) {
                 </div>
             </div>
 
-            {showProgress && status !== 'CANCELED' && (
+            {showProgress && status !== 'CANCELLED' && (
                 <div className={cx('progress-container')}>
                     <div className={cx('progress-bar')}>
                         <div
@@ -83,7 +83,7 @@ function OrderStatus({ status, showProgress = true, size = 'medium' }) {
                     </div>
                     <div className={cx('progress-steps')}>
                         {Object.entries(STATUS_CONFIG).map(([key, value]) => {
-                            if (key === 'CANCELED') return null;
+                            if (key === 'CANCELLED') return null;
                             return (
                                 <div
                                     key={key}

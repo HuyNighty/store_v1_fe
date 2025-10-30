@@ -1,5 +1,5 @@
 // src/pages/Checkout/Checkout.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './Checkout.module.scss';
@@ -31,13 +31,21 @@ function Checkout() {
         { value: 'CREDIT_CARD', label: 'Thẻ tín dụng/Ghi nợ', icon: faCreditCard },
     ];
 
+    // Format price function - Đưa ra ngoài component hoặc dùng useCallback
+    const formatPrice = useCallback((price) => {
+        if (typeof price !== 'number' || isNaN(price)) {
+            return '0';
+        }
+        return (price / 1000).toLocaleString();
+    }, []);
+
     useEffect(() => {
         // Redirect nếu giỏ hàng trống
         if (cartItems.length === 0) {
             addToast('Giỏ hàng trống, vui lòng thêm sản phẩm', 'warning');
             navigate('/cart');
         }
-    }, [cartItems, navigate, addToast]);
+    }, [cartItems, navigate, addToast]); // Chỉ phụ thuộc vào các giá trị thực sự thay đổi
 
     const handleBack = () => {
         navigate(-1);
@@ -99,14 +107,6 @@ function Checkout() {
         } finally {
             setLoading(false);
         }
-    };
-
-    // Format price function
-    const formatPrice = (price) => {
-        if (typeof price !== 'number' || isNaN(price)) {
-            return '0';
-        }
-        return (price / 1000).toLocaleString();
     };
 
     const totalPrice = getTotalPrice();

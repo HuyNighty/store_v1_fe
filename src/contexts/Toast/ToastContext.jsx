@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useCallback } from 'react';
 import styles from './ToastContext.module.scss';
 import classNames from 'classnames/bind';
 
@@ -16,7 +16,7 @@ export const useToast = () => {
 export const ToastProvider = ({ children }) => {
     const [toasts, setToasts] = useState([]);
 
-    const addToast = (message, type = 'success', duration = 3000, onConfirm = null) => {
+    const addToast = useCallback((message, type = 'success', duration = 3000, onConfirm = null) => {
         const id = Date.now();
         setToasts((prev) => [
             ...prev,
@@ -25,7 +25,7 @@ export const ToastProvider = ({ children }) => {
                 message,
                 type,
                 visible: true,
-                progress: 500,
+                progress: 100,
                 onConfirm,
             },
         ]);
@@ -48,32 +48,35 @@ export const ToastProvider = ({ children }) => {
         setTimeout(() => {
             setToasts((prev) => prev.map((toast) => (toast.id === id ? { ...toast, visible: false } : toast)));
             clearInterval(progressInterval);
-        }, duration - 100);
+        }, duration - 500);
 
         // Remove toast
         setTimeout(() => {
-            removeToast(id);
+            setToasts((prev) => prev.filter((toast) => toast.id !== id));
             clearInterval(progressInterval);
         }, duration);
-    };
+    }, []);
 
-    const removeToast = (id) => {
+    const removeToast = useCallback((id) => {
         setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    };
+    }, []);
 
-    const handleToastClick = (id) => {
-        const toast = toasts.find((t) => t.id === id);
+    const handleToastClick = useCallback(
+        (id) => {
+            const toast = toasts.find((t) => t.id === id);
 
-        if (toast && toast.onConfirm) {
-            toast.onConfirm();
-        }
+            if (toast && toast.onConfirm) {
+                toast.onConfirm();
+            }
 
-        setToasts((prev) => prev.map((toast) => (toast.id === id ? { ...toast, visible: false } : toast)));
+            setToasts((prev) => prev.map((toast) => (toast.id === id ? { ...toast, visible: false } : toast)));
 
-        setTimeout(() => {
-            removeToast(id);
-        }, 300);
-    };
+            setTimeout(() => {
+                setToasts((prev) => prev.filter((toast) => toast.id !== id));
+            }, 300);
+        },
+        [toasts],
+    );
 
     return (
         <ToastContext.Provider value={{ addToast }}>

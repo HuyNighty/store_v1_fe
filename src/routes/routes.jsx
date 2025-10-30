@@ -13,6 +13,7 @@ import FooterOnly from '../Layouts/FooterOnly';
 import Cart from '../pages/Cart';
 import Checkout from '../pages/Checkout';
 import UserOrders from '../pages/UserOrders';
+import AdminOrders from '../pages/Admin/components/AdminOrders';
 
 const publicRoutes = [
     { path: '/', component: Home },
@@ -37,6 +38,7 @@ const userRoutes = [
 const adminRoutes = [
     { path: '/admin-products', component: Products, layout: null },
     { path: '/admin-books', component: CreateBookForm, layout: null },
+    { path: '/admin-orders', component: AdminOrders, layout: null },
 ];
 
 export { publicRoutes, privateRoutes, guestRoutes, userRoutes, adminRoutes };

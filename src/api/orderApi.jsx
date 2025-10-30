@@ -16,6 +16,19 @@ const orderApi = {
 
     // Lấy tất cả đơn hàng (Admin)
     getAllOrders: () => axiosClient.get('/orders'),
+
+    updateOrderStatus: (orderId, data) => {
+        const url = `/orders/admin/${orderId}/status`;
+        return axiosClient.patch(url, data);
+    },
+
+    // Xóa mềm (User)
+    deleteOrder: (orderId) => axiosClient.delete(`/orders/me/${orderId}`),
+
+    adminDeleteOrder: (orderId) => {
+        const url = `/orders/admin/${orderId}`;
+        return axiosClient.delete(url);
+    },
 };
 
 export default orderApi;

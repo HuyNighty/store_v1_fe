@@ -14,6 +14,9 @@ function Admin() {
             <Button shine primary to="/admin-books">
                 Add Book
             </Button>
+            <Button shine primary to="/admin-orders">
+                Orders
+            </Button>
         </div>
     );
 }
