@@ -14,6 +14,8 @@ import Cart from '../pages/Cart';
 import Checkout from '../pages/Checkout';
 import UserOrders from '../pages/UserOrders';
 import AdminOrders from '../pages/Admin/components/AdminOrders';
+import OrderDetail from '../pages/OrderDetail';
+import UserOrderDetail from '../pages/UserOrderDetail';
 
 const publicRoutes = [
     { path: '/', component: Home },
@@ -22,23 +24,24 @@ const publicRoutes = [
     { path: '/book-item', component: BookItemDetail },
     { path: '/login', component: Login, layout: null },
     { path: '/register', component: Register, layout: null },
-    { path: '/admin', component: Admin, layout: HeaderOnly },
     { path: '/cart', component: Cart, layout: HeaderOnly },
 ];
-
 const privateRoutes = [];
 
 const guestRoutes = [];
 
 const userRoutes = [
+    { path: '/orders/:orderId', component: UserOrderDetail },
     { path: '/checkout', component: Checkout, layout: null },
     { path: '/orders', component: UserOrders, layout: HeaderOnly },
 ];
 
 const adminRoutes = [
+    { path: '/admin', component: Admin, layout: HeaderOnly },
     { path: '/admin-products', component: Products, layout: null },
     { path: '/admin-books', component: CreateBookForm, layout: null },
     { path: '/admin-orders', component: AdminOrders, layout: null },
+    { path: '/admin/orders/:orderId', component: OrderDetail, layout: null },
 ];
 
 export { publicRoutes, privateRoutes, guestRoutes, userRoutes, adminRoutes };

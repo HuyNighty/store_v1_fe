@@ -63,7 +63,6 @@
     }
 }
 
-// Trong AdminOrders.module.scss
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -79,16 +78,14 @@
         background: #f8f9fa;
         font-weight: 600;
         color: #333;
-        text-align: center; // Căn giữa tiêu đề
+        text-align: center;
     }
 
-    // Căn giữa cho các cột cụ thể
-    th:nth-child(1), // Mã đơn hàng
-    th:nth-child(3), // Ngày đặt
-    th:nth-child(4), // Tổng tiền
-    th:nth-child(5), // Trạng thái
+    th:nth-child(1),
+    th:nth-child(3),
+    th:nth-child(4),
+    th:nth-child(5),
     th:nth-child(6) {
-        // Hành động
         text-align: center;
     }
 
@@ -101,7 +98,6 @@
             text-align: center;
         }
 
-        // Riêng cột Khách hàng giữ căn trái
         &:nth-child(2) {
             text-align: left;
         }
@@ -257,7 +253,13 @@
 }
 
 .actions {
+    height: 221px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     .action-buttons {
+        justify-content: center;
         display: flex;
         gap: 8px;
         flex-wrap: wrap;

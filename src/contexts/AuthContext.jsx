@@ -1,12 +1,15 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
+// src/contexts/AuthContext.jsx
+import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import authApi from '../api/authApi';
 import { jwtDecode } from 'jwt-decode';
 
+// Tạo context - EXPORT NÀY
 export const AuthContext = createContext({
     isAuthenticated: false,
     user: null,
     login: async () => {},
     logout: async () => {},
+    loading: false,
 });
 
 function parseRolesFromDecoded(decoded) {
@@ -30,6 +33,7 @@ function parseRolesFromDecoded(decoded) {
 export function AuthProvider({ children }) {
     const [isAuthenticated, setIsAuthenticated] = useState(Boolean(localStorage.getItem('access_token')));
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const decodeUserFromToken = (token) => {
         try {
@@ -88,7 +92,6 @@ export function AuthProvider({ children }) {
             if (decodedUser) {
                 setUser(decodedUser);
                 setIsAuthenticated(true);
-
                 fetchUser().catch(() => {});
             } else {
                 localStorage.removeItem('access_token');
@@ -99,26 +102,33 @@ export function AuthProvider({ children }) {
             setIsAuthenticated(false);
             setUser(null);
         }
+        setLoading(false);
     }, [fetchUser]);
 
     const login = async ({ identifier, password }) => {
-        const res = await authApi.login({ identifier, password });
-        const token =
-            res.data?.result?.token || res.data?.result?.accessToken || res.data?.token || res.data?.accessToken;
+        setLoading(true);
+        try {
+            const res = await authApi.login({ identifier, password });
+            const token =
+                res.data?.result?.token || res.data?.result?.accessToken || res.data?.token || res.data?.accessToken;
 
-        if (!token) throw new Error('No token returned from login');
+            if (!token) throw new Error('No token returned from login');
 
-        localStorage.setItem('access_token', token);
-        setIsAuthenticated(true);
+            localStorage.setItem('access_token', token);
+            setIsAuthenticated(true);
 
-        const decodedUser = decodeUserFromToken(token);
-        if (decodedUser) setUser(decodedUser);
+            const decodedUser = decodeUserFromToken(token);
+            if (decodedUser) setUser(decodedUser);
 
-        await fetchUser();
-        return true;
+            await fetchUser();
+            return true;
+        } finally {
+            setLoading(false);
+        }
     };
 
     const logout = async () => {
+        setLoading(true);
         try {
             await authApi.logout();
         } catch (e) {
@@ -127,8 +137,29 @@ export function AuthProvider({ children }) {
             localStorage.removeItem('access_token');
             setIsAuthenticated(false);
             setUser(null);
+            setLoading(false);
         }
     };
 
-    return <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>{children}</AuthContext.Provider>;
+    const value = {
+        isAuthenticated,
+        user,
+        login,
+        logout,
+        loading,
+    };
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
+
+// Tạo custom hook để sử dụng AuthContext
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+};
+
+// Export default cho các component cần context trực tiếp
+export default AuthContext;
