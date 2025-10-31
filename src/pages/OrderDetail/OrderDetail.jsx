@@ -8,7 +8,8 @@ import { useToast } from '../../contexts/Toast/ToastContext';
 import OrderStatus from '../../components/OrderStatus/OrderStatus';
 import Button from '../../Layouts/components/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faUser, faMapMarkerAlt, faBox, faCreditCard } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faUser, faMapMarkerAlt, faBox, faCreditCard, faEye } from '@fortawesome/free-solid-svg-icons';
+import CustomerDetailModal from '../../components/CustomerDetailModal';
 
 const cx = classNames.bind(styles);
 
@@ -20,6 +21,8 @@ function OrderDetail() {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [updatingStatus, setUpdatingStatus] = useState(false);
+    const [showCustomerModal, setShowCustomerModal] = useState(false);
+    const [selectedCustomerId, setSelectedCustomerId] = useState(null);
 
     useEffect(() => {
         fetchOrderDetail();
@@ -61,7 +64,7 @@ function OrderDetail() {
         try {
             await orderApi.updateOrderStatus(order.orderId, { newStatusOrder: newStatus });
             addToast('Cập nhật trạng thái đơn hàng thành công', 'success');
-            fetchOrderDetail(); // Refresh data
+            fetchOrderDetail();
         } catch (error) {
             console.error('Error updating order status:', error);
             addToast('Lỗi khi cập nhật trạng thái đơn hàng', 'error');
@@ -85,6 +88,12 @@ function OrderDetail() {
             console.error('Error deleting order:', error);
             addToast('Lỗi khi xóa đơn hàng', 'error');
         }
+    };
+
+    // Hàm mở modal xem chi tiết customer
+    const handleViewCustomer = (customerId) => {
+        setSelectedCustomerId(customerId);
+        setShowCustomerModal(true);
     };
 
     const getStatusActions = (currentStatus) => {
@@ -153,6 +162,7 @@ function OrderDetail() {
                         <FontAwesomeIcon icon={faArrowLeft} />
                     </Button>
                     <div className={cx('header-content')}>
+                        <h1>Đơn hàng #{order.orderNumber}</h1>
                         <div className={cx('order-meta')}>
                             <OrderStatus status={order.statusOrder} />
                             <span className={cx('order-date')}>Đặt ngày: {formatDate(order.createdAt)}</span>
@@ -259,8 +269,18 @@ function OrderDetail() {
                                     <span>{order.phone || 'N/A'}</span>
                                 </div>
                                 <div className={cx('info-item')}>
-                                    <label>User ID:</label>
-                                    <span>{order.userId || 'N/A'}</span>
+                                    <label>Customer ID:</label>
+                                    <div className={cx('user-id-container')}>
+                                        <Button
+                                            small
+                                            outline
+                                            onClick={() => handleViewCustomer(order.customerId)}
+                                            className={cx('user-id-btn')}
+                                        >
+                                            <FontAwesomeIcon icon={faEye} />
+                                            {order.customerId || 'N/A'}
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -352,6 +372,13 @@ function OrderDetail() {
                     </div>
                 </div>
             </div>
+
+            {/* Customer Detail Modal */}
+            <CustomerDetailModal
+                customerId={selectedCustomerId}
+                isOpen={showCustomerModal}
+                onClose={() => setShowCustomerModal(false)}
+            />
         </div>
     );
 }
