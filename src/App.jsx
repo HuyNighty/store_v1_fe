@@ -5,6 +5,7 @@ import DefaultLayout from './Layouts/DefaultLayout';
 import { CartProvider } from './contexts/CartContext';
 import { ToastProvider } from './contexts/Toast/ToastContext';
 import ProtectedRoute from './routes/components/ProtectedRoute/ProtectedRoute';
+import { WishlistProvider } from './contexts/WishlistContext';
 
 function App() {
     const renderElement = (route, isProtected = false, requiredRole = null) => {
@@ -37,43 +38,45 @@ function App() {
     return (
         <CartProvider>
             <ToastProvider>
-                <Router>
-                    <div className="App">
-                        <Routes>
-                            {/* Public Routes - Ai cũng truy cập được */}
-                            {publicRoutes.map((route, index) => (
-                                <Route key={route.path || index} path={route.path} element={renderElement(route)} />
-                            ))}
+                <WishlistProvider>
+                    <Router>
+                        <div className="App">
+                            <Routes>
+                                {/* Public Routes - Ai cũng truy cập được */}
+                                {publicRoutes.map((route, index) => (
+                                    <Route key={route.path || index} path={route.path} element={renderElement(route)} />
+                                ))}
 
-                            {/* Private Routes - Cần đăng nhập (chưa dùng trong code hiện tại) */}
-                            {privateRoutes.map((route, index) => (
-                                <Route
-                                    key={route.path || index}
-                                    path={route.path}
-                                    element={renderElement(route, true)}
-                                />
-                            ))}
+                                {/* Private Routes - Cần đăng nhập (chưa dùng trong code hiện tại) */}
+                                {privateRoutes.map((route, index) => (
+                                    <Route
+                                        key={route.path || index}
+                                        path={route.path}
+                                        element={renderElement(route, true)}
+                                    />
+                                ))}
 
-                            {/* Admin Routes - Chỉ ADMIN truy cập được */}
-                            {adminRoutes.map((route, index) => (
-                                <Route
-                                    key={route.path || index}
-                                    path={route.path}
-                                    element={renderElement(route, true, 'admin')}
-                                />
-                            ))}
+                                {/* Admin Routes - Chỉ ADMIN truy cập được */}
+                                {adminRoutes.map((route, index) => (
+                                    <Route
+                                        key={route.path || index}
+                                        path={route.path}
+                                        element={renderElement(route, true, 'admin')}
+                                    />
+                                ))}
 
-                            {/* User Routes - Chỉ USER truy cập được */}
-                            {userRoutes.map((route, index) => (
-                                <Route
-                                    key={route.path || index}
-                                    path={route.path}
-                                    element={renderElement(route, true, 'user')}
-                                />
-                            ))}
-                        </Routes>
-                    </div>
-                </Router>
+                                {/* User Routes - Chỉ USER truy cập được */}
+                                {userRoutes.map((route, index) => (
+                                    <Route
+                                        key={route.path || index}
+                                        path={route.path}
+                                        element={renderElement(route, true, 'user')}
+                                    />
+                                ))}
+                            </Routes>
+                        </div>
+                    </Router>
+                </WishlistProvider>
             </ToastProvider>
         </CartProvider>
     );

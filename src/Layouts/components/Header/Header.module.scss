@@ -25,3 +25,122 @@
     min-width: 200px;
     min-height: 40px;
 }
+
+.nav-icons {
+    display: flex;
+    align-items: center;
+    gap: 16px; // Thêm gap giữa các icon
+}
+
+// Wishlist button style giống cartButton
+.wishlist-wrapper {
+    position: relative;
+    width: var(--icon-size, 24px); // Sử dụng cùng biến với cart
+    height: 20px; // Giống cart
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform var(--transition-base, 0.2s ease);
+    color: #000;
+
+    &:hover {
+        color: var(--primary-hover, #007bff);
+        transform: scale(1.15);
+    }
+
+    .badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: var(--primary-color);
+        color: var(--white, #fff);
+        font-size: 11px;
+        font-weight: 600;
+        border-radius: 50%;
+        width: var(--badge-size, 18px);
+        height: var(--badge-size, 18px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+    }
+}
+
+// Giữ nguyên các style cũ cho responsive
+.nav-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: #666;
+    text-decoration: none;
+    font-size: 1.8rem;
+    transition: all 0.2s ease;
+    min-height: 50px;
+
+    &.wishlist-btn {
+        position: relative;
+    }
+}
+
+.icon-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+
+    svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+    .content {
+        padding: 0 15px;
+        height: 60px;
+    }
+
+    .actions {
+        gap: 10px;
+    }
+
+    .wishlist-wrapper {
+        width: 20px; // Giảm kích thước trên mobile
+        height: 18px;
+
+        .badge {
+            top: -6px;
+            right: -6px;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-icons {
+        gap: 8px;
+    }
+
+    .wishlist-wrapper {
+        width: 18px;
+        height: 16px;
+
+        .badge {
+            top: -5px;
+            right: -5px;
+            width: 14px;
+            height: 14px;
+            font-size: 9px;
+        }
+    }
+}

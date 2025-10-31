@@ -281,9 +281,9 @@ function SearchBar({ searchState, setSearchState }) {
                 />
 
                 {!!query && !loading && (
-                    <Button shine className={cx('clear')} onClick={handleClear}>
+                    <button shine className={cx('clear')} onClick={handleClear}>
                         <FontAwesomeIcon icon={faCircleXmark} />
-                    </Button>
+                    </button>
                 )}
 
                 {loading && <FontAwesomeIcon className={cx('loading')} icon={faSpinner} />}

@@ -6,6 +6,7 @@ import { BookItem } from '../../components/BookItem';
 import Tippy from '@tippyjs/react/headless';
 import { Wrapper as PopperWrapper } from '../../Layouts/Popper';
 import productApi from '../../api/productApi';
+import categoryApi from '../../api/categoryApi';
 
 const cx = classNames.bind(styles);
 
@@ -13,20 +14,50 @@ function Books() {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('Most Popular');
     const [selectedCategory, setSelectedCategory] = useState('All');
+    const [selectedCategoryId, setSelectedCategoryId] = useState(null);
     const [openCategory, setOpenCategory] = useState(false);
     const [openSort, setOpenSort] = useState(false);
     const [books, setBooks] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [categoriesLoading, setCategoriesLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Fetch categories từ API
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                setCategoriesLoading(true);
+                const response = await categoryApi.getAllCategories();
+
+                let categoriesData = [];
+                if (Array.isArray(response?.data?.result)) {
+                    categoriesData = response.data.result;
+                } else if (Array.isArray(response?.data)) {
+                    categoriesData = response.data;
+                }
+
+                // Chỉ lấy categories active
+                categoriesData = categoriesData.filter((cat) => cat.isActive);
+                setCategories(categoriesData);
+            } catch (err) {
+                console.error('Lỗi khi tải categories:', err);
+                setCategories([]);
+            } finally {
+                setCategoriesLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
+    // Fetch books từ API
     useEffect(() => {
         const isActiveTrue = (v) => {
-            // handle boolean, numbers, strings
             if (v === true) return true;
             if (v === false) return false;
             if (typeof v === 'number') return v === 1;
             if (typeof v === 'string') return v.toLowerCase() === 'true' || v === '1';
-            // fallback: treat truthy values as active
             return Boolean(v);
         };
 
@@ -50,13 +81,9 @@ function Books() {
 
                 // FILTER: chỉ giữ product active
                 booksData = booksData.filter((b) => {
-                    // Some APIs nest fields (e.g., b.product.isActive), adapt if needed
                     const val = b.isActive ?? b.active ?? b.is_active ?? b.activeFlag;
                     return isActiveTrue(val);
                 });
-
-                // Optionally only featured (uncomment if needed)
-                // booksData = booksData.filter(b => b.featured === true || String(b.featured) === 'true' || b.featured === 1);
 
                 setBooks(booksData);
             } catch (err) {
@@ -70,14 +97,26 @@ function Books() {
         fetchBooks();
     }, []);
 
-    const categories = [
-        { id: 1, name: 'All' },
-        { id: 2, name: 'Fiction' },
-        { id: 3, name: 'Self-help' },
-        { id: 4, name: 'Biography' },
-        { id: 5, name: 'Sci-fi' },
-        { id: 6, name: 'Thriller' },
-    ];
+    // Xây dựng category tree để hiển thị phân cấp
+    const buildCategoryTree = (categories, parentId = 0, level = 0) => {
+        const children = categories.filter((cat) => cat.parentId === parentId);
+        if (children.length === 0) return [];
+
+        let result = [];
+        children.forEach((category) => {
+            result.push({
+                ...category,
+                level,
+                displayName: '  '.repeat(level) + category.categoryName,
+            });
+            const grandchildren = buildCategoryTree(categories, category.categoryId, level + 1);
+            result = result.concat(grandchildren);
+        });
+
+        return result;
+    };
+
+    const categoryTree = buildCategoryTree(categories);
 
     const sorts = ['Most Popular', 'Highest Rated', 'Price: Low to High', 'Price: High to Low'];
 
@@ -86,9 +125,15 @@ function Books() {
 
         const matchesSearch =
             book.productName?.toLowerCase().includes(search) ||
-            book.bookAuthors?.some((a) => a.authorName.toLowerCase().includes(search));
+            book.bookAuthors?.some((a) => a.authorName?.toLowerCase().includes(search)) ||
+            book.authorName?.toLowerCase().includes(search);
 
-        const matchesCategory = selectedCategory === 'All' || book.category === selectedCategory;
+        // Lọc theo category
+        const matchesCategory =
+            selectedCategoryId === null ||
+            (book.categories && book.categories.some((cat) => cat.categoryId === selectedCategoryId)) ||
+            (book.categoryIds && book.categoryIds.includes(selectedCategoryId)) ||
+            (book.productCategory && book.productCategory.some((pc) => pc.category?.categoryId === selectedCategoryId));
 
         return matchesSearch && matchesCategory;
     });
@@ -99,10 +144,24 @@ function Books() {
                 return (a.salePrice ?? a.price) - (b.salePrice ?? b.price);
             case 'Price: High to Low':
                 return (b.salePrice ?? b.price) - (a.salePrice ?? a.price);
+            case 'Highest Rated':
+                return (b.rating ?? b.averageRating ?? 0) - (a.rating ?? a.averageRating ?? 0);
             default:
-                return 0;
+                // Most Popular - có thể dựa vào số lượng bán hoặc view
+                return (b.popularity ?? b.soldCount ?? 0) - (a.popularity ?? a.soldCount ?? 0);
         }
     });
+
+    const handleCategorySelect = (category) => {
+        if (category === 'All') {
+            setSelectedCategory('All');
+            setSelectedCategoryId(null);
+        } else {
+            setSelectedCategory(category.categoryName);
+            setSelectedCategoryId(category.categoryId);
+        }
+        setOpenCategory(false);
+    };
 
     return (
         <div className={cx('wrapper')}>
@@ -137,18 +196,33 @@ function Books() {
                             render={(attrs) => (
                                 <div className={cx('dropdown')} tabIndex="-1" {...attrs}>
                                     <PopperWrapper>
-                                        {categories.map((cat) => (
-                                            <div
-                                                key={cat.id}
-                                                className={cx('dropdown-item')}
-                                                onClick={() => {
-                                                    setSelectedCategory(cat.name);
-                                                    setOpenCategory(false);
-                                                }}
-                                            >
-                                                {cat.name}
-                                            </div>
-                                        ))}
+                                        <div
+                                            className={cx('dropdown-item')}
+                                            onClick={() => handleCategorySelect('All')}
+                                        >
+                                            All Categories
+                                        </div>
+                                        {categoriesLoading ? (
+                                            <div className={cx('dropdown-loading')}>Loading categories...</div>
+                                        ) : (
+                                            categoryTree.map((cat) => (
+                                                <div
+                                                    key={cat.categoryId}
+                                                    className={cx('dropdown-item', 'category-item')}
+                                                    style={{ paddingLeft: `${12 + cat.level * 16}px` }}
+                                                    onClick={() => handleCategorySelect(cat)}
+                                                    title={cat.description}
+                                                >
+                                                    <span className={cx('category-name')}>
+                                                        {cat.level > 0 && '└─ '}
+                                                        {cat.categoryName}
+                                                    </span>
+                                                    {cat.description && (
+                                                        <span className={cx('category-desc')}>{cat.description}</span>
+                                                    )}
+                                                </div>
+                                            ))
+                                        )}
                                     </PopperWrapper>
                                 </div>
                             )}
@@ -198,6 +272,7 @@ function Books() {
                 <div className={cx('result-info')}>
                     <p>
                         Showing {sortedBooks.length} {sortedBooks.length === 1 ? 'book' : 'books'}
+                        {selectedCategoryId && ` in "${selectedCategory}"`}
                     </p>
                 </div>
 

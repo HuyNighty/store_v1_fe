@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createFullBook, validateFullBookCreation } from '../../../../utils/createFullBook';
 import Button from '../../../../Layouts/components/Button';
 import Checkbox from '../../../../Layouts/components/Checkbox';
@@ -7,6 +7,7 @@ import styles from './CreateBookForm.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
+import categoryApi from '../../../../api/categoryApi';
 
 const cx = classNames.bind(styles);
 
@@ -92,6 +93,9 @@ function CreateBookForm() {
         isActive: true,
         featured: false,
 
+        // Category data
+        categoryIds: [],
+
         // Asset data
         url: '',
         fileName: '',
@@ -114,6 +118,27 @@ function CreateBookForm() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [fieldErrors, setFieldErrors] = useState({});
+    const [categories, setCategories] = useState([]);
+    const [categoriesLoading, setCategoriesLoading] = useState(false);
+
+    // Fetch categories on component mount
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    const fetchCategories = async () => {
+        setCategoriesLoading(true);
+        try {
+            const response = await categoryApi.getAllCategories();
+            // Lọc chỉ lấy categories active
+            const activeCategories = response.data.result.filter((cat) => cat.isActive);
+            setCategories(activeCategories);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        } finally {
+            setCategoriesLoading(false);
+        }
+    };
 
     // Handlers
     const handleFileChange = (e) => {
@@ -146,6 +171,25 @@ function CreateBookForm() {
 
     const handleCheckboxChange = (field) => (e) => {
         handleInputChange(field, e.target.checked);
+    };
+
+    const handleCategoryChange = (categoryId) => (e) => {
+        const { checked } = e.target;
+        setFormData((prev) => {
+            const currentCategoryIds = [...(prev.categoryIds || [])];
+
+            if (checked) {
+                // Thêm categoryId nếu chưa tồn tại
+                if (!currentCategoryIds.includes(categoryId)) {
+                    return { ...prev, categoryIds: [...currentCategoryIds, categoryId] };
+                }
+            } else {
+                // Xóa categoryId
+                return { ...prev, categoryIds: currentCategoryIds.filter((id) => id !== categoryId) };
+            }
+
+            return prev;
+        });
     };
 
     const resetForm = () => {
@@ -187,6 +231,11 @@ function CreateBookForm() {
             errors.url = 'Vui lòng nhập URL hợp lệ.';
         }
 
+        // Category validation (optional)
+        if (formData.categoryIds && formData.categoryIds.length === 0) {
+            errors.categoryIds = 'Vui lòng chọn ít nhất một thể loại.';
+        }
+
         setFieldErrors(errors);
         return Object.keys(errors).length === 0;
     };
@@ -213,6 +262,9 @@ function CreateBookForm() {
             weightG: parseFloat(formData.weightG) || 0,
             isActive: formData.isActive,
             featured: formData.featured,
+
+            // Category data
+            categoryIds: formData.categoryIds || [],
 
             // Asset data (optional)
             ...(formData.url && {
@@ -321,7 +373,6 @@ function CreateBookForm() {
                 />
             </div>
             <div className={cx('number-field')}>
-                {/* Price với QuantityInput */}
                 <NumberField
                     name="price"
                     label="Price"
@@ -334,7 +385,6 @@ function CreateBookForm() {
                     max={100000000}
                 />
 
-                {/* Sale Price với QuantityInput */}
                 <NumberField
                     name="salePrice"
                     label="Sale Price"
@@ -346,7 +396,6 @@ function CreateBookForm() {
                     max={100000000}
                 />
 
-                {/* Stock Quantity với QuantityInput */}
                 <NumberField
                     name="stockQuantity"
                     label="Stock Quantity"
@@ -359,7 +408,6 @@ function CreateBookForm() {
                     max={9999}
                 />
 
-                {/* Weight với QuantityInput */}
                 <NumberField
                     name="weightG"
                     label="Weight G"
@@ -392,6 +440,42 @@ function CreateBookForm() {
             </div>
         </>
     );
+
+    const renderCategoryFields = () => {
+        const buildCategoryTree = (categories, parentId = 0, level = 0) => {
+            const children = categories.filter((cat) => cat.parentId === parentId);
+            if (children.length === 0) return null;
+
+            return children.map((category) => (
+                <div key={category.categoryId} style={{ marginLeft: `${level * 20}px` }}>
+                    <Checkbox
+                        name={`category-${category.categoryId}`}
+                        label={category.categoryName}
+                        checked={formData.categoryIds?.includes(category.categoryId) || false}
+                        onChange={handleCategoryChange(category.categoryId)}
+                        variant="info"
+                        size="medium"
+                    />
+                    {buildCategoryTree(categories, category.categoryId, level + 1)}
+                </div>
+            ));
+        };
+        return (
+            <div className={cx('categorySection')}>
+                <div className={cx('form-group', { invalid: !!fieldErrors.categoryIds })}>
+                    <label>
+                        Categories <span className={cx('required')}>*</span>
+                    </label>
+                    {categoriesLoading ? (
+                        <div className={cx('loading-categories')}>Đang tải thể loại...</div>
+                    ) : (
+                        <div className={cx('categoryTree')}>{buildCategoryTree(categories)}</div>
+                    )}
+                    {fieldErrors.categoryIds && <p className={cx('error')}>{fieldErrors.categoryIds}</p>}
+                </div>
+            </div>
+        );
+    };
 
     const renderCoverFields = () => (
         <div className={cx('coverSection')}>
@@ -491,6 +575,9 @@ function CreateBookForm() {
             </div>
 
             {renderProductFields()}
+
+            <h4 className={cx('sectionTitle')}>Categories</h4>
+            {renderCategoryFields()}
 
             <h4 className={cx('sectionTitle')}>Cover (Optional)</h4>
             {renderCoverFields()}

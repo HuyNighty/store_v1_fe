@@ -16,6 +16,7 @@ import UserOrders from '../pages/UserOrders';
 import AdminOrders from '../pages/Admin/components/AdminOrders';
 import OrderDetail from '../pages/OrderDetail';
 import UserOrderDetail from '../pages/UserOrderDetail';
+import Wishlist from '../pages/Wishlist';
 
 const publicRoutes = [
     { path: '/', component: Home },
@@ -34,6 +35,7 @@ const userRoutes = [
     { path: '/orders/:orderId', component: UserOrderDetail },
     { path: '/checkout', component: Checkout, layout: null },
     { path: '/orders', component: UserOrders, layout: HeaderOnly },
+    { path: '/wishlist', component: Wishlist, layout: HeaderOnly },
 ];
 
 const adminRoutes = [

@@ -8,8 +8,11 @@ import CartButton from './components/CartButton/CartButton';
 import ProfileMenu from './components/ProfileMenu/ProfileMenu';
 import Button from '../Button/Button';
 import Logo from '../../../components/Logo';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../contexts/AuthContext';
+import { useWishlist } from '../../../contexts/WishlistContext';
+import { faHeart } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const cx = classNames.bind(styles);
 
@@ -34,6 +37,9 @@ function Header() {
         navigate('/');
     };
 
+    const { getWishlistCount } = useWishlist();
+    const wishlistCount = getWishlistCount();
+
     return (
         <header className={cx('wrapper')}>
             <div className={cx('content')}>
@@ -44,6 +50,17 @@ function Header() {
                     {isAuthenticated ? (
                         <>
                             <CartButton />
+                            <nav className={cx('nav-icons')}>
+                                {/* Wishlist button với style giống cartButton */}
+                                <div className={cx('wishlist-wrapper')} onClick={() => navigate('/wishlist')}>
+                                    <FontAwesomeIcon icon={faHeart} />
+                                    {wishlistCount > 0 && (
+                                        <span className={cx('badge')}>
+                                            {wishlistCount > 99 ? '99+' : wishlistCount}
+                                        </span>
+                                    )}
+                                </div>
+                            </nav>
                             <ProfileMenu user={user} onProfileInteract={closeSearch} onLogout={handleLogout} />
                         </>
                     ) : (
