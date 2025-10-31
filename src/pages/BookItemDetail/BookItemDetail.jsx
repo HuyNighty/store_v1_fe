@@ -262,7 +262,13 @@ function BookItemDetail() {
                             <div className={cx('authors-list')}>
                                 {bookAuthors.map((author) => (
                                     <div key={author.authorId} className={cx('author')}>
-                                        <strong>{author.authorName}</strong>
+                                        <Button
+                                            text
+                                            className={cx('author-name-btn')}
+                                            onClick={() => navigate(`/authors/${author.authorId}`)}
+                                        >
+                                            <strong>{author.authorName}</strong>
+                                        </Button>
                                         {author.authorBio && <p>{author.authorBio}</p>}
                                     </div>
                                 ))}
@@ -413,13 +419,13 @@ function BookItemDetail() {
                             Mua ngay
                         </Button>
                         <div className={cx('secondary-actions')}>
-                            <Button
+                            <button
                                 icon
                                 className={cx('wishlist-btn', { active: isWishlisted })}
                                 onClick={handleWishlistToggle}
                             >
                                 <FontAwesomeIcon icon={isWishlisted ? faHeart : faHeartRegular} />
-                            </Button>
+                            </button>
                             <Button icon className={cx('share-btn')} onClick={handleShare}>
                                 <FontAwesomeIcon icon={faShare} />
                             </Button>

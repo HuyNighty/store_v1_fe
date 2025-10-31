@@ -5,13 +5,13 @@ import Checkbox from '../../../../Layouts/components/Checkbox';
 import QuantityInput from '../../../../Layouts/components/QuantityInput';
 import styles from './CreateBookForm.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import categoryApi from '../../../../api/categoryApi';
 
 const cx = classNames.bind(styles);
 
-// FormField Component
+// FormField Component (giữ nguyên)
 function FormField({ id, label, name, value, onChange, type = 'text', placeholder, error, required = false }) {
     return (
         <div className={cx('form-group', { invalid: !!error })}>
@@ -34,6 +34,7 @@ function FormField({ id, label, name, value, onChange, type = 'text', placeholde
     );
 }
 
+// NumberField Component (giữ nguyên)
 function NumberField({
     label,
     name,
@@ -67,20 +68,8 @@ function NumberField({
     );
 }
 
-const NATIONALITY_OPTIONS = [
-    { value: 'VN', label: 'Vietnamese' },
-    { value: 'US', label: 'American' },
-    { value: 'UK', label: 'British' },
-    { value: 'FR', label: 'French' },
-    { value: 'JP', label: 'Japanese' },
-    { value: 'CN', label: 'Chinese' },
-    { value: 'KR', label: 'Korean' },
-    { value: 'RU', label: 'Russian' },
-    { value: 'OTHER', label: 'Other' },
-];
-
 function CreateBookForm() {
-    // Initial State
+    // Initial State - Đơn giản hóa author data
     const initialFormState = {
         // Product data
         sku: '',
@@ -104,15 +93,16 @@ function CreateBookForm() {
         height: 600,
         sizeBytes: 102400,
 
-        // Author data
+        // Author data - Chỉ cần authorName
         authorName: '',
-        authorBio: '',
-        authorBornDate: '',
-        authorDeathDate: '',
-        authorNationality: 'OTHER',
+        // Bỏ các trường author details không cần thiết
+        // authorBio: '',
+        // authorBornDate: '',
+        // authorDeathDate: '',
+        // authorNationality: 'OTHER',
     };
 
-    // State Management
+    // State Management (giữ nguyên)
     const [formData, setFormData] = useState(initialFormState);
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -121,7 +111,7 @@ function CreateBookForm() {
     const [categories, setCategories] = useState([]);
     const [categoriesLoading, setCategoriesLoading] = useState(false);
 
-    // Fetch categories on component mount
+    // Fetch categories on component mount (giữ nguyên)
     useEffect(() => {
         fetchCategories();
     }, []);
@@ -130,7 +120,6 @@ function CreateBookForm() {
         setCategoriesLoading(true);
         try {
             const response = await categoryApi.getAllCategories();
-            // Lọc chỉ lấy categories active
             const activeCategories = response.data.result.filter((cat) => cat.isActive);
             setCategories(activeCategories);
         } catch (error) {
@@ -140,7 +129,7 @@ function CreateBookForm() {
         }
     };
 
-    // Handlers
+    // Handlers (giữ nguyên)
     const handleFileChange = (e) => {
         const selectedFile = e.target.files?.[0] ?? null;
         setFile(selectedFile);
@@ -157,7 +146,6 @@ function CreateBookForm() {
 
     const handleInputChange = (field, value) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
-        // Clear error when user starts typing
         if (fieldErrors[field]) {
             setFieldErrors((prev) => ({ ...prev, [field]: '' }));
         }
@@ -179,12 +167,10 @@ function CreateBookForm() {
             const currentCategoryIds = [...(prev.categoryIds || [])];
 
             if (checked) {
-                // Thêm categoryId nếu chưa tồn tại
                 if (!currentCategoryIds.includes(categoryId)) {
                     return { ...prev, categoryIds: [...currentCategoryIds, categoryId] };
                 }
             } else {
-                // Xóa categoryId
                 return { ...prev, categoryIds: currentCategoryIds.filter((id) => id !== categoryId) };
             }
 
@@ -199,7 +185,7 @@ function CreateBookForm() {
         setFieldErrors({});
     };
 
-    // Validation
+    // Validation (giữ nguyên)
     const validateForm = () => {
         const errors = {};
 
@@ -231,7 +217,6 @@ function CreateBookForm() {
             errors.url = 'Vui lòng nhập URL hợp lệ.';
         }
 
-        // Category validation (optional)
         if (formData.categoryIds && formData.categoryIds.length === 0) {
             errors.categoryIds = 'Vui lòng chọn ít nhất một thể loại.';
         }
@@ -249,7 +234,7 @@ function CreateBookForm() {
         }
     };
 
-    // Request Preparation
+    // Request Preparation - Đơn giản hóa
     const prepareFullBookRequest = () => {
         const request = {
             // Product data
@@ -276,13 +261,10 @@ function CreateBookForm() {
                 sizeBytes: formData.sizeBytes,
             }),
 
-            // Author data (optional)
+            // Author data (optional) - Chỉ cần authorName
             ...(formData.authorName && {
                 authorName: formData.authorName,
-                authorBio: formData.authorBio,
-                authorBornDate: formData.authorBornDate || null,
-                authorDeathDate: formData.authorDeathDate || null,
-                authorNationality: formData.authorNationality,
+                // Bỏ các trường author details
             }),
         };
 
@@ -290,7 +272,7 @@ function CreateBookForm() {
         return request;
     };
 
-    // Form Submission
+    // Form Submission (giữ nguyên)
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
@@ -506,6 +488,7 @@ function CreateBookForm() {
         </div>
     );
 
+    // Author Fields - Đơn giản hóa chỉ còn authorName
     const renderAuthorFields = () => (
         <div className={cx('authorSection')}>
             <FormField
@@ -516,51 +499,10 @@ function CreateBookForm() {
                 onChange={handleFormInputChange}
             />
 
-            <div className={cx('form-group')}>
-                <label htmlFor="authorBio">Bio</label>
-                <textarea
-                    id="authorBio"
-                    name="authorBio"
-                    placeholder="Bio"
-                    value={formData.authorBio}
-                    onChange={handleFormInputChange}
-                    className={cx('bioTextarea')}
-                />
-            </div>
-
-            <div className={cx('authorDetails')}>
-                <FormField
-                    name="authorBornDate"
-                    label="Born Date"
-                    type="date"
-                    value={formData.authorBornDate}
-                    onChange={handleFormInputChange}
-                />
-                <FormField
-                    name="authorDeathDate"
-                    label="Death Date"
-                    type="date"
-                    value={formData.authorDeathDate}
-                    onChange={handleFormInputChange}
-                />
-            </div>
-
-            <div className={cx('form-group')}>
-                <label htmlFor="authorNationality">Nationality</label>
-                <select
-                    id="authorNationality"
-                    name="authorNationality"
-                    value={formData.authorNationality}
-                    onChange={handleFormInputChange}
-                    className={cx('selectInput')}
-                >
-                    <option value="OTHER">Select Nationality</option>
-                    {NATIONALITY_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </select>
+            {/* Thêm tooltip giải thích */}
+            <div className={cx('author-info-tip')}>
+                <FontAwesomeIcon icon={faInfoCircle} className={cx('info-icon')} />
+                <span>Chỉ cần nhập tên tác giả. Chi tiết về tác giả có thể được thêm sau.</span>
             </div>
         </div>
     );
