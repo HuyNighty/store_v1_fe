@@ -28,7 +28,7 @@ function NavLinks() {
     const links = [
         { text: 'Home', to: '/' },
         { text: 'Books', to: '/books' },
-        { text: 'About', to: '/about' },
+        { text: 'FAQ', to: '/faq' },
     ];
 
     const adminLinks = [{ text: 'Admin', to: '/admin' }];

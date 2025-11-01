@@ -182,7 +182,7 @@ function OrderDetail() {
                             {updatingStatus ? 'Đang xử lý...' : getStatusLabel(action)}
                         </Button>
                     ))}
-                    <Button danger onClick={handleDeleteOrder}>
+                    <Button outline shine danger onClick={handleDeleteOrder}>
                         Xóa đơn hàng
                     </Button>
                 </div>
@@ -260,14 +260,7 @@ function OrderDetail() {
                                     <label>Họ tên:</label>
                                     <span>{order.fullName || 'N/A'}</span>
                                 </div>
-                                <div className={cx('info-item')}>
-                                    <label>Email:</label>
-                                    <span>{order.email || 'N/A'}</span>
-                                </div>
-                                <div className={cx('info-item')}>
-                                    <label>Điện thoại:</label>
-                                    <span>{order.phone || 'N/A'}</span>
-                                </div>
+
                                 <div className={cx('info-item')}>
                                     <label>Customer ID:</label>
                                     <div className={cx('user-id-container')}>

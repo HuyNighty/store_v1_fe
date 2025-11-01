@@ -18,6 +18,7 @@ import OrderDetail from '../pages/OrderDetail';
 import UserOrderDetail from '../pages/UserOrderDetail';
 import Wishlist from '../pages/Wishlist';
 import Author from '../pages/Author';
+import FAQ from '../pages/FAQ';
 
 const publicRoutes = [
     { path: '/', component: Home },
@@ -29,6 +30,7 @@ const publicRoutes = [
     { path: '/cart', component: Cart, layout: HeaderOnly },
     { path: '/authors/:authorId', component: Author },
     { path: '/author/:authorId', component: Author },
+    { path: '/faq', component: FAQ },
 ];
 const privateRoutes = [];
 
