@@ -1,26 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './BookItemDetail.module.scss';
 import Button from '../../Layouts/components/Button';
-import QuantityInput from '../../Layouts/components/QuantityInput';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-    faArrowLeft,
-    faShoppingCart,
-    faHeart,
-    faShare,
-    faStar,
-    faStarHalfAlt,
-    faTruck,
-    faBook,
-    faTags,
-    faLayerGroup,
-} from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faHeart, faShare, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import { useCart } from '../../contexts/CartContext';
 import { useToast } from '../../contexts/Toast/ToastContext';
 import { useWishlist } from '../../contexts/WishlistContext';
+import reviewApi from '../../api/reviewApi';
+
+// Import components
+import BookImages from './components/BookImages';
+import BookInfo from './components/BookInfo';
+import BookTabs from './components/BookTabs';
 
 const cx = classNames.bind(styles);
 
@@ -31,89 +25,252 @@ function BookItemDetail() {
     const { addToCart, isItemInCart, getItemQuantity, updateCartItem } = useCart();
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { addToast } = useToast();
+
+    // State management
     const [quantity, setQuantity] = useState(1);
     const [addingToCart, setAddingToCart] = useState(false);
     const [activeTab, setActiveTab] = useState('description');
     const [selectedImage, setSelectedImage] = useState(0);
     const [isWishlisted, setIsWishlisted] = useState(false);
 
+    // Review state
+    const [userRating, setUserRating] = useState(0);
+    const [hoverRating, setHoverRating] = useState(0);
+    const [reviewComment, setReviewComment] = useState('');
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+    const [reviews, setReviews] = useState([]);
+    const [userReview, setUserReview] = useState(null);
+
+    // Định nghĩa các hàm trước useEffect
+    const loadReviews = useCallback(async () => {
+        if (!book?.productId) return;
+
+        try {
+            console.log('🔄 Loading reviews for product:', book.productId);
+            const response = await reviewApi.getReviewsByProduct(book.productId);
+
+            let reviewsData = [];
+
+            if (response.data && response.data.result !== undefined) {
+                if (Array.isArray(response.data.result)) {
+                    reviewsData = response.data.result;
+                }
+            } else if (Array.isArray(response.data)) {
+                reviewsData = response.data;
+            }
+
+            setReviews(reviewsData);
+        } catch (error) {
+            console.error('❌ Error loading reviews:', error);
+            setReviews(book?.reviews || []);
+        }
+    }, [book?.productId]);
+
+    const checkUserReview = useCallback(async () => {
+        if (!book?.productId) return;
+
+        try {
+            const response = await reviewApi.getMyReviews();
+            let userReviews = [];
+
+            if (response.data && response.data.result && Array.isArray(response.data.result)) {
+                userReviews = response.data.result;
+            } else if (Array.isArray(response.data)) {
+                userReviews = response.data;
+            }
+
+            if (userReviews.length > 0) {
+                const existingReview = userReviews.find((review) => review.productId === book.productId);
+                if (existingReview) {
+                    setUserReview(existingReview);
+                    setUserRating(existingReview.rating);
+                    setReviewComment(existingReview.comment || '');
+                } else {
+                    setUserReview(null);
+                    setUserRating(0);
+                    setReviewComment('');
+                }
+            } else {
+                setUserReview(null);
+                setUserRating(0);
+                setReviewComment('');
+            }
+        } catch (error) {
+            console.error('❌ Error checking user review:', error);
+            setUserReview(null);
+            setUserRating(0);
+            setReviewComment('');
+        }
+    }, [book?.productId]); // Chỉ phụ thuộc vào productId
+
     useEffect(() => {
-        if (book) {
+        if (book?.productId) {
             setIsWishlisted(isInWishlist(book.productId));
         }
     }, [book, isInWishlist]);
 
-    if (!book) {
-        return (
-            <div className={cx('container')}>
-                <div className={cx('error')}>
-                    <h2>Không tìm thấy thông tin sách</h2>
-                    <Button primary onClick={() => navigate('/')}>
-                        Quay về trang chủ
-                    </Button>
-                </div>
-            </div>
-        );
-    }
+    useEffect(() => {
+        if (book?.productId) {
+            console.log('📚 Loading reviews for new product');
+            loadReviews();
+        }
+    }, [book?.productId, loadReviews]);
 
-    const {
-        productId,
-        productName,
-        productAssets = [],
-        featured,
-        bookAuthors = [],
-        salePrice,
-        price,
-        rating = 0,
-        reviews = [],
-        reviewCount = 0,
-        stockQuantity = 0,
-        weightG = 0,
-        description,
-        categories = [],
-        sku,
-        slug,
-        publishedDate,
-        publisher,
-        pages,
-        language,
-        isbn,
-    } = book;
+    useEffect(() => {
+        if (book?.productId) {
+            console.log('📚 Checking user review for new product');
+            checkUserReview();
+        }
+    }, [book?.productId, checkUserReview]);
 
-    const displayPrice = salePrice ?? price;
-    const discountPercent = salePrice && price ? Math.round((1 - salePrice / price) * 100) : 0;
-    const allImages = productAssets.length > 0 ? productAssets : [{ url: '/images/default-book.jpg' }];
-    const mainImage = allImages[selectedImage]?.url;
-    const isInCart = isItemInCart(productId);
-    const cartQuantity = getItemQuantity(productId);
-
-    // Render rating stars
-    const renderStars = (rating) => {
+    // Render rating stars function
+    const renderStars = (rating, interactive = false, onStarClick = null, onStarHover = null) => {
         const stars = [];
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 >= 0.5;
+        const currentRating = interactive ? hoverRating || userRating : rating;
+        const fullStars = Math.floor(currentRating);
+        const hasHalfStar = currentRating % 1 >= 0.5;
 
-        for (let i = 0; i < fullStars; i++) {
-            stars.push(<FontAwesomeIcon key={i} icon={faStar} className={cx('star', 'filled')} />);
-        }
-
-        if (hasHalfStar) {
-            stars.push(<FontAwesomeIcon key="half" icon={faStarHalfAlt} className={cx('star', 'filled')} />);
-        }
-
-        const emptyStars = 5 - stars.length;
-        for (let i = 0; i < emptyStars; i++) {
-            stars.push(<FontAwesomeIcon key={`empty-${i}`} icon={faStar} className={cx('star', 'empty')} />);
+        for (let i = 1; i <= 5; i++) {
+            if (i <= fullStars) {
+                stars.push(
+                    <FontAwesomeIcon
+                        key={i}
+                        icon={faStar}
+                        className={cx('star', 'filled')}
+                        onClick={() => interactive && onStarClick && onStarClick(i)}
+                        onMouseEnter={() => interactive && onStarHover && onStarHover(i)}
+                        onMouseLeave={() => interactive && onStarHover && onStarHover(0)}
+                    />,
+                );
+            } else if (i === fullStars + 1 && hasHalfStar) {
+                stars.push(
+                    <FontAwesomeIcon
+                        key="half"
+                        icon={faStarHalfAlt}
+                        className={cx('star', 'filled')}
+                        onClick={() => interactive && onStarClick && onStarClick(i - 0.5)}
+                        onMouseEnter={() => interactive && onStarHover && onStarHover(i - 0.5)}
+                        onMouseLeave={() => interactive && onStarHover && onStarHover(0)}
+                    />,
+                );
+            } else {
+                stars.push(
+                    <FontAwesomeIcon
+                        key={i}
+                        icon={faStar}
+                        className={cx('star', 'empty')}
+                        onClick={() => interactive && onStarClick && onStarClick(i)}
+                        onMouseEnter={() => interactive && onStarHover && onStarHover(i)}
+                        onMouseLeave={() => interactive && onStarHover && onStarHover(0)}
+                    />,
+                );
+            }
         }
 
         return stars;
     };
 
+    // Review handlers
+    const handleStarClick = (rating) => {
+        setUserRating(rating);
+    };
+
+    const handleStarHover = (rating) => {
+        setHoverRating(rating);
+    };
+
+    const handleSubmitReview = async () => {
+        if (!book?.productId) return;
+
+        console.log('🔍 Submitting review:', {
+            rating: userRating,
+            comment: reviewComment,
+            isNewReview: !userReview,
+            productId: book.productId,
+        });
+
+        if (userRating === 0) {
+            addToast('Vui lòng chọn số sao đánh giá', 'error');
+            return;
+        }
+
+        if (!reviewComment.trim()) {
+            addToast('Vui lòng nhập nội dung đánh giá', 'error');
+            return;
+        }
+
+        setIsSubmittingReview(true);
+        try {
+            const reviewData = {
+                rating: userRating,
+                comment: reviewComment.trim(),
+            };
+
+            console.log('📤 Sending review data:', reviewData);
+
+            let response;
+            if (userReview) {
+                // UPDATE existing review
+                response = await reviewApi.updateReview(userReview.reviewId, reviewData);
+                console.log('✅ Update response:', response);
+                addToast('Đã cập nhật đánh giá thành công!', 'success');
+            } else {
+                // CREATE new review
+                response = await reviewApi.createReview(book.productId, reviewData);
+                console.log('✅ Create response:', response);
+                addToast('Đã gửi đánh giá thành công!', 'success');
+
+                // QUAN TRỌNG: Cập nhật ngay userReview với data mới
+                // Giả sử API trả về review vừa tạo trong response
+                if (response.data && response.data.result) {
+                    const newReview = response.data.result;
+                    setUserReview(newReview);
+                }
+            }
+
+            // Reload danh sách reviews từ server
+            await loadReviews();
+
+            // Nếu là update, đảm bảo userReview được cập nhật
+            if (userReview) {
+                await checkUserReview();
+            }
+        } catch (error) {
+            console.error('❌ Error submitting review:', error);
+            console.error('❌ Error details:', error.response?.data);
+            addToast(error.response?.data?.message || 'Có lỗi xảy ra khi gửi đánh giá', 'error');
+        } finally {
+            setIsSubmittingReview(false);
+        }
+    };
+
+    const handleDeleteReview = async () => {
+        if (!userReview) return;
+
+        if (window.confirm('Bạn có chắc chắn muốn xóa đánh giá này?')) {
+            try {
+                await reviewApi.deleteReview(userReview.reviewId);
+                addToast('Đã xóa đánh giá thành công', 'success');
+
+                setUserReview(null);
+                setUserRating(0);
+                setReviewComment('');
+                setReviews((prev) => prev.filter((review) => review.reviewId !== userReview.reviewId));
+            } catch (error) {
+                console.error('Error deleting review:', error);
+                addToast('Có lỗi xảy ra khi xóa đánh giá', 'error');
+            }
+        }
+    };
+
+    // Navigation and action handlers
     const handleBack = () => {
         navigate(-1);
     };
 
     const handleAddToCart = async () => {
+        if (!book?.productId) return;
+
         if (stockQuantity === 0) {
             addToast('Sản phẩm đã hết hàng', 'error');
             return;
@@ -121,7 +278,7 @@ function BookItemDetail() {
 
         setAddingToCart(true);
         try {
-            const result = await addToCart(productId, quantity);
+            const result = await addToCart(book.productId, quantity);
             if (result.success) {
                 addToast(result.message || 'Đã thêm vào giỏ hàng!', 'success');
             } else {
@@ -135,10 +292,12 @@ function BookItemDetail() {
     };
 
     const handleUpdateCart = async () => {
+        if (!book?.productId) return;
+
         setAddingToCart(true);
         try {
             const newTotalQuantity = cartQuantity + quantity;
-            const result = await updateCartItem(productId, newTotalQuantity);
+            const result = await updateCartItem(book.productId, newTotalQuantity);
 
             if (result.success) {
                 addToast(result.message || 'Đã cập nhật giỏ hàng!', 'success');
@@ -154,20 +313,23 @@ function BookItemDetail() {
     };
 
     const handleBuyNow = () => {
+        if (!book?.productId) return;
+
         if (stockQuantity === 0) {
             addToast('Sản phẩm đã hết hàng', 'error');
             return;
         }
 
-        // Thêm vào giỏ hàng trước rồi chuyển đến checkout
-        addToCart(productId, quantity).then(() => {
+        addToCart(book.productId, quantity).then(() => {
             navigate('/checkout');
         });
     };
 
     const handleWishlistToggle = () => {
+        if (!book?.productId) return;
+
         if (isWishlisted) {
-            removeFromWishlist(productId);
+            removeFromWishlist(book.productId);
             setIsWishlisted(false);
             addToast('Đã xóa khỏi danh sách yêu thích', 'info');
         } else {
@@ -190,6 +352,47 @@ function BookItemDetail() {
         }
     };
 
+    if (!book) {
+        return (
+            <div className={cx('container')}>
+                <div className={cx('error')}>
+                    <h2>Không tìm thấy thông tin sách</h2>
+                    <Button primary onClick={() => navigate('/')}>
+                        Quay về trang chủ
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
+    // Destructure book data - ĐẶT SAU check book tồn tại
+    const {
+        productId,
+        productName,
+        productAssets = [],
+        featured,
+        bookAuthors = [],
+        salePrice,
+        price,
+        rating = 0,
+        reviewCount = 0,
+        stockQuantity = 0,
+        weightG = 0,
+        description,
+        categories = [],
+        sku,
+        publisher,
+        publishedDate,
+        pages,
+        language,
+        isbn,
+    } = book;
+
+    // Calculated values
+    const displayPrice = salePrice ?? price;
+    const discountPercent = salePrice && price ? Math.round((1 - salePrice / price) * 100) : 0;
+    const isInCart = isItemInCart(productId);
+    const cartQuantity = getItemQuantity(productId);
     const averageRating =
         reviews.length > 0 ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length : rating;
 
@@ -214,384 +417,80 @@ function BookItemDetail() {
 
             {/* Main Content */}
             <div className={cx('content')}>
-                {/* Images Section */}
-                <div className={cx('images-section')}>
-                    <div className={cx('main-image')}>
-                        <img src={mainImage} alt={productName} />
-                        {featured && <span className={cx('featured-badge')}>Nổi bật</span>}
-                        {discountPercent > 0 && <span className={cx('discount-badge')}>-{discountPercent}%</span>}
-                    </div>
-                    <div className={cx('thumbnail-images')}>
-                        {allImages.map((asset, index) => (
-                            <div
-                                key={index}
-                                className={cx('thumbnail-container', { active: selectedImage === index })}
-                                onClick={() => setSelectedImage(index)}
-                            >
-                                <img src={asset.url} alt={`${productName} ${index + 1}`} className={cx('thumbnail')} />
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                <BookImages
+                    productName={productName}
+                    productAssets={productAssets}
+                    featured={featured}
+                    discountPercent={discountPercent}
+                    selectedImage={selectedImage}
+                    onImageSelect={setSelectedImage}
+                />
 
-                {/* Product Info Section */}
-                <div className={cx('info-section')}>
-                    <h1 className={cx('product-title')}>{productName}</h1>
-
-                    {/* SKU & Categories */}
-                    <div className={cx('meta-info')}>
-                        <div className={cx('meta-item')}>
-                            <FontAwesomeIcon icon={faTags} />
-                            <span>SKU: {sku || 'N/A'}</span>
-                        </div>
-                        {categories.length > 0 && (
-                            <div className={cx('meta-item')}>
-                                <FontAwesomeIcon icon={faLayerGroup} />
-                                <span>Thể loại: {categories.map((cat) => cat.categoryName).join(', ')}</span>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Authors */}
-                    <div className={cx('authors-section')}>
-                        <h3>
-                            <FontAwesomeIcon icon={faBook} />
-                            Tác giả
-                        </h3>
-                        {bookAuthors.length > 0 ? (
-                            <div className={cx('authors-list')}>
-                                {bookAuthors.map((author) => (
-                                    <div key={author.authorId} className={cx('author')}>
-                                        <Button
-                                            text
-                                            className={cx('author-name-btn')}
-                                            onClick={() => navigate(`/authors/${author.authorId}`)}
-                                        >
-                                            <strong>{author.authorName}</strong>
-                                        </Button>
-                                        {author.authorBio && <p>{author.authorBio}</p>}
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p>Đang cập nhật thông tin tác giả</p>
-                        )}
-                    </div>
-
-                    {/* Rating */}
-                    <div className={cx('rating-section')}>
-                        <div className={cx('rating-stars')}>
-                            {renderStars(averageRating)}
-                            <span className={cx('rating-value')}>{averageRating.toFixed(1)}/5</span>
-                        </div>
-                        <span className={cx('reviews')}>({reviewCount || reviews.length} đánh giá)</span>
-                        <Button text className={cx('view-reviews-btn')} onClick={() => setActiveTab('reviews')}>
-                            Xem đánh giá
-                        </Button>
-                    </div>
-
-                    {/* Price */}
-                    <div className={cx('price-section')}>
-                        <div className={cx('price')}>
-                            <span className={cx('current-price')}>{(displayPrice / 1000).toLocaleString()}.000 đ</span>
-                            {salePrice && price && salePrice < price && (
-                                <>
-                                    <span className={cx('original-price')}>
-                                        {(price / 1000).toLocaleString()}.000 đ
-                                    </span>
-                                    <span className={cx('discount')}>-{discountPercent}%</span>
-                                </>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Book Details */}
-                    <div className={cx('book-details')}>
-                        <h3>Thông tin sách</h3>
-                        <div className={cx('details-grid')}>
-                            {publisher && (
-                                <div className={cx('detail-item')}>
-                                    <strong>Nhà xuất bản:</strong>
-                                    <span>{publisher}</span>
-                                </div>
-                            )}
-                            {publishedDate && (
-                                <div className={cx('detail-item')}>
-                                    <strong>Ngày xuất bản:</strong>
-                                    <span>{new Date(publishedDate).toLocaleDateString('vi-VN')}</span>
-                                </div>
-                            )}
-                            {pages && (
-                                <div className={cx('detail-item')}>
-                                    <strong>Số trang:</strong>
-                                    <span>{pages}</span>
-                                </div>
-                            )}
-                            {language && (
-                                <div className={cx('detail-item')}>
-                                    <strong>Ngôn ngữ:</strong>
-                                    <span>{language}</span>
-                                </div>
-                            )}
-                            {isbn && (
-                                <div className={cx('detail-item')}>
-                                    <strong>ISBN:</strong>
-                                    <span>{isbn}</span>
-                                </div>
-                            )}
-                            <div className={cx('detail-item')}>
-                                <strong>Trọng lượng:</strong>
-                                <span>{weightG}g</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Quantity Selector */}
-                    <div className={cx('quantity-section')}>
-                        <label>Số lượng: </label>
-                        <QuantityInput
-                            value={quantity}
-                            onChange={setQuantity}
-                            min={1}
-                            max={stockQuantity}
-                            size="medium"
-                        />
-                        {isInCart && <p className={cx('cart-notice')}>Đã có {cartQuantity} sản phẩm trong giỏ hàng</p>}
-                    </div>
-
-                    {/* Stock Status */}
-                    <div className={cx('stock-section')}>
-                        <div
-                            className={cx('stock-status', {
-                                'in-stock': stockQuantity > 0,
-                                'out-of-stock': stockQuantity === 0,
-                            })}
-                        >
-                            {stockQuantity > 0 ? (
-                                <>
-                                    <FontAwesomeIcon icon={faTruck} />
-                                    <span>Còn hàng ({stockQuantity} sản phẩm)</span>
-                                </>
-                            ) : (
-                                <>
-                                    <FontAwesomeIcon icon={faTruck} />
-                                    <span>Tạm hết hàng</span>
-                                </>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className={cx('action-buttons')}>
-                        {isInCart ? (
-                            <Button
-                                shine
-                                primary
-                                large
-                                onClick={handleUpdateCart}
-                                disabled={stockQuantity === 0 || addingToCart}
-                                className={cx('update-cart-btn')}
-                            >
-                                <FontAwesomeIcon icon={faShoppingCart} />
-                                {addingToCart ? 'Đang cập nhật...' : 'Cập nhật giỏ hàng'}
-                            </Button>
-                        ) : (
-                            <Button
-                                shine
-                                primary
-                                large
-                                onClick={handleAddToCart}
-                                disabled={stockQuantity === 0 || addingToCart}
-                                className={cx('add-to-cart-btn')}
-                            >
-                                <FontAwesomeIcon icon={faShoppingCart} />
-                                {addingToCart ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
-                            </Button>
-                        )}
-                        <Button
-                            shine
-                            outline
-                            large
-                            onClick={handleBuyNow}
-                            disabled={stockQuantity === 0}
-                            className={cx('buy-now-btn')}
-                        >
-                            Mua ngay
-                        </Button>
-                        <div className={cx('secondary-actions')}>
-                            <button
-                                icon
-                                className={cx('wishlist-btn', { active: isWishlisted })}
-                                onClick={handleWishlistToggle}
-                            >
-                                <FontAwesomeIcon icon={isWishlisted ? faHeart : faHeartRegular} />
-                            </button>
-                            <Button icon className={cx('share-btn')} onClick={handleShare}>
-                                <FontAwesomeIcon icon={faShare} />
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+                <BookInfo
+                    productName={productName}
+                    sku={sku}
+                    categories={categories}
+                    bookAuthors={bookAuthors}
+                    navigate={navigate}
+                    averageRating={averageRating}
+                    renderStars={renderStars}
+                    reviewCount={reviewCount}
+                    reviews={reviews}
+                    setActiveTab={setActiveTab}
+                    displayPrice={displayPrice}
+                    salePrice={salePrice}
+                    price={price}
+                    discountPercent={discountPercent}
+                    publisher={publisher}
+                    publishedDate={publishedDate}
+                    pages={pages}
+                    language={language}
+                    isbn={isbn}
+                    weightG={weightG}
+                    stockQuantity={stockQuantity}
+                    quantity={quantity}
+                    setQuantity={setQuantity}
+                    isInCart={isInCart}
+                    cartQuantity={cartQuantity}
+                    addingToCart={addingToCart}
+                    handleAddToCart={handleAddToCart}
+                    handleUpdateCart={handleUpdateCart}
+                    handleBuyNow={handleBuyNow}
+                    isWishlisted={isWishlisted}
+                    handleWishlistToggle={handleWishlistToggle}
+                    handleShare={handleShare}
+                />
             </div>
 
             {/* Additional Info Tabs */}
-            <div className={cx('tabs-section')}>
-                <div className={cx('tabs-header')}>
-                    <button
-                        className={cx('tab', { active: activeTab === 'description' })}
-                        onClick={() => setActiveTab('description')}
-                    >
-                        Mô tả sản phẩm
-                    </button>
-                    <button
-                        className={cx('tab', { active: activeTab === 'details' })}
-                        onClick={() => setActiveTab('details')}
-                    >
-                        Thông tin chi tiết
-                    </button>
-                    <button
-                        className={cx('tab', { active: activeTab === 'reviews' })}
-                        onClick={() => setActiveTab('reviews')}
-                    >
-                        Đánh giá ({reviewCount || reviews.length})
-                    </button>
-                    <button
-                        className={cx('tab', { active: activeTab === 'shipping' })}
-                        onClick={() => setActiveTab('shipping')}
-                    >
-                        Vận chuyển & Trả hàng
-                    </button>
-                </div>
-
-                <div className={cx('tabs-content')}>
-                    {activeTab === 'description' && (
-                        <div className={cx('tab-panel')}>
-                            <h3>Giới thiệu về "{productName}"</h3>
-                            <p>
-                                {description ||
-                                    `Cuốn sách "${productName}" là một tác phẩm đáng chú ý trong thể loại này. Thông tin chi tiết về nội dung sẽ được cập nhật sớm nhất.`}
-                            </p>
-                        </div>
-                    )}
-
-                    {activeTab === 'details' && (
-                        <div className={cx('tab-panel')}>
-                            <h3>Thông số kỹ thuật</h3>
-                            <div className={cx('specs-grid')}>
-                                <div className={cx('spec-item')}>
-                                    <strong>Tên sản phẩm:</strong>
-                                    <span>{productName}</span>
-                                </div>
-                                <div className={cx('spec-item')}>
-                                    <strong>SKU:</strong>
-                                    <span>{sku || 'N/A'}</span>
-                                </div>
-                                <div className={cx('spec-item')}>
-                                    <strong>Tác giả:</strong>
-                                    <span>{bookAuthors.map((a) => a.authorName).join(', ') || 'Đang cập nhật'}</span>
-                                </div>
-                                {publisher && (
-                                    <div className={cx('spec-item')}>
-                                        <strong>Nhà xuất bản:</strong>
-                                        <span>{publisher}</span>
-                                    </div>
-                                )}
-                                {publishedDate && (
-                                    <div className={cx('spec-item')}>
-                                        <strong>Ngày xuất bản:</strong>
-                                        <span>{new Date(publishedDate).toLocaleDateString('vi-VN')}</span>
-                                    </div>
-                                )}
-                                {pages && (
-                                    <div className={cx('spec-item')}>
-                                        <strong>Số trang:</strong>
-                                        <span>{pages}</span>
-                                    </div>
-                                )}
-                                {language && (
-                                    <div className={cx('spec-item')}>
-                                        <strong>Ngôn ngữ:</strong>
-                                        <span>{language}</span>
-                                    </div>
-                                )}
-                                {isbn && (
-                                    <div className={cx('spec-item')}>
-                                        <strong>ISBN:</strong>
-                                        <span>{isbn}</span>
-                                    </div>
-                                )}
-                                <div className={cx('spec-item')}>
-                                    <strong>Trọng lượng:</strong>
-                                    <span>{weightG}g</span>
-                                </div>
-                                <div className={cx('spec-item')}>
-                                    <strong>Tình trạng:</strong>
-                                    <span>{stockQuantity > 0 ? 'Còn hàng' : 'Hết hàng'}</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'reviews' && (
-                        <div className={cx('tab-panel')}>
-                            <h3>Đánh giá từ độc giả</h3>
-                            {reviews.length > 0 ? (
-                                <div className={cx('reviews-list')}>
-                                    {reviews.map((review, index) => (
-                                        <div key={index} className={cx('review-item')}>
-                                            <div className={cx('review-header')}>
-                                                <div className={cx('reviewer')}>{review.userName || 'Độc giả'}</div>
-                                                <div className={cx('review-rating')}>{renderStars(review.rating)}</div>
-                                                <div className={cx('review-date')}>
-                                                    {new Date(review.createdAt).toLocaleDateString('vi-VN')}
-                                                </div>
-                                            </div>
-                                            <div className={cx('review-content')}>
-                                                <p>{review.comment}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p>Chưa có đánh giá nào cho sản phẩm này.</p>
-                            )}
-                        </div>
-                    )}
-
-                    {activeTab === 'shipping' && (
-                        <div className={cx('tab-panel')}>
-                            <h3>Chính sách vận chuyển & Trả hàng</h3>
-                            <div className={cx('shipping-info')}>
-                                <h4>🚚 Vận chuyển</h4>
-                                <ul>
-                                    <li>Miễn phí vận chuyển cho đơn hàng từ 300.000đ</li>
-                                    <li>Phí vận chuyển 20.000đ cho đơn hàng dưới 300.000đ</li>
-                                    <li>Giao hàng toàn quốc trong 2-4 ngày làm việc</li>
-                                    <li>Hỗ trợ giao hàng nhanh trong 24h (tính phí)</li>
-                                </ul>
-
-                                <h4>🔄 Đổi trả</h4>
-                                <ul>
-                                    <li>Đổi trả trong vòng 7 ngày kể từ khi nhận hàng</li>
-                                    <li>Sách phải còn nguyên vẹn, không bị rách, bẩn</li>
-                                    <li>Miễn phí đổi trả do lỗi từ nhà sản xuất</li>
-                                    <li>Liên hệ hotline: 1800-xxxx để được hỗ trợ</li>
-                                </ul>
-
-                                <h4>🛡️ Bảo hành</h4>
-                                <ul>
-                                    <li>Bảo hành chất lượng in ấn: 30 ngày</li>
-                                    <li>Đảm bảo sách chính hãng, không phải sách lậu</li>
-                                    <li>Hoàn tiền 100% nếu phát hiện sách giả</li>
-                                </ul>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Related Products Section - Có thể thêm sau */}
-            {/* <RelatedProducts currentProductId={productId} categoryId={categories[0]?.categoryId} /> */}
+            <BookTabs
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                productName={productName}
+                description={description}
+                bookAuthors={bookAuthors}
+                sku={sku}
+                publisher={publisher}
+                publishedDate={publishedDate}
+                pages={pages}
+                language={language}
+                isbn={isbn}
+                weightG={weightG}
+                stockQuantity={stockQuantity}
+                averageRating={averageRating}
+                reviews={reviews}
+                renderStars={renderStars}
+                userReview={userReview}
+                userRating={userRating}
+                hoverRating={hoverRating}
+                reviewComment={reviewComment}
+                isSubmittingReview={isSubmittingReview}
+                handleStarClick={handleStarClick}
+                handleStarHover={handleStarHover}
+                setReviewComment={setReviewComment}
+                handleSubmitReview={handleSubmitReview}
+                handleDeleteReview={handleDeleteReview}
+            />
         </div>
     );
 }

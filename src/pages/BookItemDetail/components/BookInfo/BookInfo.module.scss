@@ -1,0 +1,374 @@
+.info-section {
+    .product-title {
+        margin: 0 0 20px 0;
+        font-size: 2.4rem;
+        color: #333;
+        line-height: 1.3;
+        font-weight: 100;
+    }
+}
+
+.meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.4rem;
+        color: #666;
+
+        svg {
+            color: var(--primary-color);
+            width: 14px;
+        }
+    }
+}
+
+.authors-section {
+    margin-bottom: 25px;
+
+    h3 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 12px 0;
+        font-size: 1.6rem;
+        color: #333;
+        font-weight: 100;
+
+        svg {
+            color: var(--primary-color);
+            width: 16px;
+        }
+    }
+
+    .authors-list {
+        .author {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+
+            strong {
+                display: block;
+                margin-bottom: 6px;
+                color: #333;
+                font-size: 1.4rem;
+            }
+
+            p {
+                margin: 0;
+                font-size: 1.3rem;
+                color: #666;
+                line-height: 1.4;
+            }
+        }
+    }
+}
+
+.rating-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+
+    .rating-stars {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .star {
+            width: 16px;
+            height: 16px;
+
+            &.filled {
+                color: #ffc107;
+            }
+
+            &.empty {
+                color: #e0e0e0;
+            }
+        }
+
+        .rating-value {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.4rem;
+        }
+    }
+
+    .reviews {
+        color: #666;
+        font-size: 1.3rem;
+    }
+
+    .view-reviews-btn {
+        color: var(--primary-color);
+        font-size: 1.3rem;
+        padding: 0;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.price-section {
+    margin-bottom: 25px;
+
+    .price {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .current-price {
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: #e74c3c;
+    }
+
+    .original-price {
+        font-size: 1.8rem;
+        color: #999;
+        text-decoration: line-through;
+    }
+
+    .discount {
+        background: #e74c3c;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+}
+
+.book-details {
+    margin-bottom: 25px;
+
+    h3 {
+        margin: 0 0 15px 0;
+        font-size: 1.6rem;
+        color: #333;
+        font-weight: 100;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+
+        @media (max-width: 480px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+
+        strong {
+            color: #666;
+            font-weight: 500;
+            font-size: 1.3rem;
+        }
+
+        span {
+            color: #333;
+            font-size: 1.3rem;
+            text-align: right;
+        }
+    }
+}
+
+.quantity-section {
+    margin-bottom: 25px;
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 1.4rem;
+        font-weight: 500;
+    }
+
+    .cart-notice {
+        margin: 8px 0 0 0;
+        color: #28a745;
+        font-size: 1.3rem;
+        font-style: italic;
+    }
+}
+
+.stock-section {
+    margin-bottom: 25px;
+
+    .stock-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 1.4rem;
+        font-weight: 500;
+
+        &.in-stock {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+
+            svg {
+                color: #28a745;
+            }
+        }
+
+        &.out-of-stock {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+
+            svg {
+                color: #dc3545;
+            }
+        }
+
+        svg {
+            width: 16px;
+        }
+    }
+}
+
+.action-buttons {
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .add-to-cart-btn,
+    .update-cart-btn,
+    .buy-now-btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 1.6rem;
+
+        svg {
+            margin-right: 8px;
+            width: 16px;
+        }
+    }
+
+    .secondary-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+
+        .wishlist-btn,
+        .share-btn {
+            border-color: transparent;
+            background-color: transparent;
+            color: var(--primary-color);
+
+            &.active {
+                background: transparent;
+                color: var(--primary-color);
+            }
+        }
+    }
+}
+
+.benefits-section {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 30px;
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 3px solid #007bff;
+
+        svg {
+            color: #007bff;
+            width: 20px;
+            flex-shrink: 0;
+        }
+
+        div {
+            flex: 1;
+
+            strong {
+                display: block;
+                color: #333;
+                font-size: 1.4rem;
+                margin-bottom: 4px;
+            }
+
+            span {
+                color: #666;
+                font-size: 1.3rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .info-section {
+        .product-title {
+            font-size: 2rem;
+        }
+    }
+
+    .price-section {
+        .current-price {
+            font-size: 2rem;
+        }
+
+        .original-price {
+            font-size: 1.6rem;
+        }
+    }
+
+    .action-buttons {
+        .secondary-actions {
+            .wishlist-btn,
+            .share-btn {
+                width: 45px;
+                height: 45px;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .rating-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .price-section {
+        .price {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+    }
+
+    .benefits-section {
+        grid-template-columns: 1fr;
+    }
+}

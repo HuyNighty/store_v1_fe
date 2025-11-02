@@ -26,7 +26,7 @@ const reviewApi = {
     },
 
     // Lấy reviews theo product (admin)
-    getReviewsByProduct: (productId) => {
+    getReviewsByProductAdmin: (productId) => {
         const url = `/reviews/products/${productId}`;
         return axiosClient.get(url);
     },
@@ -41,6 +41,11 @@ const reviewApi = {
     deleteReviewAsAdmin: (reviewId) => {
         const url = `/reviews/admin/${reviewId}`;
         return axiosClient.delete(url);
+    },
+
+    getReviewsByProduct: (productId) => {
+        const url = `/reviews/public/products/${productId}`;
+        return axiosClient.get(url);
     },
 };
 

@@ -1,0 +1,161 @@
+.reviews-container {
+    padding: 20px 0;
+}
+
+.review-summary {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.average-rating {
+    text-align: center;
+    margin-right: 30px;
+}
+
+.rating-number {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #ffc107;
+    line-height: 1;
+}
+
+.total-reviews {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.reviews-list {
+    margin-top: 30px;
+}
+
+.review-item {
+    padding: 20px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background: #fff;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.reviewer-info {
+    flex: 1;
+}
+
+.reviewer {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 4px;
+}
+
+.review-date {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.review-content {
+    color: #495057;
+    line-height: 1.5;
+}
+
+.review-status {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #fd7e14;
+    font-style: italic;
+}
+
+.no-reviews {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 40px 0;
+}
+
+// Reviews list specific styles
+.reviews-list {
+    .review-item {
+        padding: 20px 0;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    .review-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+
+        .reviewer {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.4rem;
+        }
+
+        .review-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+
+            .star {
+                width: 14px;
+                height: 14px;
+
+                &.filled {
+                    color: #ffc107;
+                }
+            }
+        }
+
+        .review-date {
+            color: #999;
+            font-size: 1.3rem;
+        }
+    }
+
+    .review-content {
+        p {
+            margin: 0;
+            font-size: 1.4rem;
+            line-height: 1.5;
+            color: #666;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .review-summary {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .average-rating {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .review-header {
+        flex-direction: column;
+    }
+
+    .review-date {
+        margin-top: 5px;
+    }
+}

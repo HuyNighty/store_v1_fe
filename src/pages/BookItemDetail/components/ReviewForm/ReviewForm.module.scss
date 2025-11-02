@@ -1,0 +1,100 @@
+.write-review {
+    margin-bottom: 40px;
+    padding: 25px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.review-form {
+    margin-top: 15px;
+}
+
+.rating-input {
+    margin-bottom: 20px;
+}
+
+.rating-input label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.interactive-stars {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.interactive-stars .star {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.5rem;
+
+    &.filled {
+        color: #ffc107;
+    }
+
+    &.empty {
+        color: #dee2e6;
+    }
+
+    &:hover {
+        transform: scale(1.2);
+    }
+}
+
+.rating-text {
+    margin-left: 10px;
+    color: #495057;
+    font-weight: 500;
+}
+
+.comment-input {
+    margin-bottom: 20px;
+}
+
+.comment-input label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.comment-input textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 0.95rem;
+
+    &:focus {
+        outline: none;
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+}
+
+.char-count {
+    text-align: right;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 4px;
+}
+
+.review-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+
+        button {
+            width: 100%;
+        }
+    }
+}
