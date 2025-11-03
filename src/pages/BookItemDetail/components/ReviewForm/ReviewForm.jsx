@@ -25,7 +25,7 @@ function ReviewForm({
                 <div className={cx('rating-input')}>
                     <label>Đánh giá của bạn:</label>
                     <div className={cx('interactive-stars')} onMouseLeave={() => handleStarHover(0)}>
-                        {renderStars(userRating, true, handleStarClick, handleStarHover)}
+                        {renderStars(userRating, true, handleStarClick, handleStarHover, hoverRating)}
                         <span className={cx('rating-text')}>
                             {userRating > 0 ? `${userRating} sao` : 'Chọn số sao'}
                         </span>

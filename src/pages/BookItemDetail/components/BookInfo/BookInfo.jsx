@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import classNames from 'classnames/bind';
 import styles from './BookInfo.module.scss';
 import Button from '../../../../Layouts/components/Button';
@@ -42,6 +42,24 @@ function BookInfo({
     handleWishlistToggle,
     handleShare,
 }) {
+    // Thêm hàm scroll đến phần reviews
+    const handleViewReviews = () => {
+        // Chuyển sang tab reviews
+        setActiveTab('reviews');
+
+        // Delay một chút để đảm bảo tab đã được render
+        setTimeout(() => {
+            // Tìm phần tử reviews section
+            const reviewsSection = document.getElementById('reviews-section');
+            if (reviewsSection) {
+                reviewsSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                });
+            }
+        }, 100);
+    };
+
     return (
         <div className={cx('info-section')}>
             <h1 className={cx('product-title')}>{productName}</h1>
@@ -90,10 +108,11 @@ function BookInfo({
             <div className={cx('rating-section')}>
                 <div className={cx('rating-stars')}>
                     {renderStars(averageRating)}
-                    <span className={cx('rating-value')}>{averageRating.toFixed(1)}/5</span>
+                    <span className={cx('rating-value')}>{averageRating.toFixed(1)} / 5.0</span>
                 </div>
                 <span className={cx('reviews')}>({reviewCount || reviews.length} đánh giá)</span>
-                <Button text className={cx('view-reviews-btn')} onClick={() => setActiveTab('reviews')}>
+                {/* SỬA Ở ĐÂY: Thay onClick bằng handleViewReviews */}
+                <Button text className={cx('view-reviews-btn')} onClick={handleViewReviews}>
                     Xem đánh giá
                 </Button>
             </div>

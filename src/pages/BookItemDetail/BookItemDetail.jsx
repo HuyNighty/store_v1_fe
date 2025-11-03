@@ -3,9 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './BookItemDetail.module.scss';
 import Button from '../../Layouts/components/Button';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faHeart, faShare, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
-import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
+import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import { useCart } from '../../contexts/CartContext';
 import { useToast } from '../../contexts/Toast/ToastContext';
 import { useWishlist } from '../../contexts/WishlistContext';
@@ -101,7 +99,7 @@ function BookItemDetail() {
             setUserRating(0);
             setReviewComment('');
         }
-    }, [book?.productId]); // Chỉ phụ thuộc vào productId
+    }, [book?.productId]);
 
     useEffect(() => {
         if (book?.productId) {
@@ -111,57 +109,63 @@ function BookItemDetail() {
 
     useEffect(() => {
         if (book?.productId) {
-            console.log('📚 Loading reviews for new product');
             loadReviews();
         }
     }, [book?.productId, loadReviews]);
 
     useEffect(() => {
         if (book?.productId) {
-            console.log('📚 Checking user review for new product');
             checkUserReview();
         }
     }, [book?.productId, checkUserReview]);
 
-    // Render rating stars function
-    const renderStars = (rating, interactive = false, onStarClick = null, onStarHover = null) => {
+    const renderStars = (
+        rating,
+        interactive = false,
+        onStarClick = null,
+        onStarHover = null,
+        externalHoverRating = null,
+    ) => {
         const stars = [];
-        const currentRating = interactive ? hoverRating || userRating : rating;
-        const fullStars = Math.floor(currentRating);
-        const hasHalfStar = currentRating % 1 >= 0.5;
+        const currentHoverRating = externalHoverRating !== undefined ? externalHoverRating : hoverRating;
+        const displayRating = interactive ? currentHoverRating || userRating : rating;
+
+        const fullStars = Math.floor(displayRating);
+        const hasHalfStar = displayRating % 1 >= 0.5;
 
         for (let i = 1; i <= 5; i++) {
             if (i <= fullStars) {
                 stars.push(
-                    <FontAwesomeIcon
+                    <FaStar
                         key={i}
-                        icon={faStar}
                         className={cx('star', 'filled')}
-                        onClick={() => interactive && onStarClick && onStarClick(i)}
-                        onMouseEnter={() => interactive && onStarHover && onStarHover(i)}
-                        onMouseLeave={() => interactive && onStarHover && onStarHover(0)}
+                        style={{ color: '#ffc107', fontSize: '2rem' }}
+                        onClick={() => {
+                            interactive && onStarClick && onStarClick(i);
+                        }}
+                        onMouseEnter={() => {
+                            interactive && onStarHover && onStarHover(i);
+                        }}
                     />,
                 );
             } else if (i === fullStars + 1 && hasHalfStar) {
                 stars.push(
-                    <FontAwesomeIcon
+                    <FaStarHalfAlt
                         key="half"
-                        icon={faStarHalfAlt}
                         className={cx('star', 'filled')}
+                        style={{ color: '#ffc107', fontSize: '2rem' }}
                         onClick={() => interactive && onStarClick && onStarClick(i - 0.5)}
                         onMouseEnter={() => interactive && onStarHover && onStarHover(i - 0.5)}
-                        onMouseLeave={() => interactive && onStarHover && onStarHover(0)}
                     />,
                 );
             } else {
                 stars.push(
-                    <FontAwesomeIcon
+                    <FaRegStar
                         key={i}
-                        icon={faStar}
                         className={cx('star', 'empty')}
+                        style={{ color: '#e0e0e0', fontSize: '2rem' }}
                         onClick={() => interactive && onStarClick && onStarClick(i)}
                         onMouseEnter={() => interactive && onStarHover && onStarHover(i)}
-                        onMouseLeave={() => interactive && onStarHover && onStarHover(0)}
                     />,
                 );
             }
@@ -182,13 +186,6 @@ function BookItemDetail() {
     const handleSubmitReview = async () => {
         if (!book?.productId) return;
 
-        console.log('🔍 Submitting review:', {
-            rating: userRating,
-            comment: reviewComment,
-            isNewReview: !userReview,
-            productId: book.productId,
-        });
-
         if (userRating === 0) {
             addToast('Vui lòng chọn số sao đánh giá', 'error');
             return;
@@ -206,32 +203,24 @@ function BookItemDetail() {
                 comment: reviewComment.trim(),
             };
 
-            console.log('📤 Sending review data:', reviewData);
-
             let response;
             if (userReview) {
                 // UPDATE existing review
                 response = await reviewApi.updateReview(userReview.reviewId, reviewData);
-                console.log('✅ Update response:', response);
                 addToast('Đã cập nhật đánh giá thành công!', 'success');
             } else {
                 // CREATE new review
                 response = await reviewApi.createReview(book.productId, reviewData);
-                console.log('✅ Create response:', response);
                 addToast('Đã gửi đánh giá thành công!', 'success');
 
-                // QUAN TRỌNG: Cập nhật ngay userReview với data mới
-                // Giả sử API trả về review vừa tạo trong response
                 if (response.data && response.data.result) {
                     const newReview = response.data.result;
                     setUserReview(newReview);
                 }
             }
 
-            // Reload danh sách reviews từ server
             await loadReviews();
 
-            // Nếu là update, đảm bảo userReview được cập nhật
             if (userReview) {
                 await checkUserReview();
             }
@@ -365,7 +354,7 @@ function BookItemDetail() {
         );
     }
 
-    // Destructure book data - ĐẶT SAU check book tồn tại
+    // Destructure book data
     const {
         productId,
         productName,
@@ -401,7 +390,7 @@ function BookItemDetail() {
             {/* Header */}
             <div className={cx('header')}>
                 <Button shine outline back onClick={handleBack}>
-                    <FontAwesomeIcon icon={faArrowLeft} />
+                    ←
                 </Button>
                 <h1>Chi tiết sách</h1>
             </div>

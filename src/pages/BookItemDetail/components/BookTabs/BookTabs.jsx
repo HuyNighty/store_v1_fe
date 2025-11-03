@@ -107,7 +107,7 @@ function BookTabs({
 
             case 'reviews':
                 return (
-                    <div className={cx('tab-panel')}>
+                    <div className={cx('tab-panel')} id="reviews-section">
                         <ReviewSection
                             averageRating={averageRating}
                             reviews={reviews}
