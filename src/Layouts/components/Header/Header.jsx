@@ -51,7 +51,6 @@ function Header() {
                         <>
                             <CartButton />
                             <nav className={cx('nav-icons')}>
-                                {/* Wishlist button với style giống cartButton */}
                                 <div className={cx('wishlist-wrapper')} onClick={() => navigate('/wishlist')}>
                                     <FontAwesomeIcon icon={faHeart} />
                                     {wishlistCount > 0 && (

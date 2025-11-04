@@ -2,6 +2,8 @@ import React from 'react';
 import classNames from 'classnames/bind';
 import styles from './ReviewSection.module.scss';
 import ReviewForm from '../ReviewForm';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 const cx = classNames.bind(styles);
 
@@ -54,7 +56,11 @@ function ReviewSection({
                         <div key={review.reviewId || index} className={cx('review-item')}>
                             <div className={cx('review-header')}>
                                 <div className={cx('reviewer-info')}>
-                                    <div className={cx('reviewer')}>{review.userName || 'Độc giả'}</div>
+                                    <button className={cx('reviewer-profile')}>
+                                        <FontAwesomeIcon icon={faUser} /> {/*Icon... click */}
+                                        <div className={cx('reviewer')}>{review.userName || 'Độc giả'}</div>
+                                        <div className={cx('reviewer-email')}>{review.email || 'Độc giả'}</div>
+                                    </button>
                                     <div className={cx('review-rating')}>{renderStars(review.rating)}</div>
                                 </div>
                                 <div className={cx('review-date')}>

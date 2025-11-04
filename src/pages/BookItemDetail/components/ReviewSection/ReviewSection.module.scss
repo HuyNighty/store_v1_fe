@@ -55,10 +55,29 @@
     flex: 1;
 }
 
+.reviewer-profile {
+    background-color: transparent;
+    border: transparent;
+    display: flex;
+    gap: 12px;
+    transition: transform var(--transition-base), color var(--transition-base);
+
+    &:hover {
+        cursor: pointer;
+        transform: scale(1.08);
+    }
+}
+
 .reviewer {
     font-weight: 600;
     color: #495057;
     margin-bottom: 4px;
+}
+
+.reviewer-email {
+    color: #ccc;
+    font-size: 1.4rem;
+    margin-bottom: 10px;
 }
 
 .review-date {
@@ -88,7 +107,7 @@
 // Reviews list specific styles
 .reviews-list {
     .review-item {
-        padding: 20px 0;
+        padding: 20px;
         border-bottom: 1px solid #f0f0f0;
 
         &:last-child {

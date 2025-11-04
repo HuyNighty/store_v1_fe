@@ -243,7 +243,6 @@ function BookItemDetail() {
         );
     };
 
-    // Review handlers - SỬA LẠI HÀM NÀY
     const handleStarClick = (rating) => {
         setUserRating(rating);
         console.log('Selected rating:', rating); // Debug
