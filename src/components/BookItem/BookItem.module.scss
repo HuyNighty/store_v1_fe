@@ -19,6 +19,30 @@
     letter-spacing: 0.5px;
 }
 
+.book-item-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+}
+
+.book-item-stars {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.book-item-rating-number {
+    font-size: 1.2rem;
+    color: #666;
+    margin-left: 4px;
+}
+
+.book-item-reviews {
+    font-size: 1.2rem;
+    color: #888;
+}
+
 .book-item {
     display: flex;
     flex-direction: column;

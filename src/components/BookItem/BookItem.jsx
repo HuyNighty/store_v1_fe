@@ -2,11 +2,16 @@ import classNames from 'classnames/bind';
 import styles from './BookItem.module.scss';
 import Button from '../../Layouts/components/Button';
 import { useNavigate } from 'react-router-dom';
+import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import reviewApi from '../../api/reviewApi';
 
 const cx = classNames.bind(styles);
 
 function BookItem({ book }) {
     const navigate = useNavigate();
+    const [reviews, setReviews] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     console.log(book);
 
@@ -20,8 +25,6 @@ function BookItem({ book }) {
         bookAuthors = [],
         salePrice,
         price,
-        rating,
-        reviews,
         stockQuantity,
         weightG,
         sku,
@@ -31,8 +34,61 @@ function BookItem({ book }) {
     const imageUrl = productAssets[0]?.url || '/images/default-book.jpg';
     const displayPrice = salePrice ?? price;
 
+    // Load reviews khi component mount
+    useEffect(() => {
+        const loadReviews = async () => {
+            if (!productId) return;
+
+            setLoading(true);
+            try {
+                const response = await reviewApi.getReviewsByProduct(productId);
+                let reviewsData = [];
+
+                if (response.data && response.data.result !== undefined) {
+                    if (Array.isArray(response.data.result)) {
+                        reviewsData = response.data.result;
+                    }
+                } else if (Array.isArray(response.data)) {
+                    reviewsData = response.data;
+                }
+
+                setReviews(reviewsData);
+            } catch (error) {
+                console.error('Error loading reviews for book item:', error);
+                setReviews([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadReviews();
+    }, [productId]);
+
+    const averageRating =
+        reviews.length > 0 ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length : 0;
+
+    const displayRating = Math.round(averageRating * 10) / 10;
+    const reviewCount = reviews.length;
+
+    const renderStars = (rating) => {
+        const stars = [];
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+
+        for (let i = 1; i <= 5; i++) {
+            if (i <= fullStars) {
+                stars.push(<FaStar key={i} style={{ color: '#ffc107', fontSize: '1.6rem' }} />);
+            } else if (i === fullStars + 1 && hasHalfStar) {
+                stars.push(<FaStarHalfAlt key="half" style={{ color: '#ffc107', fontSize: '1.6rem' }} />);
+            } else {
+                stars.push(<FaRegStar key={i} style={{ color: '#e0e0e0', fontSize: '1.6rem' }} />);
+            }
+        }
+
+        return stars;
+    };
+
     const handleViewDetails = () => {
-        // Chuyển hướng đến trang chi tiết và truyền toàn bộ dữ liệu book
         navigate('/book-item', {
             state: {
                 book: {
@@ -43,7 +99,7 @@ function BookItem({ book }) {
                     bookAuthors,
                     salePrice,
                     price,
-                    rating,
+                    rating: displayRating, // Truyền rating đã tính toán từ reviews
                     reviews,
                     stockQuantity,
                     weightG,
@@ -74,10 +130,21 @@ function BookItem({ book }) {
                 ) : (
                     <p className={cx('book-item-author')}>Tác giả: Đang cập nhật</p>
                 )}
+
                 <div className={cx('book-item-rating')}>
-                    <div className={cx('book-item-stars')}>{rating || 0} ⭐</div>
-                    <span className={cx('book-item-reviews')}>({reviews || 0} reviews)</span>
+                    {loading ? (
+                        <div className={cx('book-item-loading')}>Đang tải đánh giá...</div>
+                    ) : (
+                        <>
+                            <div className={cx('book-item-stars')}>
+                                {renderStars(displayRating)}
+                                <span className={cx('book-item-rating-number')}>({displayRating})</span>
+                            </div>
+                            <span className={cx('book-item-reviews')}>({reviewCount} reviews)</span>
+                        </>
+                    )}
                 </div>
+
                 <div className={cx('book-item-footer')}>
                     <p className={cx('book-item-price')}>{displayPrice / 1000}.000 đ</p>
                     <Button small outline shine className={cx('book-item-view-btn')} onClick={handleViewDetails}>

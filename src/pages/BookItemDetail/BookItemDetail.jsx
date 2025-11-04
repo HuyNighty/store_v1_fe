@@ -59,7 +59,6 @@ function BookItemDetail() {
 
             setReviews(reviewsData);
         } catch (error) {
-            console.error('❌ Error loading reviews:', error);
             setReviews(book?.reviews || []);
         }
     }, [book?.productId]);
@@ -130,53 +129,124 @@ function BookItemDetail() {
         const currentHoverRating = externalHoverRating !== undefined ? externalHoverRating : hoverRating;
         const displayRating = interactive ? currentHoverRating || userRating : rating;
 
-        const fullStars = Math.floor(displayRating);
-        const hasHalfStar = displayRating % 1 >= 0.5;
-
         for (let i = 1; i <= 5; i++) {
-            if (i <= fullStars) {
+            const fullStar = displayRating >= i;
+            const halfStar = displayRating >= i - 0.5 && displayRating < i;
+
+            if (interactive) {
+                // Interactive stars - cho phép chọn nửa sao
                 stars.push(
-                    <FaStar
+                    <div
                         key={i}
-                        className={cx('star', 'filled')}
-                        style={{ color: '#ffc107', fontSize: '2rem' }}
-                        onClick={() => {
-                            interactive && onStarClick && onStarClick(i);
-                        }}
-                        onMouseEnter={() => {
-                            interactive && onStarHover && onStarHover(i);
-                        }}
-                    />,
-                );
-            } else if (i === fullStars + 1 && hasHalfStar) {
-                stars.push(
-                    <FaStarHalfAlt
-                        key="half"
-                        className={cx('star', 'filled')}
-                        style={{ color: '#ffc107', fontSize: '2rem' }}
-                        onClick={() => interactive && onStarClick && onStarClick(i - 0.5)}
-                        onMouseEnter={() => interactive && onStarHover && onStarHover(i - 0.5)}
-                    />,
+                        className={cx('star-container')}
+                        style={{ position: 'relative', display: 'inline-block' }}
+                    >
+                        {/* Nửa TRÁI - chọn NỬA SAO (0.5, 1.5, 2.5, ...) */}
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '50%',
+                                height: '100%',
+                                cursor: 'pointer',
+                                zIndex: 2,
+                            }}
+                            onClick={() => onStarClick && onStarClick(i - 0.5)}
+                            onMouseEnter={() => onStarHover && onStarHover(i - 0.5)}
+                        />
+                        {/* Nửa PHẢI - chọn SAO ĐẦY (1, 2, 3, ...) */}
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: '50%',
+                                width: '50%',
+                                height: '100%',
+                                cursor: 'pointer',
+                                zIndex: 2,
+                            }}
+                            onClick={() => onStarClick && onStarClick(i)}
+                            onMouseEnter={() => onStarHover && onStarHover(i)}
+                        />
+                        {/* Ngôi sao hiển thị */}
+                        {fullStar ? (
+                            <FaStar
+                                className={cx('star', 'filled', 'interactive')}
+                                style={{
+                                    color: currentHoverRating >= i ? '#ffb300' : '#ffc107',
+                                    fontSize: '2.5rem',
+                                    position: 'relative',
+                                    zIndex: 1,
+                                }}
+                            />
+                        ) : halfStar ? (
+                            <FaStarHalfAlt
+                                className={cx('star', 'filled', 'interactive')}
+                                style={{
+                                    color: currentHoverRating >= i - 0.5 ? '#ffb300' : '#ffc107',
+                                    fontSize: '2.5rem',
+                                    position: 'relative',
+                                    zIndex: 1,
+                                }}
+                            />
+                        ) : (
+                            <FaRegStar
+                                className={cx('star', 'empty', 'interactive')}
+                                style={{
+                                    color: currentHoverRating >= i ? '#ffd54f' : '#e0e0e0',
+                                    fontSize: '2.5rem',
+                                    position: 'relative',
+                                    zIndex: 1,
+                                }}
+                            />
+                        )}
+                    </div>,
                 );
             } else {
-                stars.push(
-                    <FaRegStar
-                        key={i}
-                        className={cx('star', 'empty')}
-                        style={{ color: '#e0e0e0', fontSize: '2rem' }}
-                        onClick={() => interactive && onStarClick && onStarClick(i)}
-                        onMouseEnter={() => interactive && onStarHover && onStarHover(i)}
-                    />,
-                );
+                // Non-interactive stars - chỉ hiển thị
+                if (fullStar) {
+                    stars.push(
+                        <FaStar
+                            key={i}
+                            className={cx('star', 'filled')}
+                            style={{ color: '#ffc107', fontSize: '1.5rem' }}
+                        />,
+                    );
+                } else if (halfStar) {
+                    stars.push(
+                        <FaStarHalfAlt
+                            key={i}
+                            className={cx('star', 'filled')}
+                            style={{ color: '#ffc107', fontSize: '1.5rem' }}
+                        />,
+                    );
+                } else {
+                    stars.push(
+                        <FaRegStar
+                            key={i}
+                            className={cx('star', 'empty')}
+                            style={{ color: '#e0e0e0', fontSize: '1.5rem' }}
+                        />,
+                    );
+                }
             }
         }
 
-        return stars;
+        return (
+            <div
+                className={cx('stars-container', { interactive })}
+                onMouseLeave={() => interactive && onStarHover && onStarHover(0)}
+            >
+                {stars}
+            </div>
+        );
     };
 
-    // Review handlers
+    // Review handlers - SỬA LẠI HÀM NÀY
     const handleStarClick = (rating) => {
         setUserRating(rating);
+        console.log('Selected rating:', rating); // Debug
     };
 
     const handleStarHover = (rating) => {
@@ -205,11 +275,9 @@ function BookItemDetail() {
 
             let response;
             if (userReview) {
-                // UPDATE existing review
                 response = await reviewApi.updateReview(userReview.reviewId, reviewData);
                 addToast('Đã cập nhật đánh giá thành công!', 'success');
             } else {
-                // CREATE new review
                 response = await reviewApi.createReview(book.productId, reviewData);
                 addToast('Đã gửi đánh giá thành công!', 'success');
 
@@ -225,8 +293,6 @@ function BookItemDetail() {
                 await checkUserReview();
             }
         } catch (error) {
-            console.error('❌ Error submitting review:', error);
-            console.error('❌ Error details:', error.response?.data);
             addToast(error.response?.data?.message || 'Có lỗi xảy ra khi gửi đánh giá', 'error');
         } finally {
             setIsSubmittingReview(false);
@@ -364,7 +430,6 @@ function BookItemDetail() {
         salePrice,
         price,
         rating = 0,
-        reviewCount = 0,
         stockQuantity = 0,
         weightG = 0,
         description,
@@ -382,8 +447,12 @@ function BookItemDetail() {
     const discountPercent = salePrice && price ? Math.round((1 - salePrice / price) * 100) : 0;
     const isInCart = isItemInCart(productId);
     const cartQuantity = getItemQuantity(productId);
+
+    // Tính averageRating từ reviews thực tế
     const averageRating =
         reviews.length > 0 ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length : rating;
+
+    const reviewCount = reviews.length;
 
     return (
         <div className={cx('container')}>
