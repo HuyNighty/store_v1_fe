@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './ReviewForm.module.scss';
 import Button from '../../../../Layouts/components/Button';
+import { AuthContext } from '../../../../contexts/AuthContext';
 
 const cx = classNames.bind(styles);
 
@@ -18,6 +20,31 @@ function ReviewForm({
     handleSubmitReview,
     handleDeleteReview,
 }) {
+    const { user } = useContext(AuthContext) || {};
+    const navigate = useNavigate();
+
+    const handleLoginRedirect = () => {
+        // Lưu trang hiện tại để quay lại sau khi đăng nhập
+        const currentPath = window.location.pathname + window.location.search;
+        localStorage.setItem('redirectPath', currentPath);
+        navigate('/login');
+    };
+
+    // Nếu người dùng chưa đăng nhập, hiển thị nút đăng nhập
+    if (!user) {
+        return (
+            <div className={cx('write-review')}>
+                <h4>Đánh giá sản phẩm</h4>
+                <div className={cx('login-prompt')}>
+                    <p>Bạn cần đăng nhập để viết đánh giá</p>
+                    <Button primary onClick={handleLoginRedirect}>
+                        Đăng nhập để đánh giá
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={cx('write-review')}>
             <h4>{userReview ? 'Chỉnh sửa đánh giá của bạn' : 'Viết đánh giá của bạn'}</h4>

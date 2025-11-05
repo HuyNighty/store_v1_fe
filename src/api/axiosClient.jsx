@@ -39,14 +39,14 @@ function onRefreshed(newToken) {
     subscribers.forEach((cb) => cb(newToken));
     subscribers = [];
 }
+
 function addSubscriber(cb) {
     subscribers.push(cb);
 }
 
 async function refreshToken() {
-    // call refresh endpoint with plain refreshClient to avoid recursion
     try {
-        const resp = await refreshClient.post('/auth/refresh', {}); // adjust payload if backend expects refresh token body
+        const resp = await refreshClient.post('/auth/refresh', {});
         const newAccessToken = resp.data?.result?.token || resp.data?.accessToken || resp.data?.token;
         if (newAccessToken) {
             localStorage.setItem('access_token', newAccessToken);
@@ -54,7 +54,6 @@ async function refreshToken() {
         }
         return null;
     } catch (e) {
-        // refresh failed
         localStorage.removeItem('access_token');
         return null;
     }
@@ -64,10 +63,25 @@ axiosClient.interceptors.response.use(
     (res) => res,
     async (error) => {
         const { config, response } = error;
-        if (!response) return Promise.reject(error);
 
-        // if 401 and not retried yet
-        if (response.status === 401 && !config._retry) {
+        // Không xử lý nếu không có response (network error)
+
+        if (!response) return Promise.reject(error);
+        const isPublicEndpoint =
+            config.url &&
+            (config.url.includes('/reviews/public/') ||
+                config.url.includes('/products/public/') ||
+                config.url.includes('/categories/public/'));
+
+        // Chỉ xử lý 401 và chưa retry
+        if (response.status === 401 && !config._retry && !isPublicEndpoint) {
+            // QUAN TRỌNG: Không refresh token nếu người dùng chưa đăng nhập
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                // Người dùng là khách, không cần refresh, chỉ reject error
+                return Promise.reject(error);
+            }
+
             config._retry = true;
 
             if (!isRefreshing) {
@@ -87,15 +101,22 @@ axiosClient.interceptors.response.use(
                 }
             }
 
-            // wait for refreshed token
             return new Promise((resolve, reject) => {
                 addSubscriber((token) => {
                     if (token) {
                         config.headers.Authorization = `Bearer ${token}`;
                         resolve(axiosClient(config));
                     } else {
-                        // redirect to login if no token
-                        window.location.href = '/login';
+                        // CHỈ chuyển hướng nếu đang ở trang yêu cầu authentication
+                        // và có token trước đó (đã từng đăng nhập)
+                        const currentPath = window.location.pathname;
+                        const isAuthPage = currentPath === '/login' || currentPath === '/register';
+
+                        if (!isAuthPage) {
+                            // Lưu trang hiện tại để redirect back sau khi login
+                            localStorage.setItem('redirectPath', currentPath);
+                            window.location.href = '/login';
+                        }
                         reject(error);
                     }
                 });

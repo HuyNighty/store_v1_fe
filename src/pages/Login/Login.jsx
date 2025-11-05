@@ -5,9 +5,13 @@ import styles from './Login.module.scss';
 import { AuthContext } from '../../contexts/AuthContext';
 import Button from '../../Layouts/components/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 const cx = classNames.bind(styles);
+
+// Tạo các component icon
+const EyeIcon = () => <FontAwesomeIcon icon={faEye} />;
+const EyeSlashIcon = () => <FontAwesomeIcon icon={faEyeSlash} />;
 
 function Login() {
     const { login } = useContext(AuthContext);
@@ -15,10 +19,16 @@ function Login() {
     const [form, setForm] = useState({ identifier: '', password: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
     const handleGoHome = () => {
         navigate('/');
+    };
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
     };
 
     const handleSubmit = async (e) => {
@@ -27,7 +37,6 @@ function Login() {
         setLoading(true);
         try {
             await login(form);
-
             navigate('/');
         } catch (err) {
             console.error(err);
@@ -36,6 +45,8 @@ function Login() {
             setLoading(false);
         }
     };
+
+    const shouldShowPasswordIcon = form.password.length > 0;
 
     return (
         <div className={cx('login-wrapper')}>
@@ -54,17 +65,32 @@ function Login() {
                     name="identifier"
                     value={form.identifier}
                     onChange={handleChange}
-                    placeholder="Email or username"
+                    placeholder="Email hoặc tên đăng nhập"
                     required
                 />
-                <input
-                    name="password"
-                    type="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    placeholder="Password"
-                    required
-                />
+
+                <div className={cx('field', 'password-field')}>
+                    <div className={cx('password-input-wrapper')}>
+                        <input
+                            name="password"
+                            type={showPassword ? 'text' : 'password'}
+                            value={form.password}
+                            onChange={handleChange}
+                            placeholder="Mật khẩu"
+                            required
+                        />
+                        {shouldShowPasswordIcon && (
+                            <button
+                                type="button"
+                                className={cx('password-toggle')}
+                                onClick={togglePasswordVisibility}
+                                aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                            >
+                                {showPassword ? <EyeIcon /> : <EyeSlashIcon />}
+                            </button>
+                        )}
+                    </div>
+                </div>
 
                 <div className={cx('login-actions')}>
                     <Button shine primary width={15} disabled={loading}>

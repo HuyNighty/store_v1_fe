@@ -246,6 +246,98 @@
     animation: reviewSuccess 2s ease-in-out;
 }
 
+.write-review {
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+
+    h4 {
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 18px;
+    }
+}
+
+.login-prompt {
+    text-align: center;
+    padding: 30px 20px;
+
+    p {
+        margin-bottom: 20px;
+        color: #666;
+        font-size: 16px;
+    }
+}
+
+.review-form {
+    // Các style hiện có của bạn
+}
+
+.rating-input {
+    margin-bottom: 15px;
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+    }
+}
+
+.interactive-stars {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rating-text {
+    font-size: 14px;
+    color: #666;
+    margin-left: 10px;
+}
+
+.comment-input {
+    margin-bottom: 15px;
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+        font-family: inherit;
+        font-size: 14px;
+
+        &:focus {
+            outline: none;
+            border-color: var(--primary-hover);
+            box-shadow: 0 0 0 2px var(--primary-hover);
+        }
+    }
+}
+
+.char-count {
+    text-align: right;
+    font-size: 12px;
+    color: #999;
+    margin-top: 5px;
+}
+
+.review-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
 // Responsive improvements
 @media (max-width: 480px) {
     .write-review {
