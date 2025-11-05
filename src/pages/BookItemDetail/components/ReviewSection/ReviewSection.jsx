@@ -22,6 +22,54 @@ function ReviewSection({
     handleSubmitReview,
     handleDeleteReview,
 }) {
+    const getImageUrl = (imagePath) => {
+        if (!imagePath) return null;
+
+        if (imagePath.startsWith('http')) {
+            return imagePath;
+        }
+
+        const baseUrl = 'http://localhost:8080';
+        return `${baseUrl}/Store${imagePath}`;
+    };
+
+    // Hàm hiển thị avatar - ĐÃ SỬA
+    const renderAvatar = (review) => {
+        const hasProfileImage = review.profileImage || review.user?.profileImage;
+        const profileImageUrl = review.profileImage || review.user?.profileImage;
+        const firstName = review.firstName || review.user?.firstName || '';
+        const lastName = review.lastName || review.user?.lastName || '';
+        const userName = review.userName || 'Độc giả';
+
+        // Nếu có ảnh, hiển thị ảnh với fallback
+        if (hasProfileImage && profileImageUrl) {
+            return (
+                <div className={cx('avatar-container')}>
+                    <img
+                        src={getImageUrl(profileImageUrl)}
+                        alt="Avatar"
+                        className={cx('review-avatar')}
+                        onError={(e) => {
+                            // Khi ảnh lỗi, hiển thị placeholder với chữ cái đầu
+                            e.target.style.display = 'none';
+                        }}
+                    />
+                    {/* Fallback hiển thị khi ảnh lỗi */}
+                    <div className={cx('avatar-placeholder', 'fallback')} style={{ display: 'none' }}>
+                        {firstName ? firstName.charAt(0) + (lastName?.charAt(0) || '') : userName.charAt(0)}
+                    </div>
+                </div>
+            );
+        }
+
+        // Nếu không có ảnh, hiển thị placeholder với chữ cái đầu
+        return (
+            <div className={cx('avatar-placeholder')}>
+                {firstName ? firstName.charAt(0) + (lastName?.charAt(0) || '') : userName.charAt(0)}
+            </div>
+        );
+    };
+
     return (
         <div className={cx('reviews-container')}>
             {/* Review Summary */}
@@ -56,12 +104,12 @@ function ReviewSection({
                         <div key={review.reviewId || index} className={cx('review-item')}>
                             <div className={cx('review-header')}>
                                 <div className={cx('reviewer-info')}>
-                                    <button className={cx('reviewer-profile')}>
-                                        <FontAwesomeIcon icon={faUser} /> {/*Icon... click */}
+                                    {renderAvatar(review)}
+                                    <div className={cx('reviewer-details')}>
                                         <div className={cx('reviewer')}>{review.userName || 'Độc giả'}</div>
                                         <div className={cx('reviewer-email')}>{review.email || 'Độc giả'}</div>
-                                    </button>
-                                    <div className={cx('review-rating')}>{renderStars(review.rating)}</div>
+                                        <div className={cx('review-rating')}>{renderStars(review.rating)}</div>
+                                    </div>
                                 </div>
                                 <div className={cx('review-date')}>
                                     {new Date(review.createdAt).toLocaleDateString('vi-VN')}

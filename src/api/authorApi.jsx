@@ -52,6 +52,11 @@ const authorApi = {
         const url = `/authors/name/${encodeURIComponent(authorName)}`;
         return axiosClient.get(url);
     },
+
+    me: () => {
+        const url = '/auth/me';
+        return axiosClient.get(url);
+    },
 };
 
 export default authorApi;

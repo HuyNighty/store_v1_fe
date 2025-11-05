@@ -23,6 +23,10 @@
     line-height: 1;
 }
 
+.rating-stars {
+    margin: 8px 0;
+}
+
 .total-reviews {
     color: #6c757d;
     font-size: 0.9rem;
@@ -52,32 +56,82 @@
 }
 
 .reviewer-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
     flex: 1;
 }
 
-.reviewer-profile {
-    background-color: transparent;
-    border: transparent;
+.avatar-container {
+    position: relative;
     display: flex;
-    gap: 12px;
-    transition: transform var(--transition-base), color var(--transition-base);
+    align-items: center;
+    justify-content: center;
+}
 
-    &:hover {
-        cursor: pointer;
-        transform: scale(1.08);
+.review-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid var(--border-color);
+
+    // Fallback style khi ảnh lỗi
+    &.fallback {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none; // Mặc định ẩn, chỉ hiện khi ảnh lỗi
+    }
+
+    svg {
+        width: 18px;
+        height: 18px;
     }
 }
 
+.reviewer-details {
+    flex: 1;
+}
+
 .reviewer {
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 4px;
+    font-weight: 100;
+    color: var(--text-color);
+    margin-bottom: 2px;
+    font-size: 1.4rem;
 }
 
 .reviewer-email {
-    color: #ccc;
-    font-size: 1.4rem;
-    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: var(--secondary-color);
+    margin-bottom: 4px;
+}
+
+.review-rating {
+    margin-top: 4px;
+
+    .star {
+        width: 14px;
+        height: 14px;
+
+        &.filled {
+            color: #ffc107;
+        }
+    }
 }
 
 .review-date {
@@ -88,6 +142,13 @@
 .review-content {
     color: #495057;
     line-height: 1.5;
+
+    p {
+        margin: 0;
+        font-size: 1.4rem;
+        line-height: 1.5;
+        color: #666;
+    }
 }
 
 .review-status {
@@ -104,61 +165,6 @@
     padding: 40px 0;
 }
 
-// Reviews list specific styles
-.reviews-list {
-    .review-item {
-        padding: 20px;
-        border-bottom: 1px solid #f0f0f0;
-
-        &:last-child {
-            border-bottom: none;
-        }
-    }
-
-    .review-header {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 10px;
-        flex-wrap: wrap;
-
-        .reviewer {
-            font-weight: 600;
-            color: #333;
-            font-size: 1.4rem;
-        }
-
-        .review-rating {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-
-            .star {
-                width: 14px;
-                height: 14px;
-
-                &.filled {
-                    color: #ffc107;
-                }
-            }
-        }
-
-        .review-date {
-            color: #999;
-            font-size: 1.3rem;
-        }
-    }
-
-    .review-content {
-        p {
-            margin: 0;
-            font-size: 1.4rem;
-            line-height: 1.5;
-            color: #666;
-        }
-    }
-}
-
 @media (max-width: 768px) {
     .review-summary {
         flex-direction: column;
@@ -172,9 +178,15 @@
 
     .review-header {
         flex-direction: column;
+        align-items: flex-start;
     }
 
     .review-date {
         margin-top: 5px;
+        align-self: flex-end;
+    }
+
+    .reviewer-info {
+        width: 100%;
     }
 }

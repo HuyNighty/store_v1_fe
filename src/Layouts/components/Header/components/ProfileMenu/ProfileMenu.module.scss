@@ -27,6 +27,42 @@
     }
 }
 
+.profile-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-base);
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+.profile-image {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
+    transition: all var(--transition-base);
+
+    &:hover {
+        border-color: var(--white);
+    }
+}
+
+.icon-btn {
+    width: 20px;
+    height: 20px;
+    color: var(--text-color);
+    transition: all var(--transition-base);
+
+    &:hover {
+        color: var(--primary-color);
+    }
+}
+
 .menu-item {
     padding: 12px 20px;
     font-size: 1.6rem;

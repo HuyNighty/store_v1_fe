@@ -1,3 +1,4 @@
+// src/api/customerApi.js
 import axiosClient from './axiosClient';
 
 const customerApi = {
@@ -22,6 +23,30 @@ const customerApi = {
     getCustomerByUserId: (userId) => {
         const url = `/customers/by-user/${userId}`;
         return axiosClient.get(url);
+    },
+
+    // Lấy thông tin customer của user hiện tại
+    getMyProfile: () => {
+        const url = '/customers/me';
+        return axiosClient.get(url);
+    },
+
+    // Upload ảnh đại diện
+    uploadProfileImage: (file) => {
+        const url = '/customers/profile-image';
+        const formData = new FormData();
+        formData.append('file', file);
+        return axiosClient.post(url, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    },
+
+    // Xóa ảnh đại diện
+    removeProfileImage: () => {
+        const url = '/customers/profile-image';
+        return axiosClient.delete(url);
     },
 };
 

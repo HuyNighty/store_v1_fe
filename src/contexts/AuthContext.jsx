@@ -1,6 +1,7 @@
 // src/contexts/AuthContext.jsx
 import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import authApi from '../api/authApi';
+import customerApi from '../api/customerApi';
 import { jwtDecode } from 'jwt-decode';
 
 // Tạo context - EXPORT NÀY
@@ -38,7 +39,7 @@ export function AuthProvider({ children }) {
     const decodeUserFromToken = (token) => {
         try {
             const decoded = jwtDecode(token);
-            console.log('🔍 Decoded token:', decoded);
+            console.log('Decoded token:', decoded);
 
             const roles = parseRolesFromDecoded(decoded);
             const primaryRole = roles.length ? roles[0] : null;
@@ -58,24 +59,91 @@ export function AuthProvider({ children }) {
 
     const fetchUser = useCallback(async () => {
         try {
-            const res = await authApi.me();
-            const data = res.data?.result;
-            if (data) {
-                const roles = Array.isArray(data.roles)
-                    ? data.roles.map((r) => String(r).toUpperCase())
-                    : typeof data.scope === 'string'
-                    ? data.scope.split(/\s+/).map((r) => r.toUpperCase())
+            // Thử lấy thông tin từ customer API trước (có profileImage)
+            const customerRes = await customerApi.getMyProfile();
+            const customerData = customerRes.data?.result;
+
+            if (customerData) {
+                const roles = Array.isArray(customerData.roles)
+                    ? customerData.roles.map((r) => String(r).toUpperCase())
+                    : typeof customerData.scope === 'string'
+                    ? customerData.scope.split(/\s+/).map((r) => r.toUpperCase())
                     : [];
-                const primaryRole = roles.length ? roles[0] : data.role ? String(data.role).toUpperCase() : null;
+                const primaryRole = roles.length
+                    ? roles[0]
+                    : customerData.role
+                    ? String(customerData.role).toUpperCase()
+                    : null;
 
                 setUser({
-                    ...data,
+                    ...customerData,
                     roles,
                     role: primaryRole,
+                    profileImage: customerData.profileImage || null,
+                    firstName: customerData.firstName,
+                    lastName: customerData.lastName,
+                    email: customerData.email,
                 });
+            } else {
+                const authRes = await authApi.me();
+                const authData = authRes.data?.result;
+                if (authData) {
+                    const roles = Array.isArray(authData.roles)
+                        ? authData.roles.map((r) => String(r).toUpperCase())
+                        : typeof authData.scope === 'string'
+                        ? authData.scope.split(/\s+/).map((r) => r.toUpperCase())
+                        : [];
+                    const primaryRole = roles.length
+                        ? roles[0]
+                        : authData.role
+                        ? String(authData.role).toUpperCase()
+                        : null;
+
+                    setUser({
+                        ...authData,
+                        roles,
+                        role: primaryRole,
+                        profileImage: authData.profileImage || null,
+                        firstName: authData.firstName,
+                        lastName: authData.lastName,
+                        email: authData.email,
+                    });
+                }
             }
         } catch (e) {
             console.warn('[AuthContext] fetchUser failed:', e?.response?.status || e.message);
+
+            if (e?.response?.status === 404 || e?.response?.status === 400) {
+                try {
+                    const authRes = await authApi.me();
+                    const authData = authRes.data?.result;
+                    if (authData) {
+                        const roles = Array.isArray(authData.roles)
+                            ? authData.roles.map((r) => String(r).toUpperCase())
+                            : typeof authData.scope === 'string'
+                            ? authData.scope.split(/\s+/).map((r) => r.toUpperCase())
+                            : [];
+                        const primaryRole = roles.length
+                            ? roles[0]
+                            : authData.role
+                            ? String(authData.role).toUpperCase()
+                            : null;
+
+                        setUser({
+                            ...authData,
+                            roles,
+                            role: primaryRole,
+                            profileImage: authData.profileImage || null,
+                            firstName: authData.firstName,
+                            lastName: authData.lastName,
+                            email: authData.email,
+                        });
+                        return;
+                    }
+                } catch (authError) {
+                    console.warn('[AuthContext] authApi.me also failed:', authError);
+                }
+            }
 
             if (e?.response?.status === 401) {
                 localStorage.removeItem('access_token');
@@ -86,23 +154,27 @@ export function AuthProvider({ children }) {
     }, []);
 
     useEffect(() => {
-        const token = localStorage.getItem('access_token');
-        if (token) {
-            const decodedUser = decodeUserFromToken(token);
-            if (decodedUser) {
-                setUser(decodedUser);
-                setIsAuthenticated(true);
-                fetchUser().catch(() => {});
+        const initializeAuth = async () => {
+            const token = localStorage.getItem('access_token');
+            if (token) {
+                const decodedUser = decodeUserFromToken(token);
+                if (decodedUser) {
+                    setUser(decodedUser);
+                    setIsAuthenticated(true);
+                    await fetchUser();
+                } else {
+                    localStorage.removeItem('access_token');
+                    setIsAuthenticated(false);
+                    setUser(null);
+                }
             } else {
-                localStorage.removeItem('access_token');
                 setIsAuthenticated(false);
                 setUser(null);
             }
-        } else {
-            setIsAuthenticated(false);
-            setUser(null);
-        }
-        setLoading(false);
+            setLoading(false);
+        };
+
+        initializeAuth();
     }, [fetchUser]);
 
     const login = async ({ identifier, password }) => {
@@ -122,6 +194,9 @@ export function AuthProvider({ children }) {
 
             await fetchUser();
             return true;
+        } catch (error) {
+            console.error('[AuthContext] Login failed:', error);
+            throw error;
         } finally {
             setLoading(false);
         }
@@ -141,18 +216,24 @@ export function AuthProvider({ children }) {
         }
     };
 
+    const refreshUserData = async () => {
+        if (isAuthenticated) {
+            await fetchUser();
+        }
+    };
+
     const value = {
         isAuthenticated,
         user,
         login,
         logout,
         loading,
+        refreshUserData,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-// Tạo custom hook để sử dụng AuthContext
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
