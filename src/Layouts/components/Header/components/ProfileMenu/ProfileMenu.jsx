@@ -12,7 +12,7 @@ function ProfileMenu({ onProfileInteract, onLogout, user }) {
     const profileMenuItems = [
         { label: 'Thông tin cá nhân', icon: faUser, to: '/profile' },
         { label: 'Đơn hàng', icon: faBox, to: '/orders' },
-        { label: 'Cài đặt', icon: faGear, to: '/settings' },
+        // { label: 'Cài đặt', icon: faGear, to: '/settings' },
         { label: 'Đăng xuất', icon: faRightFromBracket, onClick: onLogout },
     ];
 

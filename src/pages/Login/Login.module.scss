@@ -1,251 +1,811 @@
 .login-wrapper {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    font-family: var(--font-family-primary);
+}
+
+// Background styles
+.background-overlay {
+    position: absolute;
+    inset: 0;
+
+    .background-image {
+        position: absolute;
+        inset: 0;
+        background-image: url('https://images.unsplash.com/photo-1551494504-5d2592424809?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .gradient-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            135deg,
+            rgba(101, 85, 72, 0.85) 0%,
+            rgba(147, 125, 107, 0.8) 50%,
+            rgba(101, 85, 72, 0.85) 100%
+        );
+    }
+
+    .radial-overlay {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(184, 165, 134, 0.15), transparent 60%);
+    }
+}
+
+// Floating particles
+.floating-particle {
+    position: absolute;
+    display: none;
+
+    @media (min-width: 1024px) {
+        display: block;
+        color: rgba(184, 165, 134, 0.3);
+        font-size: 2rem;
+
+        animation: floatParticle 20s linear infinite;
+
+        &.particle-0 {
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+        &.particle-1 {
+            top: 20%;
+            right: 10%;
+            animation-delay: 3s;
+        }
+        &.particle-2 {
+            top: 50%;
+            left: 80%;
+            animation-delay: 6s;
+        }
+        &.particle-3 {
+            bottom: 30%;
+            left: 15%;
+            animation-delay: 9s;
+        }
+        &.particle-4 {
+            bottom: 20%;
+            right: 20%;
+            animation-delay: 12s;
+        }
+        &.particle-5 {
+            top: 70%;
+            right: 5%;
+            animation-delay: 15s;
+        }
+    }
+}
+
+@keyframes floatParticle {
+    0% {
+        transform: translateY(-50px) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.4;
+    }
+    50% {
+        opacity: 0.4;
+    }
+    90% {
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(calc(100vh + 50px)) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+// Main container - SỬA QUAN TRỌNG
+.login-container {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-    background-color: var(--background-color);
-    font-family: var(--font-family-primary);
-    animation: fadeSlideDown 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    padding: 20px;
+
+    @media (min-width: 640px) {
+        padding: 24px;
+    }
+
+    @media (min-width: 1024px) {
+        padding: 32px;
+    }
 }
 
-.login-form {
-    background-color: var(--white);
-    padding: 40px 50px;
-    border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    width: 380px;
+.content-grid {
+    width: 100%;
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    align-items: center;
+
+    @media (min-width: 1024px) {
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+    }
+}
+
+// Branding section - SỬA LAYOUT
+.branding-section {
+    color: var(--white);
+    display: none;
+
+    @media (min-width: 1024px) {
+        display: block;
+        padding: 40px 0;
+    }
+}
+
+.branding-content {
+    margin-bottom: 48px;
+    animation: fadeSlideDown 1s both;
+
+    @media (min-width: 1024px) {
+        padding-right: 20px;
+    }
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    .logo-icon {
+        font-size: 4rem;
+        color: var(--primary-hover);
+        animation: float 6s ease-in-out infinite;
+        flex-shrink: 0;
+    }
+
+    .brand-name {
+        font-size: 4.5rem;
+        color: var(--background-color);
+        margin: 0 0 8px 0;
+        font-weight: 100;
+        line-height: 1.1;
+        font-family: var(--font-family-primary);
+    }
+
+    .brand-tagline {
+        font-size: 1.8rem;
+        color: var(--primary-hover);
+        margin: 0;
+        font-family: var(--font-family-primary);
+    }
+}
+
+.brand-description {
+    font-size: 1.8rem;
+    color: rgba(246, 244, 239, 0.9);
+    line-height: 1.6;
+    margin: 0;
+    font-family: var(--font-family-primary);
+}
+
+// Features section - SỬA CĂN CHỈNH
+.features-section {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    margin-bottom: 48px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
 
     &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateX(8px);
     }
 
-    .form-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-        position: relative;
+    &:nth-child(1) {
+        animation: fadeSlideDown 0.8s both 0.1s;
     }
+    &:nth-child(2) {
+        animation: fadeSlideDown 0.8s both 0.2s;
+    }
+    &:nth-child(3) {
+        animation: fadeSlideDown 0.8s both 0.3s;
+    }
+
+    .feature-icon {
+        padding: 12px;
+        border-radius: 12px;
+        background: rgba(101, 85, 72, 0.4);
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+
+        svg {
+            width: 24px;
+            height: 24px;
+            color: var(--primary-hover);
+        }
+    }
+
+    .feature-content {
+        flex: 1;
+
+        .feature-title {
+            font-size: 1.8rem;
+            color: var(--background-color);
+            margin: 0 0 8px 0;
+            font-weight: 100;
+            font-family: var(--font-family-primary);
+        }
+
+        .feature-desc {
+            font-size: 1.4rem;
+            color: rgba(246, 244, 239, 0.7);
+            margin: 0;
+            line-height: 1.5;
+            font-family: var(--font-family-primary);
+        }
+    }
+}
+
+// Stats section
+.stats-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    animation: fadeSlideDown 0.8s both 0.4s;
+
+    .stat-item {
+        text-align: center;
+
+        .stat-value {
+            font-size: 3rem;
+            color: var(--primary-hover);
+            margin-bottom: 8px;
+            font-weight: 100;
+            line-height: 1;
+            font-family: var(--font-family-primary);
+        }
+
+        .stat-label {
+            font-size: 1.4rem;
+            color: rgba(246, 244, 239, 0.7);
+            font-family: var(--font-family-primary);
+        }
+    }
+}
+
+// Form section - SỬA QUAN TRỌNG
+.form-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.form-card {
+    position: relative;
+    animation: scaleIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    width: 100%;
+
+    .card-glow {
+        position: absolute;
+        inset: -4px;
+        background: linear-gradient(to right, var(--primary-color), var(--primary-hover));
+        border-radius: 24px;
+        filter: blur(20px);
+        opacity: 0.2;
+        z-index: -1;
+    }
+
+    .card-content {
+        position: relative;
+        background: rgba(246, 244, 239, 0.95);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(147, 125, 107, 0.3);
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        width: 100%;
+
+        @media (min-width: 640px) {
+            padding: 40px;
+        }
+    }
+}
+
+.mobile-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+
+    svg {
+        width: 56px;
+        height: 56px;
+        color: var(--primary-color-bold);
+    }
+
+    @media (min-width: 1024px) {
+        display: none;
+    }
+}
+
+// Form Header - SỬA CĂN CHỈNH
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+    gap: 16px;
 
     .home-button {
         display: flex;
         align-items: center;
-        margin-left: -36px;
+        gap: 8px;
         background: transparent;
-        border: 1px solid var(--primary-color);
-        color: var(--primary-color);
-        padding: 8px 12px;
-        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        padding: 10px 16px;
+        border-radius: 12px;
         font-size: 1.4rem;
         cursor: pointer;
         transition: all var(--transition-fast);
         text-decoration: none;
+        flex-shrink: 0;
         white-space: nowrap;
 
         &:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(147, 125, 107, 0.2);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateX(-2px);
         }
 
-        &:active {
-            transform: translateY(0);
-        }
-
-        &:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(147, 125, 107, 0.3);
+        span {
+            font-family: var(--font-family-primary);
         }
     }
 
-    h2 {
+    .header-content {
+        flex: 1;
         text-align: center;
-        font-size: 2.4rem;
+        min-width: 0;
+
+        .form-title {
+            font-size: 3.2rem;
+            color: var(--primary-color-bold);
+            margin: 0 0 8px 0;
+            font-weight: 100;
+            line-height: 1.2;
+            font-family: var(--font-family-primary);
+            word-wrap: break-word;
+        }
+
+        .form-subtitle {
+            color: var(--secondary-color);
+            font-size: 1.6rem;
+            margin: 0;
+            font-family: var(--font-family-primary);
+        }
+    }
+
+    .header-spacer {
+        width: 100px;
+        flex-shrink: 0;
+        visibility: hidden;
+
+        @media (max-width: 768px) {
+            display: none;
+        }
+    }
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fcebea;
+    border: 1px solid var(--danger-color);
+    color: var(--danger-color);
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    font-size: 1.4rem;
+
+    .error-icon {
+        font-size: 1.6rem;
+    }
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.input-group {
+    .input-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 100;
         color: var(--primary-color-bold);
-        margin: 0;
+        font-size: 1.4rem;
+        font-family: var(--font-family-primary);
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        border: 2px solid rgba(147, 125, 107, 0.3);
+        border-radius: 12px;
+        transition: all var(--transition-base);
+        background: var(--white);
+
+        &.focused {
+            border-color: var(--primary-color-bold);
+            box-shadow: 0 0 0 4px rgba(101, 85, 72, 0.1);
+
+            .input-icon {
+                color: var(--primary-color-bold);
+            }
+        }
+
+        .input-icon {
+            padding: 0 16px;
+            color: var(--primary-color);
+            transition: color var(--transition-base);
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .styled-input {
+            flex: 1;
+            border: none;
+            padding: 16px 16px 16px 0;
+            font-size: var(--font-size-base);
+            background: transparent;
+            font-family: var(--font-family-primary);
+            color: var(--text-color);
+            min-width: 0;
+
+            &:focus {
+                outline: none;
+            }
+
+            &::placeholder {
+                color: var(--primary-color);
+                opacity: 0.5;
+                font-family: var(--font-family-primary);
+            }
+        }
+
+        .password-toggle {
+            background: none;
+            border: none;
+            padding: 0 16px;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: color var(--transition-fast);
+            font-size: 1.6rem;
+            flex-shrink: 0;
+
+            &:hover {
+                color: var(--primary-color-bold);
+            }
+        }
+    }
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.4rem;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        color: var(--text-color);
+        font-family: var(--font-family-primary);
+        white-space: nowrap;
+
+        input {
+            display: none;
+        }
+
+        .checkmark {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(147, 125, 107, 0.5);
+            border-radius: 4px;
+            position: relative;
+            transition: all var(--transition-fast);
+            flex-shrink: 0;
+
+            &::after {
+                content: '';
+                position: absolute;
+                left: 5px;
+                top: 2px;
+                width: 4px;
+                height: 8px;
+                border: solid white;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+                opacity: 0;
+                transition: opacity var(--transition-fast);
+            }
+        }
+
+        input:checked + .checkmark {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+
+            &::after {
+                opacity: 1;
+            }
+        }
+    }
+
+    .forgot-password {
+        color: var(--primary-color-bold);
+        text-decoration: none;
+        transition: color var(--transition-fast);
+        font-family: var(--font-family-primary);
+        white-space: nowrap;
+
+        &:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+    }
+}
+
+.submit-section {
+    .login-button {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        height: 52px;
+        border-radius: 12px;
+        font-size: 1.6rem;
+        font-weight: 100;
+        font-family: var(--font-family-primary);
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: rotate 1s linear infinite;
+            margin-right: 8px;
+        }
+    }
+}
+
+.divider {
+    position: relative;
+    margin: 32px 0;
+    text-align: center;
+
+    &::before {
+        content: '';
         position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(147, 125, 107, 0.3);
+    }
+
+    span {
+        border-radius: 10px;
+        background: rgba(246, 244, 239, 0.95);
+        padding: 0 16px;
+        color: var(--secondary-color);
+        font-size: 1.4rem;
+        position: relative;
+        z-index: 1;
+        font-family: var(--font-family-primary);
         font-weight: 100;
     }
+}
 
-    input {
-        padding: 12px 15px;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        font-size: var(--font-size-base);
-        color: var(--text-color);
-        background-color: #fafafa;
-        transition: border var(--transition-fast), box-shadow var(--transition-fast);
+.social-login {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
 
-        &:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(147, 125, 107, 0.2);
-        }
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
     }
 
-    // Styles cho password field
-    .password-field {
-        position: relative;
-        margin-bottom: 5px;
-    }
-
-    .password-input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
-    .password-input-wrapper input {
-        width: 100%;
-        padding-right: 45px; // Để chừa chỗ cho icon
-    }
-
-    .password-toggle {
-        position: absolute;
-        right: 12px;
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: #666;
-        padding: 5px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: color var(--transition-fast);
-
-        &:hover {
-            color: var(--primary-color);
-        }
-
-        &:focus {
-            outline: none;
-            color: var(--primary-color);
-        }
-
-        &:active {
-            transform: scale(0.95);
-        }
-    }
-
-    button[type='submit'] {
-        font-size: var(--font-size-base);
-        font-family: var(--font-family-primary);
-        background-color: var(--primary-color);
-        color: var(--white);
-        padding: 12px 15px;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: background-color var(--transition-base), transform var(--transition-fast);
-
-        &:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-        }
-
-        &:disabled {
-            background-color: #d3c9c0;
-            cursor: not-allowed;
-            transform: none;
-        }
-    }
-
-    .error {
-        color: var(--error-color);
+    .social-button {
+        height: 48px;
+        background: var(--white);
+        border: 2px solid rgba(147, 125, 107, 0.3);
+        color: var(--primary-color-bold);
+        border-radius: 12px;
         font-size: 1.4rem;
-        text-align: center;
-        background-color: #fcebea;
-        border: 1px solid #f5c6cb;
-        padding: 8px;
-        border-radius: 6px;
-        margin-top: -10px;
-    }
-}
+        font-weight: 100;
+        transition: all var(--transition-fast);
+        font-family: var(--font-family-primary);
 
-.login-actions {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-@keyframes fadeSlideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes shine {
-    0% {
-        left: -100%;
-    }
-    50% {
-        left: 100%;
-    }
-    100% {
-        left: 100%;
-    }
-}
-
-// Responsive design
-@media (max-width: 480px) {
-    .login-form {
-        padding: 30px 25px;
-        width: 320px;
-
-        .form-header {
-            flex-wrap: wrap;
+        span {
+            display: flex;
             justify-content: center;
-            gap: 10px;
+            align-items: center;
         }
 
-        h2 {
-            position: static;
-            transform: none;
-            order: -1;
-            width: 100%;
-            margin-bottom: 10px;
+        &:hover {
+            background: var(--background-color);
+            border-color: var(--primary-color-bold);
+            color: #000;
         }
+
+        .social-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+    }
+}
+
+.register-link-section {
+    text-align: center;
+
+    .register-prompt {
+        color: var(--secondary-color);
+        font-size: 1.4rem;
+        font-family: var(--font-family-primary);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .register-link {
+        text-decoration: none;
+        font-size: 1.4rem;
+        font-family: var(--font-family-primary);
+    }
+}
+
+// Animations
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// Responsive design - SỬA QUAN TRỌNG
+@media (max-width: 1023px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    .branding-section {
+        display: none;
+    }
+
+    .form-section {
+        max-width: 480px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        padding: 16px;
+    }
+
+    .form-card .card-content {
+        padding: 24px;
+    }
+
+    .form-header {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
 
         .home-button {
+            align-self: flex-start;
             order: 1;
+        }
+
+        .header-content {
+            order: 2;
         }
 
         .header-spacer {
             display: none;
         }
+    }
 
-        // Điều chỉnh cho password field trên mobile
-        .password-input-wrapper input {
-            padding-right: 40px;
-        }
+    .form-options {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
 
-        .password-toggle {
-            right: 10px;
-        }
+    .social-login {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-wrapper {
+        padding: 8px;
+    }
+
+    .form-card .card-content {
+        padding: 20px;
+    }
+
+    .form-title {
+        font-size: 2.8rem !important;
+    }
+
+    .logo-section .brand-name {
+        font-size: 3.5rem;
+    }
+
+    .brand-description {
+        font-size: 1.6rem;
+    }
+}
+
+// Mobile-specific fixes
+@media (max-width: 375px) {
+    .form-card .card-content {
+        padding: 16px;
+    }
+
+    .form-title {
+        font-size: 2.4rem !important;
+    }
+
+    .input-group .input-wrapper .styled-input {
+        font-size: 1.4rem;
+    }
+
+    .form-options {
+        font-size: 1.2rem;
     }
 }
