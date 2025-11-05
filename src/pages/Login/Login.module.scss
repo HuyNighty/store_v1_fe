@@ -394,6 +394,10 @@
             line-height: 1.2;
             font-family: var(--font-family-primary);
             word-wrap: break-word;
+
+            h2 {
+                font-weight: 100;
+            }
         }
 
         .form-subtitle {

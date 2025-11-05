@@ -1,10 +1,20 @@
 .wrapper {
     width: 100%;
-    background-color: var(--white);
-    box-shadow: var(--shadow-header);
-    position: sticky;
+    position: fixed;
     top: 0;
     z-index: 100;
+    transition: all 0.5s ease;
+
+    // Mặc định trong suốt (cho Hero section)
+    background: transparent;
+    backdrop-filter: blur(0px);
+
+    &.scrolled {
+        // Khi scroll xuống thì có background
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 20px rgba(101, 85, 72, 0.1);
+    }
 }
 
 .content {
@@ -14,6 +24,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 14px 24px;
+    transition: padding 0.3s ease;
+
+    .scrolled & {
+        padding: 8px 24px;
+    }
 }
 
 .actions {
@@ -29,24 +44,46 @@
 .nav-icons {
     display: flex;
     align-items: center;
-    gap: 16px; // Thêm gap giữa các icon
+    gap: 16px;
 }
 
-// Wishlist button style giống cartButton
+// Wishlist button - ĐIỀU CHỈNH QUAN TRỌNG
 .wishlist-wrapper {
     position: relative;
-    width: var(--icon-size, 24px); // Sử dụng cùng biến với cart
-    height: 20px; // Giống cart
+    width: var(--icon-size, 24px);
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform var(--transition-base, 0.2s ease);
-    color: #000;
+    transition: all var(--transition-base, 0.2s ease);
+    border-radius: 8px;
+    padding: 8px;
 
-    &:hover {
-        color: var(--primary-hover, #007bff);
-        transform: scale(1.15);
+    // Màu khi header trong suốt (trên Hero)
+    .wrapper:not(.scrolled) & {
+        color: var(--white);
+
+        &:hover {
+            color: var(--primary-hover);
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.15);
+        }
+    }
+
+    // Màu khi header có background (sau khi scroll)
+    .wrapper.scrolled & {
+        color: var(--primary-color-bold);
+
+        &:hover {
+            color: var(--primary-hover);
+            background: rgba(101, 85, 72, 0.1);
+            transform: scale(1.15);
+        }
+    }
+
+    &:active {
+        transform: scale(0.95);
     }
 
     .badge {
@@ -54,7 +91,7 @@
         top: -8px;
         right: -8px;
         background: var(--primary-color);
-        color: var(--white, #fff);
+        color: var(--white);
         font-size: 11px;
         font-weight: 600;
         border-radius: 50%;
@@ -64,48 +101,224 @@
         align-items: center;
         justify-content: center;
         line-height: 1;
+        box-shadow: 0 2px 8px rgba(101, 85, 72, 0.3);
+        animation: badgePopIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
 }
 
-// Giữ nguyên các style cũ cho responsive
-.nav-item {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    color: #666;
-    text-decoration: none;
-    font-size: 1.8rem;
-    transition: all 0.2s ease;
-    min-height: 50px;
+// Logo cần điều chỉnh màu
+.logo {
+    // Khi header trong suốt, logo màu trắng
+    .wrapper:not(.scrolled) & {
+        filter: brightness(0) invert(1);
+    }
 
-    &.wishlist-btn {
-        position: relative;
+    // Khi header có background, logo màu bình thường
+    .wrapper.scrolled & {
+        filter: none;
     }
 }
 
-.icon-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
+// Navigation Links cần điều chỉnh màu
+.nav-links-container {
+    // Áp dụng cho container của NavLinks
+    .wrapper:not(.scrolled) & {
+        // Các link màu trắng khi header trong suốt
+        a,
+        .nav-link {
+            color: var(--white) !important;
 
-    svg {
-        width: 24px;
-        height: 24px;
+            &:hover {
+                color: var(--primary-hover) !important;
+            }
+        }
+    }
+
+    .wrapper.scrolled & {
+        // Các link màu bình thường khi header có background
+        a,
+        .nav-link {
+            color: var(--primary-color-bold) !important;
+
+            &:hover {
+                color: var(--primary-color) !important;
+            }
+        }
+    }
+}
+
+// Cart Button cần điều chỉnh (nếu có custom styles)
+.cart-button-wrapper {
+    transition: all var(--transition-base);
+
+    // Khi header trong suốt
+    .wrapper:not(.scrolled) & {
+        .cart-icon {
+            color: var(--white);
+
+            &:hover {
+                color: var(--primary-hover);
+            }
+        }
+    }
+
+    // Khi header có background
+    .wrapper.scrolled & {
+        .cart-icon {
+            color: var(--primary-color-bold);
+
+            &:hover {
+                color: var(--primary-color);
+            }
+        }
+    }
+
+    &:hover {
+        transform: scale(1.1);
+    }
+
+    &:active {
+        transform: scale(0.9);
+    }
+}
+
+// Search Bar cần điều chỉnh
+.search-bar-wrapper {
+    transition: all var(--transition-base);
+
+    &:hover {
+        transform: scale(1.02);
+    }
+}
+
+// Login Button cần điều chỉnh
+.login-button-wrapper {
+    transition: all var(--transition-base);
+
+    // Button outline khi header trong suốt
+    .wrapper:not(.scrolled) & {
+        .btn-outline {
+            border-color: var(--white);
+            color: var(--white);
+
+            &:hover {
+                background: var(--white);
+                color: var(--primary-color-bold);
+            }
+        }
+    }
+
+    // Button outline khi header có background
+    .wrapper.scrolled & {
+        .btn-outline {
+            border-color: var(--primary-color-bold);
+            color: var(--primary-color-bold);
+
+            &:hover {
+                background: var(--primary-color-bold);
+                color: var(--white);
+            }
+        }
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+// Profile Menu cần điều chỉnh
+.profile-menu-wrapper {
+    transition: all var(--transition-base);
+
+    // Khi header trong suốt
+    .wrapper:not(.scrolled) & {
+        .profile-trigger {
+            color: var(--white);
+
+            &:hover {
+                color: var(--primary-hover);
+            }
+        }
+    }
+
+    // Khi header có background
+    .wrapper.scrolled & {
+        .profile-trigger {
+            color: var(--primary-color-bold);
+
+            &:hover {
+                color: var(--primary-color);
+            }
+        }
+    }
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+// Staggered animation cho các action items
+.action-item {
+    opacity: 0;
+    transform: translateX(20px);
+    animation: slideInRight 0.5s ease forwards;
+
+    &:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+    &:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    &:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+    &:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+    &:nth-child(5) {
+        animation-delay: 0.5s;
+    }
+}
+
+// Animation Keyframes
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes badgePopIn {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    70% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
     }
 }
 
 // Responsive design
 @media (max-width: 768px) {
     .content {
-        padding: 0 15px;
-        height: 60px;
+        padding: 12px 15px;
+
+        .scrolled & {
+            padding: 8px 15px;
+        }
     }
 
     .actions {
@@ -113,8 +326,9 @@
     }
 
     .wishlist-wrapper {
-        width: 20px; // Giảm kích thước trên mobile
+        width: 20px;
         height: 18px;
+        padding: 6px;
 
         .badge {
             top: -6px;
@@ -122,6 +336,24 @@
             width: 16px;
             height: 16px;
             font-size: 10px;
+        }
+    }
+
+    .action-item {
+        &:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+        &:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        &:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+        &:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+        &:nth-child(5) {
+            animation-delay: 0.25s;
         }
     }
 }
@@ -134,6 +366,7 @@
     .wishlist-wrapper {
         width: 18px;
         height: 16px;
+        padding: 5px;
 
         .badge {
             top: -5px;
@@ -142,5 +375,10 @@
             height: 14px;
             font-size: 9px;
         }
+    }
+
+    .actions {
+        gap: 8px;
+        min-width: 150px;
     }
 }

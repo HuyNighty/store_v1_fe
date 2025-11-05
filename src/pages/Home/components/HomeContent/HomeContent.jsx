@@ -1,9 +1,9 @@
-// HomeContent.js
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import classNames from 'classnames/bind';
 import styles from './HomeContent.module.scss';
-import ImageGrid from './ImageGrid';
 import Button from '../../../../Layouts/components/Button';
+import { Sparkles, ArrowRight, Star, Users, Award } from 'lucide-react';
 
 const cx = classNames.bind(styles);
 
@@ -12,7 +12,7 @@ function HomeContent() {
 
     useEffect(() => {
         const img = new Image();
-        const imageUrl = 'https://i.pinimg.com/736x/5e/a5/27/5ea52724a7d5a0e0d2362e7ffdf8ad60.jpg';
+        const imageUrl = 'https://i.pinimg.com/736x/3b/30/b6/3b30b6bc5b1a89ce7857999dd0672ef0.jpg';
 
         console.log('Loading image:', imageUrl);
 
@@ -27,29 +27,125 @@ function HomeContent() {
         };
     }, []);
 
-    console.log('bgLoaded state:', bgLoaded);
+    // Stats data
+    const stats = [
+        { icon: Star, value: '10,000+', label: 'Books Available', delay: 0.2 },
+        { icon: Users, value: '50,000+', label: 'Happy Readers', delay: 0.4 },
+        { icon: Star, value: '4.9/5', label: 'Average Rating', delay: 0.6 },
+        { icon: Award, value: '100+', label: 'Awards Won', delay: 0.8 },
+    ];
+
+    // Floating books positions
+    const floatingBooks = [...Array(6)].map((_, i) => i);
 
     return (
         <>
+            {/* Hero Section */}
             <section className={cx('hero', { 'no-bg': !bgLoaded })}>
+                {/* Floating books animation */}
+                {floatingBooks.map((i) => (
+                    <motion.div
+                        key={i}
+                        className={cx('floating-book')}
+                        initial={{
+                            x: Math.random() * window.innerWidth,
+                            y: Math.random() * window.innerHeight,
+                            opacity: 0,
+                        }}
+                        animate={{
+                            y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
+                            opacity: [0.1, 0.3, 0.1],
+                            rotate: [0, 360],
+                        }}
+                        transition={{
+                            duration: 20 + Math.random() * 10,
+                            repeat: Infinity,
+                            ease: 'linear',
+                        }}
+                    >
+                        <Star className={cx('book-icon')} />
+                    </motion.div>
+                ))}
+
                 <div className={cx('hero-inner')}>
+                    {/* Animated badge */}
+                    <motion.div
+                        className={cx('hero-badge')}
+                        animate={{ y: [0, -10, 0] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                    >
+                        <Sparkles className={cx('badge-icon')} />
+                        Discover Endless Knowledge
+                    </motion.div>
+
                     <div className={cx('title')}>
                         <span>Discover Your</span>
                         <span>Next Great Read</span>
                     </div>
+
                     <p className={cx('subtitle')}>
                         Browse thousands of books across all genres. From timeless classics to modern bestsellers, find
                         your perfect story today.
                     </p>
+
                     <div className={cx('actions')}>
                         <Button to="/books" className={cx('btn', 'btn-primary')}>
                             Browse Collection
+                            <motion.div
+                                whileHover={{ x: 5 }}
+                                transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                            >
+                                <ArrowRight className={cx('btn-icon')} />
+                            </motion.div>
                         </Button>
                         <Button className={cx('btn', 'btn-outline')}>View Bestsellers</Button>
                     </div>
                 </div>
+
+                {/* Scroll indicator */}
+                <motion.div
+                    className={cx('scroll-indicator')}
+                    animate={{ y: [0, 10, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                    <div className={cx('scroll-track')}>
+                        <motion.div
+                            className={cx('scroll-thumb')}
+                            animate={{ y: [0, 16, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                        />
+                    </div>
+                </motion.div>
             </section>
-            <ImageGrid />
+
+            {/* Stats Section */}
+            <section className={cx('stats-section')}>
+                <div className={cx('stats-container')}>
+                    <div className={cx('stats-grid')}>
+                        {stats.map((stat, index) => (
+                            <motion.div
+                                key={index}
+                                className={cx('stat-item')}
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: stat.delay }}
+                                whileHover={{ scale: 1.05 }}
+                            >
+                                <motion.div
+                                    className={cx('stat-icon')}
+                                    whileHover={{ rotate: 360 }}
+                                    transition={{ duration: 0.6 }}
+                                >
+                                    <stat.icon className={cx('icon')} />
+                                </motion.div>
+                                <div className={cx('stat-value')}>{stat.value}</div>
+                                <div className={cx('stat-label')}>{stat.label}</div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
         </>
     );
 }
