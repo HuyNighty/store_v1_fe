@@ -4,9 +4,12 @@ import { Link } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
-function Logo() {
+function Logo({ className, isTransparent = false, ...props }) {
+    const rootClass = cx('logo', { transparent: isTransparent });
+    const combined = [rootClass, className].filter(Boolean).join(' ');
+
     return (
-        <Link to="/" className={cx('logo')}>
+        <Link to="/" className={combined} {...props}>
             <div className={cx('logo-icon')}>
                 <span>B</span>
             </div>

@@ -1,10 +1,10 @@
 import Header from '../components/Header';
 
-function HeaderOnly({ children }) {
+function HeaderOnly({ children, headerMode = 'auto' }) {
     return (
         <>
-            <Header />
-            {children}
+            <Header mode={headerMode} />
+            <main style={{ paddingTop: 'var(--header-height)' }}>{children}</main>
         </>
     );
 }

@@ -7,17 +7,51 @@
     display: flex;
     align-items: center;
     width: fit-content;
+    transition: all var(--transition-base, 0.2s) ease;
+
+    &.transparent {
+        .search-icon {
+            color: var(--white);
+        }
+
+        .search-input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: var(--white);
+        }
+
+        .clear,
+        .loading {
+            color: rgba(255, 255, 255, 0.9);
+        }
+    }
+
+    &.solid {
+        .search-icon {
+            color: var(--primary-color-bold);
+        }
+
+        .search-input {
+            background: var(--white);
+            border: 1px solid #e8e5e5;
+            color: #111;
+        }
+
+        .clear,
+        .loading {
+            color: rgba(22, 24, 35, 0.6);
+        }
+    }
 
     .search-icon {
-        color: var(--primary-color-bold);
         cursor: pointer;
         font-size: 20px;
         transition: transform 0.2s ease, color 0.2s ease;
         z-index: 11;
 
         &:hover {
-            color: var(--primary-hover);
             transform: scale(1.1);
+            color: var(--primary-hover);
         }
     }
 
@@ -27,14 +61,20 @@
         opacity: 0;
         width: 0;
         padding: 6px 34px 6px 10px;
-        border: 1px solid #ccc;
         border-radius: 6px;
         font-size: 14px;
-        background-color: var(--white);
-        transition: opacity 0.3s ease, width 0.3s ease;
+        transition: opacity 0.25s ease, width 0.25s ease, background 0.2s ease, border 0.2s ease;
         z-index: 10;
-        color: #000;
         pointer-events: none;
+        outline: none;
+
+        &::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+    }
+
+    &.transparent .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.75);
     }
 
     &.active .search-input {
@@ -48,17 +88,16 @@
         right: 32px;
         top: 50%;
         transform: translateY(-50%);
-        color: rgba(22, 24, 35, 0.6);
         font-size: 16px;
         display: flex;
         align-items: center;
         cursor: pointer;
         z-index: 12;
         background: transparent;
-        border: transparent;
+        border: none;
 
         &:hover {
-            color: var(--primary-hover);
+            transform: scale(1.05);
         }
     }
 
@@ -67,18 +106,17 @@
         right: 38px;
         top: 50%;
         transform: translateY(-50%);
-        color: #000;
         font-size: 16px;
         animation: spinner 1s linear infinite;
         z-index: 12;
     }
 }
 
+/* Popup kết quả, cũng có 2 trạng thái */
 .search-results {
     width: 360px;
     max-height: 480px;
     overflow-y: auto;
-    background: #fff;
     border-radius: 8px;
     box-shadow: var(--shadow-light);
     padding: 8px 0;
@@ -86,35 +124,66 @@
     scrollbar-width: none;
     margin-top: 10px;
 
+    &.transparent {
+        background: rgba(0, 0, 0, 0.75);
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+
+        .search-item {
+            color: var(--white);
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+            .book-author {
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            .sale-price {
+                color: #ffd1d1;
+            }
+
+            .original-price {
+                color: rgba(255, 255, 255, 0.65);
+            }
+        }
+
+        .no-results {
+            color: rgba(255, 255, 255, 0.85);
+        }
+    }
+
+    &.solid {
+        background: #fff;
+        color: var(--text-color);
+        border: 1px solid #f3f1f1;
+
+        .search-item {
+            color: var(--text-color);
+
+            &:hover {
+                background: var(--primary-hover);
+                color: #fff;
+            }
+
+            .book-author {
+                color: #666;
+            }
+        }
+
+        .no-results {
+            color: #888;
+        }
+    }
+
     .search-item {
         display: flex;
         align-items: flex-start;
         gap: 16px;
         padding: 12px 18px;
         text-decoration: none;
-        color: var(--text-color);
         transition: background 0.2s ease;
-
-        &:hover {
-            border-radius: 4px;
-            cursor: pointer;
-            background: var(--primary-hover);
-            color: #fff;
-
-            .price-section {
-                .sale-price,
-                .normal-price {
-                    color: #fff;
-                }
-                .original-price {
-                    color: rgba(255, 255, 255, 0.8);
-                }
-                .discount-badge {
-                    background: rgba(255, 255, 255, 0.9);
-                    color: #e74c3c;
-                }
-            }
-        }
 
         .book-thumb {
             width: 50px;
@@ -141,10 +210,6 @@
                 font-size: 12px;
                 color: #666;
                 margin-bottom: 6px;
-
-                .search-item:hover & {
-                    color: rgba(255, 255, 255, 0.9);
-                }
             }
         }
     }
@@ -152,35 +217,30 @@
     .no-results {
         text-align: center;
         padding: 20px;
-        color: #888;
         font-size: 14px;
     }
 }
 
-/* ===== PRICE SECTION STYLES ===== */
+/* PRICE */
 .price-section {
     margin-top: 2px;
 }
-
 .sale-price-container {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
-
 .price-row {
     display: flex;
     align-items: center;
     gap: 6px;
 }
-
 .sale-price {
     font-size: 14px;
     font-weight: 700;
     color: #e74c3c;
     line-height: 1.2;
 }
-
 .discount-badge {
     background: #e74c3c;
     color: white;
@@ -188,22 +248,17 @@
     border-radius: 3px;
     font-size: 11px;
     font-weight: 600;
-    line-height: 1.2;
 }
-
 .original-price {
     font-size: 12px;
     color: #999;
     text-decoration: line-through;
-    font-weight: 400;
 }
-
 .normal-price {
     font-size: 14px;
     font-weight: 600;
     color: #333;
 }
-/* ===== END PRICE SECTION ===== */
 
 @keyframes spinner {
     from {
@@ -214,14 +269,13 @@
     }
 }
 
-// Responsive adjustments
+/* Responsive */
 @media (max-width: 768px) {
     .search-results {
         width: 300px;
         left: 10px !important;
         right: 10px !important;
     }
-
     :root {
         --search-width: 180px;
     }

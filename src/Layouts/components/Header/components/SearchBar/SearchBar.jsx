@@ -1,3 +1,4 @@
+// SearchBar.jsx
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faCircleXmark, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import HeadlessTippy from '@tippyjs/react/headless';
@@ -11,7 +12,7 @@ import Button from '../../../Button';
 
 const cx = classNames.bind(styles);
 
-function SearchBar({ searchState, setSearchState }) {
+function SearchBar({ searchState, setSearchState, isTransparent, ...props }) {
     const navigate = useNavigate();
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -64,10 +65,8 @@ function SearchBar({ searchState, setSearchState }) {
                 setError(null);
 
                 const resp = await productApi.searchByName(debouncedQuery.trim());
-                // axios usually wraps data in resp.data
                 const data = resp?.data ?? resp;
 
-                // normalise array payload
                 let arr = [];
                 if (Array.isArray(data)) arr = data;
                 else if (Array.isArray(data.result)) arr = data.result;
@@ -97,17 +96,13 @@ function SearchBar({ searchState, setSearchState }) {
         };
     }, [debouncedQuery]);
 
-    // Helper function to get main image URL
     const getMainImage = (book) => {
-        // Nếu có productAssets và không rỗng
         if (book.productAssets && book.productAssets.length > 0) {
             return book.productAssets[0].url;
         }
-        // Fallback image
         return '/images/default-book.jpg';
     };
 
-    // Helper function to calculate discount percentage
     const getDiscountPercent = (book) => {
         if (book.salePrice && book.price && book.salePrice < book.price) {
             return Math.round((1 - book.salePrice / book.price) * 100);
@@ -115,12 +110,8 @@ function SearchBar({ searchState, setSearchState }) {
         return 0;
     };
 
-    // Function để chuyển hướng đến trang chi tiết sách - GIỐNG BookItem
     const handleBookClick = (book) => {
-        console.log('Navigating to book detail:', book.productId);
         closeSearch();
-
-        // Chuyển hướng đến trang chi tiết và truyền toàn bộ dữ liệu book - GIỐNG BookItem
         navigate('/book-item', {
             state: {
                 book: {
@@ -137,7 +128,7 @@ function SearchBar({ searchState, setSearchState }) {
                     weightG: book.weightG,
                     sku: book.sku,
                     slug: book.slug,
-                    imageUrl: getMainImage(book), // Thêm imageUrl giống BookItem
+                    imageUrl: getMainImage(book),
                 },
             },
         });
@@ -172,28 +163,30 @@ function SearchBar({ searchState, setSearchState }) {
     };
 
     const handleInputFocus = () => {
-        if (!showSearch) {
-            openSearch();
-        }
+        if (!showSearch) openSearch();
     };
 
     const toggleSearch = () => {
-        if (!showSearch) {
-            openSearch();
-        } else {
-            closeSearch();
-        }
+        if (!showSearch) openSearch();
+        else closeSearch();
     };
 
     return (
         <HeadlessTippy
-            appendTo={() => wrapperRef.current}
+            appendTo={() => wrapperRef.current || document.body}
             visible={showSearch && (loading || results.length > 0 || (searched && results.length === 0))}
             interactive
             placement="bottom-end"
             offset={[0, 8]}
             render={(attrs) => (
-                <div className={cx('search-results')} tabIndex="-1" {...attrs}>
+                <div
+                    className={cx('search-results', {
+                        transparent: isTransparent,
+                        solid: !isTransparent,
+                    })}
+                    tabIndex="-1"
+                    {...attrs}
+                >
                     {loading ? (
                         <div className={cx('no-results')}>
                             <FontAwesomeIcon icon={faSpinner} spin /> Đang tìm kiếm...
@@ -229,7 +222,6 @@ function SearchBar({ searchState, setSearchState }) {
                                                 </span>
                                             )}
 
-                                            {/* Price Display với discount style */}
                                             <div className={cx('price-section')}>
                                                 {hasDiscount ? (
                                                     <div className={cx('sale-price-container')}>
@@ -267,6 +259,8 @@ function SearchBar({ searchState, setSearchState }) {
             <div
                 className={cx('search-wrapper', {
                     active: isExpanded,
+                    transparent: isTransparent,
+                    solid: !isTransparent,
                 })}
                 ref={wrapperRef}
             >
@@ -281,7 +275,7 @@ function SearchBar({ searchState, setSearchState }) {
                 />
 
                 {!!query && !loading && (
-                    <button shine className={cx('clear')} onClick={handleClear}>
+                    <button type="button" className={cx('clear')} onClick={handleClear}>
                         <FontAwesomeIcon icon={faCircleXmark} />
                     </button>
                 )}

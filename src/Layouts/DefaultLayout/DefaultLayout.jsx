@@ -5,11 +5,16 @@ import styles from './DefaultLayout.module.scss';
 
 const cx = classNames.bind(styles);
 
-function DefaultLayout({ children }) {
+function DefaultLayout({ children, headerMode = 'auto' }) {
     return (
         <div className={cx('wrapper')}>
-            <Header />
-            <div className={cx('content')}>{children}</div>
+            <Header mode={headerMode} />
+            <div
+                className={cx('content')}
+                style={{ paddingTop: headerMode === 'auto' ? 0 : 'var(--header-height, 72px)' }}
+            >
+                {children}
+            </div>
             <Footer />
         </div>
     );

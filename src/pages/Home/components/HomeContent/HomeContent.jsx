@@ -27,13 +27,13 @@ function HomeContent() {
         };
     }, []);
 
-    // Stats data
-    const stats = [
-        { icon: Star, value: '10,000+', label: 'Books Available', delay: 0.2 },
-        { icon: Users, value: '50,000+', label: 'Happy Readers', delay: 0.4 },
-        { icon: Star, value: '4.9/5', label: 'Average Rating', delay: 0.6 },
-        { icon: Award, value: '100+', label: 'Awards Won', delay: 0.8 },
-    ];
+    // // Stats data
+    // const stats = [
+    //     { icon: Star, value: '10,000+', label: 'Books Available', delay: 0.2 },
+    //     { icon: Users, value: '50,000+', label: 'Happy Readers', delay: 0.4 },
+    //     { icon: Star, value: '4.9/5', label: 'Average Rating', delay: 0.6 },
+    //     { icon: Award, value: '100+', label: 'Awards Won', delay: 0.8 },
+    // ];
 
     // Floating books positions
     const floatingBooks = [...Array(6)].map((_, i) => i);
@@ -119,7 +119,7 @@ function HomeContent() {
             </section>
 
             {/* Stats Section */}
-            <section className={cx('stats-section')}>
+            {/* <section className={cx('stats-section')}>
                 <div className={cx('stats-container')}>
                     <div className={cx('stats-grid')}>
                         {stats.map((stat, index) => (
@@ -145,7 +145,7 @@ function HomeContent() {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section> */}
         </>
     );
 }

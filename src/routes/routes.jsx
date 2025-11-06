@@ -21,30 +21,30 @@ import Author from '../pages/Author';
 import FAQ from '../pages/FAQ';
 
 const publicRoutes = [
-    { path: '/', component: Home },
-    { path: '/books', component: Books },
-    { path: '/profile', component: Profile },
-    { path: '/book-item', component: BookItemDetail },
+    { path: '/', component: Home, headerMode: 'auto' },
+    { path: '/books', component: Books, headerMode: 'solid' },
+    { path: '/profile', component: Profile, headerMode: 'solid' },
+    { path: '/book-item', component: BookItemDetail, headerMode: 'solid' },
     { path: '/login', component: Login, layout: null },
     { path: '/register', component: Register, layout: null },
-    { path: '/cart', component: Cart, layout: HeaderOnly },
-    { path: '/authors/:authorId', component: Author },
-    { path: '/author/:authorId', component: Author },
-    { path: '/faq', component: FAQ },
+    { path: '/cart', component: Cart, layout: HeaderOnly, headerMode: 'solid' },
+    { path: '/authors/:authorId', component: Author, headerMode: 'solid' },
+    { path: '/author/:authorId', component: Author, headerMode: 'solid' },
+    { path: '/faq', component: FAQ, headerMode: 'solid' },
 ];
 const privateRoutes = [];
 
 const guestRoutes = [];
 
 const userRoutes = [
-    { path: '/orders/:orderId', component: UserOrderDetail },
+    { path: '/orders/:orderId', component: UserOrderDetail, headerMode: 'solid' },
     { path: '/checkout', component: Checkout, layout: null },
-    { path: '/orders', component: UserOrders, layout: HeaderOnly },
-    { path: '/wishlist', component: Wishlist, layout: HeaderOnly },
+    { path: '/orders', component: UserOrders, layout: HeaderOnly, headerMode: 'solid' },
+    { path: '/wishlist', component: Wishlist, layout: HeaderOnly, headerMode: 'solid' },
 ];
 
 const adminRoutes = [
-    { path: '/admin', component: Admin, layout: HeaderOnly },
+    { path: '/admin', component: Admin, layout: HeaderOnly, headerMode: 'solid' },
     { path: '/admin-products', component: Products, layout: null },
     { path: '/admin-books', component: CreateBookForm, layout: null },
     { path: '/admin-orders', component: AdminOrders, layout: null },

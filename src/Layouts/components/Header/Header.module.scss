@@ -106,22 +106,72 @@
     }
 }
 
-// Logo cần điều chỉnh màu
-.logo {
-    // Khi header trong suốt, logo màu trắng
+// Logo wrapper styles - THÊM VÀO HEADER.MODULE.SCSS
+.logo-wrapper {
+    // Khi header trong suốt
     .wrapper:not(.scrolled) & {
-        filter: brightness(0) invert(1);
+        :global(.logo) {
+            :global(.logo-text) {
+                color: var(--white) !important;
+            }
+
+            :global(.logo-icon) {
+                background-color: var(--white) !important;
+
+                span {
+                    color: var(--primary-color-bold) !important;
+                }
+            }
+
+            &:hover {
+                :global(.logo-text) {
+                    color: var(--primary-hover) !important;
+                }
+
+                :global(.logo-icon) {
+                    background-color: var(--primary-hover) !important;
+
+                    span {
+                        color: var(--white) !important;
+                    }
+                }
+            }
+        }
     }
 
-    // Khi header có background, logo màu bình thường
+    // Khi header có background
     .wrapper.scrolled & {
-        filter: none;
+        :global(.logo) {
+            :global(.logo-text) {
+                color: var(--primary-color-bold) !important;
+            }
+
+            :global(.logo-icon) {
+                background-color: var(--primary-color-bold) !important;
+
+                span {
+                    color: var(--white) !important;
+                }
+            }
+
+            &:hover {
+                :global(.logo-text) {
+                    color: var(--primary-color) !important;
+                }
+
+                :global(.logo-icon) {
+                    background-color: var(--primary-color) !important;
+
+                    span {
+                        color: var(--white) !important;
+                    }
+                }
+            }
+        }
     }
 }
 
-// Navigation Links cần điều chỉnh màu
 .nav-links-container {
-    // Áp dụng cho container của NavLinks
     .wrapper:not(.scrolled) & {
         // Các link màu trắng khi header trong suốt
         a,
@@ -185,6 +235,12 @@
 // Search Bar cần điều chỉnh
 .search-bar-wrapper {
     transition: all var(--transition-base);
+
+    .wrapper:not(.scrolled) & {
+        .search-icon {
+            color: var(--white);
+        }
+    }
 
     &:hover {
         transform: scale(1.02);

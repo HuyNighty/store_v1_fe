@@ -1,23 +1,67 @@
+:root {
+    --icon-size: 24px;
+    --badge-size: 18px;
+}
+
 .cart-wrapper {
     position: relative;
     width: var(--icon-size);
-    height: 20px;
-    display: flex;
+    height: 28px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform var(--transition-base);
-    color: #000;
+    transition: transform var(--transition-base, 0.18s) ease, color var(--transition-base, 0.18s) ease,
+        background 0.18s ease;
+    border: none;
+    background: transparent;
+    padding: 6px;
+    border-radius: 8px;
+    color: var(--primary-color-bold); // default
+    outline: none;
 
     &:hover {
-        color: var(--primary-hover);
-        transform: scale(1.15);
+        transform: scale(1.12);
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+
+    // variant: header trong suốt (trên Hero)
+    &.transparent {
+        color: var(--white);
+
+        &:hover {
+            color: var(--primary-hover);
+        }
+    }
+
+    // variant: header có background (sau scroll)
+    &.solid {
+        color: var(--primary-color-bold);
+
+        &:hover {
+            color: var(--primary-hover);
+            background: rgba(101, 85, 72, 0.06);
+        }
+    }
+
+    // Icon dùng currentColor để dễ thay đổi màu
+    .icon-btn {
+        font-size: 18px;
+        width: var(--icon-size);
+        height: auto;
+        display: inline-block;
+        line-height: 1;
+        // đảm bảo icon nhận màu từ color trên container
+        color: currentColor;
     }
 
     .badge {
         position: absolute;
-        top: -8px;
-        right: -8px;
+        top: -6px;
+        right: -6px;
         background: var(--primary-color);
         color: var(--white);
         font-size: 11px;
@@ -29,5 +73,26 @@
         align-items: center;
         justify-content: center;
         line-height: 1;
+        box-shadow: 0 2px 8px rgba(101, 85, 72, 0.25);
+        transform-origin: center;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .cart-wrapper {
+        width: 22px;
+        padding: 5px;
+        .icon-btn {
+            font-size: 16px;
+        }
+        .badge {
+            top: -5px;
+            right: -5px;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+        }
     }
 }

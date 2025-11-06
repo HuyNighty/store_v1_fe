@@ -8,6 +8,7 @@ import ProtectedRoute from './routes/components/ProtectedRoute/ProtectedRoute';
 import { WishlistProvider } from './contexts/WishlistContext';
 
 function App() {
+    // trong App.js: thay renderElement bằng phiên bản này
     const renderElement = (route, isProtected = false, requiredRole = null) => {
         const PageComponent = route.component;
         let Layout = route.layout || DefaultLayout;
@@ -21,13 +22,19 @@ function App() {
             return <div>Error: Component not found</div>;
         }
 
+        // Chỉ forward headerMode nếu Layout không phải Fragment
+        const layoutProps = {};
+        if (Layout !== React.Fragment) {
+            // fallback default to 'auto' nếu không truyền
+            layoutProps.headerMode = route.headerMode ?? 'auto';
+        }
+
         const element = (
-            <Layout>
+            <Layout {...layoutProps}>
                 <PageComponent />
             </Layout>
         );
 
-        // Nếu route cần bảo vệ, wrap với ProtectedRoute
         if (isProtected && requiredRole) {
             return <ProtectedRoute requiredRole={requiredRole}>{element}</ProtectedRoute>;
         }
