@@ -60,7 +60,10 @@ function BookInfo({
     addingToCart = false,
     handleAddToCart = () => {},
     handleUpdateCart = () => {},
-    handleBuyNow = () => {},
+    handleBuyNow = (e) => {
+        e.preventDefault();
+        navigate('/cart');
+    },
     isWishlisted = false,
     handleWishlistToggle = () => {},
     handleShare = () => {},
@@ -269,6 +272,7 @@ function BookInfo({
             <div className={cx('action-buttons')}>
                 {isInCart ? (
                     <Button
+                        height={5}
                         shine
                         primary
                         large
@@ -282,6 +286,7 @@ function BookInfo({
                     </Button>
                 ) : (
                     <Button
+                        height={5}
                         shine
                         primary
                         large
@@ -297,6 +302,7 @@ function BookInfo({
                 )}
 
                 <Button
+                    height={5}
                     shine
                     outline
                     large

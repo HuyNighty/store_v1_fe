@@ -28,7 +28,7 @@
         color: var(--primary-600);
         font-family: var(--font-family-primary, inherit);
         line-height: 1.08;
-        font-weight: 700;
+        font-weight: 100;
     }
 
     .original-title {
@@ -81,9 +81,9 @@
         align-items: center;
         gap: 8px;
         margin: 0 0 10px 0;
-        font-size: 1.15rem;
+        font-size: 1.8rem;
         color: #333;
-        font-weight: 600;
+        font-weight: 100;
     }
 
     .authors-list {
@@ -98,9 +98,14 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+            transition: all 0.1s ease;
+
+            &:hover {
+                transform: scale(1.02);
+            }
 
             strong {
-                font-size: 1.05rem;
+                font-size: 1.2rem;
                 color: #222;
             }
 
@@ -123,7 +128,7 @@
                 color: var(--primary-600);
                 text-decoration: none;
                 cursor: pointer;
-                font-weight: 600;
+                font-weight: 100;
                 font-size: 1.04rem;
             }
 
@@ -152,9 +157,9 @@
     }
 
     .rating-value {
-        font-weight: 700;
+        font-weight: 100;
         color: var(--primary-600);
-        font-size: 1.05rem;
+        font-size: 1.2rem;
     }
 
     .reviews {
@@ -169,8 +174,12 @@
         border: none;
         color: var(--primary-600);
         cursor: pointer;
-        font-size: 0.98rem;
+        font-size: 1.2rem;
         text-decoration: underline;
+
+        &:hover {
+            color: var(--primary-color);
+        }
     }
 
     .view-reviews-btn:focus {
@@ -208,7 +217,7 @@
         padding: 6px 10px;
         border-radius: 14px;
         font-size: 0.95rem;
-        font-weight: 700;
+        font-weight: 100;
     }
 }
 
@@ -220,7 +229,7 @@
         margin: 0 0 10px 0;
         font-size: 1.05rem;
         color: #333;
-        font-weight: 700;
+        font-weight: 100;
     }
 
     .details-grid {
@@ -241,13 +250,13 @@
 
         strong {
             color: #666;
-            font-weight: 600;
-            font-size: 0.95rem;
+            font-weight: 100;
+            font-size: 1rem;
         }
 
         span {
             color: #333;
-            font-size: 0.95rem;
+            font-size: 1rem;
             text-align: right;
             max-width: 60%;
             word-break: break-word;
@@ -264,7 +273,7 @@
         margin-bottom: 8px;
         color: #333;
         font-size: 0.98rem;
-        font-weight: 600;
+        font-weight: 100;
     }
 
     .cart-notice {
@@ -286,7 +295,7 @@
         padding: 10px 14px;
         border-radius: 8px;
         font-size: 0.98rem;
-        font-weight: 600;
+        font-weight: 100;
         border: 1px solid transparent;
     }
 

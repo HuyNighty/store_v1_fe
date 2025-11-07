@@ -6,9 +6,9 @@ import { CartProvider } from './contexts/CartContext';
 import { ToastProvider } from './contexts/Toast/ToastContext';
 import ProtectedRoute from './routes/components/ProtectedRoute/ProtectedRoute';
 import { WishlistProvider } from './contexts/WishlistContext';
+import ScrollToTop from './utils/ScrollToTop';
 
 function App() {
-    // trong App.js: thay renderElement bằng phiên bản này
     const renderElement = (route, isProtected = false, requiredRole = null) => {
         const PageComponent = route.component;
         let Layout = route.layout || DefaultLayout;
@@ -47,6 +47,9 @@ function App() {
             <ToastProvider>
                 <WishlistProvider>
                     <Router>
+                        {/* THÊM SCROLLTOTOP COMPONENT Ở ĐÂY */}
+                        <ScrollToTop />
+
                         <div className="App">
                             <Routes>
                                 {/* Public Routes - Ai cũng truy cập được */}

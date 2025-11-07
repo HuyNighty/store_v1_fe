@@ -174,7 +174,7 @@ function BookItemDetail() {
                             <FaStar
                                 className={cx('star', 'filled', 'interactive')}
                                 style={{
-                                    color: currentHoverRating >= i ? '#ffb300' : '#ffc107',
+                                    color: currentHoverRating >= i ? 'var(--primary-hover)' : 'var(--primary-hover)',
                                     fontSize: '2.5rem',
                                     position: 'relative',
                                     zIndex: 1,
@@ -184,7 +184,8 @@ function BookItemDetail() {
                             <FaStarHalfAlt
                                 className={cx('star', 'filled', 'interactive')}
                                 style={{
-                                    color: currentHoverRating >= i - 0.5 ? '#ffb300' : '#ffc107',
+                                    color:
+                                        currentHoverRating >= i - 0.5 ? 'var(--primary-hover)' : 'var(--primary-hover)',
                                     fontSize: '2.5rem',
                                     position: 'relative',
                                     zIndex: 1,
@@ -194,7 +195,7 @@ function BookItemDetail() {
                             <FaRegStar
                                 className={cx('star', 'empty', 'interactive')}
                                 style={{
-                                    color: currentHoverRating >= i ? '#ffd54f' : '#e0e0e0',
+                                    color: currentHoverRating >= i ? 'var(--primary-hover)' : '#e0e0e0',
                                     fontSize: '2.5rem',
                                     position: 'relative',
                                     zIndex: 1,

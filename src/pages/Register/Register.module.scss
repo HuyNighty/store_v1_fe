@@ -337,7 +337,30 @@
         border: 2px solid rgba(147, 125, 107, 0.3);
         border-radius: 12px;
         transition: all var(--transition-base);
-        background: var(--white);
+        background: var(--white) !important;
+
+        &:has(input:-webkit-autofill) {
+            background: var(--white) !important;
+
+            .input-icon {
+                background: transparent !important;
+            }
+
+            .password-toggle {
+                background: transparent !important;
+            }
+        }
+
+        input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 1000px var(--white) inset !important;
+            -webkit-text-fill-color: var(--text-color) !important;
+            background: var(--white) !important;
+            border-radius: 0 10px 10px 0;
+        }
+
+        input:-webkit-autofill ~ .input-icon {
+            background: transparent !important;
+        }
 
         &.focused {
             border-color: var(--primary-color-bold);

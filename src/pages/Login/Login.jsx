@@ -196,9 +196,7 @@ function Login() {
                                 <form onSubmit={handleSubmit} className={cx('login-form')}>
                                     {/* Email Input */}
                                     <div className={cx('input-group')}>
-                                        <label htmlFor="identifier" className={cx('input-label')}>
-                                            Email hoặc tên đăng nhập
-                                        </label>
+                                        <label className={cx('input-label')}>Email hoặc tên đăng nhập</label>
                                         <div
                                             className={cx('input-wrapper', { focused: focusedField === 'identifier' })}
                                         >

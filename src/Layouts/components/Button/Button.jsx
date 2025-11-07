@@ -1,13 +1,14 @@
-// Button.js
+// Button.js - Đảm bảo có xử lý state
 import classNames from 'classnames/bind';
 import styles from './Button.module.scss';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
 function Button({
     to,
     href,
+    state, // Đảm bảo có prop state
     primary,
     outline,
     secondary,
@@ -26,6 +27,7 @@ function Button({
     width,
     height,
     className,
+    scrollToTop = false,
     // Animation props
     pulse,
     bounce,
@@ -41,11 +43,40 @@ function Button({
     ...passProps
 }) {
     let Comp = 'button';
+    const location = useLocation();
+
+    const handleClick = (e) => {
+        if (scrollToTop && to) {
+            const isSamePage = location.pathname === to;
+
+            if (isSamePage) {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth',
+                });
+            }
+
+            if (onClick) {
+                onClick(e);
+            }
+            return;
+        }
+
+        if (onClick) {
+            onClick(e);
+        }
+    };
 
     const props = {
-        onClick,
+        onClick: handleClick,
         ...passProps,
     };
+
+    // QUAN TRỌNG: Thêm state vào props nếu có
+    if (to && state) {
+        props.state = state;
+    }
 
     // Remove event listeners when button is disabled
     if (disabled) {

@@ -1,7 +1,6 @@
 import classNames from 'classnames/bind';
 import styles from './BookItem.module.scss';
 import Button from '../../Layouts/components/Button';
-import { useNavigate } from 'react-router-dom';
 import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import reviewApi from '../../api/reviewApi';
@@ -9,7 +8,6 @@ import reviewApi from '../../api/reviewApi';
 const cx = classNames.bind(styles);
 
 function BookItem({ book }) {
-    const navigate = useNavigate();
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -77,38 +75,15 @@ function BookItem({ book }) {
 
         for (let i = 1; i <= 5; i++) {
             if (i <= fullStars) {
-                stars.push(<FaStar key={i} style={{ color: '#ffc107', fontSize: '1.6rem' }} />);
+                stars.push(<FaStar key={i} style={{ color: 'var(--primary-hover)', fontSize: '1.6rem' }} />);
             } else if (i === fullStars + 1 && hasHalfStar) {
-                stars.push(<FaStarHalfAlt key="half" style={{ color: '#ffc107', fontSize: '1.6rem' }} />);
+                stars.push(<FaStarHalfAlt key="half" style={{ color: 'var(--primary-hover)', fontSize: '1.6rem' }} />);
             } else {
                 stars.push(<FaRegStar key={i} style={{ color: '#e0e0e0', fontSize: '1.6rem' }} />);
             }
         }
 
         return stars;
-    };
-
-    const handleViewDetails = () => {
-        navigate('/book-item', {
-            state: {
-                book: {
-                    productId,
-                    productName,
-                    productAssets,
-                    featured,
-                    bookAuthors,
-                    salePrice,
-                    price,
-                    rating: displayRating, // Truyền rating đã tính toán từ reviews
-                    reviews,
-                    stockQuantity,
-                    weightG,
-                    sku,
-                    slug,
-                    imageUrl,
-                },
-            },
-        });
     };
 
     return (
@@ -147,7 +122,32 @@ function BookItem({ book }) {
 
                 <div className={cx('book-item-footer')}>
                     <p className={cx('book-item-price')}>{displayPrice / 1000}.000 đ</p>
-                    <Button small outline shine className={cx('book-item-view-btn')} onClick={handleViewDetails}>
+                    <Button
+                        small
+                        outline
+                        shine
+                        className={cx('book-item-view-btn')}
+                        to="/book-item"
+                        state={{
+                            book: {
+                                productId,
+                                productName,
+                                productAssets,
+                                featured,
+                                bookAuthors,
+                                salePrice,
+                                price,
+                                rating: displayRating,
+                                reviews,
+                                stockQuantity,
+                                weightG,
+                                sku,
+                                slug,
+                                imageUrl,
+                            },
+                        }}
+                        scrollToTop
+                    >
                         Xem chi tiết
                     </Button>
                 </div>

@@ -141,6 +141,7 @@
     }
 
     textarea {
+        color: #000;
         width: 100%;
         min-height: 120px;
         resize: vertical;
@@ -148,7 +149,7 @@
         border-radius: 8px;
         border: 1px solid var(--border-color);
         background: var(--gray-light);
-        font-size: 0.98rem;
+        font-size: 1.4rem;
         line-height: 1.45;
         transition: box-shadow var(--transition-fast), transform var(--transition-fast);
         font-family: inherit;

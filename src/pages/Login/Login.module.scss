@@ -462,6 +462,28 @@
         transition: all var(--transition-base);
         background: var(--white);
 
+        &:has(input:-webkit-autofill) {
+            background: var(--white);
+
+            .input-icon {
+                background: transparent;
+            }
+
+            .password-toggle {
+                background: transparent;
+            }
+        }
+
+        input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 100px var(--white) inset !important;
+            -webkit-text-fill-color: var(--text-color) !important;
+            background: var(--white) !important;
+        }
+
+        input:-webkit-autofill ~ .input-icon {
+            background: transparent !important;
+        }
+
         &.focused {
             border-color: var(--primary-color-bold);
             box-shadow: 0 0 0 4px rgba(101, 85, 72, 0.1);
@@ -488,6 +510,7 @@
             font-family: var(--font-family-primary);
             color: var(--text-color);
             min-width: 0;
+            border-radius: 0 12px 12px 0;
 
             &:focus {
                 outline: none;
@@ -509,6 +532,7 @@
             transition: color var(--transition-fast);
             font-size: 1.6rem;
             flex-shrink: 0;
+            border-radius: 0 12px 12px 0;
 
             &:hover {
                 color: var(--primary-color-bold);

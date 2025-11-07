@@ -26,7 +26,7 @@ function NavLinks() {
     const isAdmin = roles.includes('ADMIN');
 
     const links = [
-        { text: 'Home', to: '/' },
+        { text: 'Home', to: '/', scrollToTop: true },
         { text: 'Books', to: '/books' },
         { text: 'FAQ', to: '/faq' },
     ];
@@ -37,7 +37,7 @@ function NavLinks() {
         <nav className={cx('nav')}>
             <div className={cx('links')}>
                 {links.map((link, idx) => (
-                    <Button shine key={idx} to={link.to} text={2.4}>
+                    <Button shine key={idx} to={link.to} text={2.4} scrollToTop>
                         {link.text}
                     </Button>
                 ))}
