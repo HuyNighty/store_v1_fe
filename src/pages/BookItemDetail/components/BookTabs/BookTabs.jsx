@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import styles from './BookTabs.module.scss';
 import ReviewSection from '../ReviewSection';
@@ -10,7 +10,7 @@ function BookTabs({
     setActiveTab,
     productName,
     description,
-    bookAuthors,
+    bookAuthors = [],
     sku,
     publisher,
     publishedDate,
@@ -20,7 +20,7 @@ function BookTabs({
     weightG,
     stockQuantity,
     averageRating,
-    reviews,
+    reviews = [],
     renderStars,
     userReview,
     userRating,
@@ -33,11 +33,63 @@ function BookTabs({
     handleSubmitReview,
     handleDeleteReview,
 }) {
-    const renderTabContent = () => {
+    // Tab definitions - dễ mở rộng
+    const tabs = [
+        { id: 'description', label: 'Mô tả sản phẩm' },
+        { id: 'details', label: 'Thông tin chi tiết' },
+        { id: 'reviews', label: `Đánh giá (${(reviews && reviews.length) || 0})` },
+        { id: 'shipping', label: 'Vận chuyển & Trả hàng' },
+    ];
+
+    // refs cho keyboard navigation
+    const tabRefs = useRef([]);
+
+    useEffect(() => {
+        // đảm bảo focus vào tab active khi activeTab thay đổi (hữu ích khi đổi bằng code)
+        const idx = tabs.findIndex((t) => t.id === activeTab);
+        if (idx >= 0 && tabRefs.current[idx]) {
+            tabRefs.current[idx].setAttribute('tabindex', '0');
+        }
+    }, [activeTab]);
+
+    const focusTabByIndex = (index) => {
+        const node = tabRefs.current[index];
+        if (node) node.focus();
+    };
+
+    const onKeyDown = (e, index) => {
+        const last = tabs.length - 1;
+        if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            const next = index === last ? 0 : index + 1;
+            setActiveTab(tabs[next].id);
+            focusTabByIndex(next);
+        } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            const prev = index === 0 ? last : index - 1;
+            setActiveTab(tabs[prev].id);
+            focusTabByIndex(prev);
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            setActiveTab(tabs[0].id);
+            focusTabByIndex(0);
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            setActiveTab(tabs[last].id);
+            focusTabByIndex(last);
+        }
+    };
+
+    const renderTabPanel = () => {
         switch (activeTab) {
             case 'description':
                 return (
-                    <div className={cx('tab-panel')}>
+                    <div
+                        className={cx('tab-panel')}
+                        role="tabpanel"
+                        aria-labelledby="tab-description"
+                        id="panel-description"
+                    >
                         <h3>Giới thiệu về "{productName}"</h3>
                         <p>
                             {description ||
@@ -48,7 +100,7 @@ function BookTabs({
 
             case 'details':
                 return (
-                    <div className={cx('tab-panel')}>
+                    <div className={cx('tab-panel')} role="tabpanel" aria-labelledby="tab-details" id="panel-details">
                         <h3>Thông số kỹ thuật</h3>
                         <div className={cx('specs-grid')}>
                             <div className={cx('spec-item')}>
@@ -61,7 +113,9 @@ function BookTabs({
                             </div>
                             <div className={cx('spec-item')}>
                                 <strong>Tác giả:</strong>
-                                <span>{bookAuthors.map((a) => a.authorName).join(', ') || 'Đang cập nhật'}</span>
+                                <span>
+                                    {(bookAuthors || []).map((a) => a.authorName).join(', ') || 'Đang cập nhật'}
+                                </span>
                             </div>
                             {publisher && (
                                 <div className={cx('spec-item')}>
@@ -95,7 +149,7 @@ function BookTabs({
                             )}
                             <div className={cx('spec-item')}>
                                 <strong>Trọng lượng:</strong>
-                                <span>{weightG}g</span>
+                                <span>{weightG ?? '-'}g</span>
                             </div>
                             <div className={cx('spec-item')}>
                                 <strong>Tình trạng:</strong>
@@ -107,7 +161,7 @@ function BookTabs({
 
             case 'reviews':
                 return (
-                    <div className={cx('tab-panel')} id="reviews-section">
+                    <div className={cx('tab-panel')} id="reviews-section" role="tabpanel" aria-labelledby="tab-reviews">
                         <ReviewSection
                             averageRating={averageRating}
                             reviews={reviews}
@@ -128,7 +182,7 @@ function BookTabs({
 
             case 'shipping':
                 return (
-                    <div className={cx('tab-panel')}>
+                    <div className={cx('tab-panel')} role="tabpanel" aria-labelledby="tab-shipping" id="panel-shipping">
                         <h3>Chính sách vận chuyển & Trả hàng</h3>
                         <div className={cx('shipping-info')}>
                             <h4>🚚 Vận chuyển</h4>
@@ -164,34 +218,30 @@ function BookTabs({
 
     return (
         <div className={cx('tabs-section')}>
-            <div className={cx('tabs-header')}>
-                <button
-                    className={cx('tab', { active: activeTab === 'description' })}
-                    onClick={() => setActiveTab('description')}
-                >
-                    Mô tả sản phẩm
-                </button>
-                <button
-                    className={cx('tab', { active: activeTab === 'details' })}
-                    onClick={() => setActiveTab('details')}
-                >
-                    Thông tin chi tiết
-                </button>
-                <button
-                    className={cx('tab', { active: activeTab === 'reviews' })}
-                    onClick={() => setActiveTab('reviews')}
-                >
-                    Đánh giá ({reviews.length})
-                </button>
-                <button
-                    className={cx('tab', { active: activeTab === 'shipping' })}
-                    onClick={() => setActiveTab('shipping')}
-                >
-                    Vận chuyển & Trả hàng
-                </button>
+            <div className={cx('tabs-header')} role="tablist" aria-label={`${productName} tabs`}>
+                {tabs.map((t, idx) => {
+                    const isActive = activeTab === t.id;
+                    const tabId = `tab-${t.id}`;
+                    return (
+                        <button
+                            key={t.id}
+                            id={tabId}
+                            ref={(el) => (tabRefs.current[idx] = el)}
+                            role="tab"
+                            aria-selected={isActive}
+                            aria-controls={`panel-${t.id}`.replace('panel-', `panel-${t.id}`)}
+                            tabIndex={isActive ? 0 : -1}
+                            className={cx('tab', { active: isActive })}
+                            onClick={() => setActiveTab(t.id)}
+                            onKeyDown={(e) => onKeyDown(e, idx)}
+                        >
+                            {t.label}
+                        </button>
+                    );
+                })}
             </div>
 
-            <div className={cx('tabs-content')}>{renderTabContent()}</div>
+            <div className={cx('tabs-content')}>{renderTabPanel()}</div>
         </div>
     );
 }

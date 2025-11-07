@@ -1,14 +1,26 @@
-.tabs-section {
-    margin-top: 40px;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    overflow: hidden;
+/* BookTabs.module.scss - thay thế file hiện tại */
+:root {
+    --primary-600: #655548;
+    --primary-400: #937d6b;
+    --muted: #6c757d;
+    --surface: #fff;
+    --accent: #e9ecef;
 }
 
+.tabs-section {
+    margin-top: 32px;
+    border: 1px solid #e6e2dd;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+}
+
+/* header / tab list */
 .tabs-header {
     display: flex;
+    gap: 0;
     background: #f8f9fa;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e9e6e2;
 
     @media (max-width: 768px) {
         flex-direction: column;
@@ -16,83 +28,92 @@
 
     .tab {
         flex: 1;
-        padding: 15px 20px;
+        padding: 14px 18px;
         background: none;
         border: none;
-        font-size: 1.4rem;
+        font-size: 1rem;
         color: #666;
         cursor: pointer;
-        transition: all 0.2s ease;
-        font-weight: 500;
+        transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+        font-weight: 600;
+        text-align: center;
 
-        &:hover {
-            background: #e9ecef;
+        &:hover,
+        &:focus {
+            background: var(--accent);
             color: #333;
+            outline: none;
         }
 
         &.active {
-            background: white;
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--primary-color);
+            background: var(--surface);
+            color: var(--primary-600);
+            border-bottom: 3px solid var(--primary-400);
+            transform: translateY(-1px);
         }
 
         @media (max-width: 768px) {
             text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+            padding: 12px 16px;
 
             &.active {
-                border-bottom: 2px solid var(--primary-color);
+                border-bottom: none;
+                border-left: 4px solid var(--primary-400);
+                transform: none;
             }
         }
     }
 }
 
+/* content area */
 .tabs-content {
-    background: white;
-    min-height: 200px;
+    background: var(--surface);
+    min-height: 180px;
 }
 
+/* panel */
 .tab-panel {
-    padding: 30px;
+    padding: 24px;
 
     h3 {
-        margin: 0 0 20px 0;
-        font-size: 1.8rem;
+        margin: 0 0 14px 0;
+        font-size: 1.25rem;
         color: #333;
-        font-weight: 100;
+        font-weight: 700;
     }
 
     h4 {
-        margin: 25px 0 15px 0;
-        font-size: 1.6rem;
+        margin: 18px 0 10px 0;
+        font-size: 1.05rem;
         color: #333;
-        font-weight: 500;
+        font-weight: 600;
     }
 
     p {
-        margin: 0 0 15px 0;
-        font-size: 1.4rem;
+        margin: 0 0 12px 0;
+        font-size: 0.98rem;
         line-height: 1.6;
-        color: #666;
+        color: #555;
     }
 
     ul {
-        margin: 0 0 15px 0;
-        padding-left: 20px;
+        margin: 0 0 12px 0;
+        padding-left: 18px;
 
         li {
-            margin-bottom: 8px;
-            font-size: 1.4rem;
-            line-height: 1.5;
-            color: #666;
+            margin-bottom: 6px;
+            font-size: 0.98rem;
+            color: #555;
         }
     }
 }
 
+/* specs grid */
 .specs-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 12px;
+    margin-top: 8px;
 
     @media (max-width: 768px) {
         grid-template-columns: 1fr;
@@ -101,38 +122,48 @@
     .spec-item {
         display: flex;
         justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid #f0f0f0;
+        padding: 10px;
+        background: #fff;
+        border-radius: 8px;
+        border: 1px solid #f3f3f3;
 
         strong {
             color: #666;
-            font-weight: 500;
-            font-size: 1.4rem;
+            font-weight: 600;
+            font-size: 0.95rem;
         }
 
         span {
             color: #333;
-            font-size: 1.4rem;
+            font-size: 0.95rem;
             text-align: right;
-            max-width: 60%;
+            max-width: 65%;
+            word-break: break-word;
         }
     }
 }
 
+/* shipping info */
 .shipping-info {
     h4 {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin: 25px 0 15px 0;
-        font-size: 1.6rem;
+        margin: 14px 0 8px 0;
+        font-size: 1rem;
         color: #333;
-        font-weight: 500;
+        font-weight: 600;
     }
 }
 
-@media (max-width: 768px) {
+/* mobile tweaks */
+@media (max-width: 480px) {
     .tab-panel {
-        padding: 20px;
+        padding: 16px;
+    }
+
+    .tabs-header .tab {
+        font-size: 0.95rem;
+        padding: 10px 12px;
     }
 }
