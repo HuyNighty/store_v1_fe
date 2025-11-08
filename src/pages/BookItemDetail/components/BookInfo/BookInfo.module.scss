@@ -264,6 +264,36 @@
     }
 }
 
+.wishlist-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.wishlist-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 20px;
+    margin-left: 20px;
+
+    svg {
+        font-size: 1.25rem;
+    }
+}
+.wishlist-btn.wishlisted {
+    color: var(--primary-color);
+}
+
+.wishlist-text {
+    margin-left: 10px;
+}
+
 /* Quantity */
 .quantity-section {
     margin-bottom: 16px;

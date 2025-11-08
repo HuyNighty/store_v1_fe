@@ -2,6 +2,21 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 
+const normalizeRoles = (user) => {
+    if (!user) return [];
+    if (Array.isArray(user.roles)) {
+        return user.roles
+            .map((r) => {
+                if (typeof r === 'string') return r.toUpperCase();
+                if (r && typeof r === 'object') return (r.name || r.role || '').toString().toUpperCase();
+                return '';
+            })
+            .filter(Boolean);
+    }
+    if (typeof user.role === 'string') return [user.role.toUpperCase()];
+    return [];
+};
+
 const ProtectedRoute = ({ children, requiredRole }) => {
     const { isAuthenticated, user, loading } = useAuth();
 
@@ -20,22 +35,16 @@ const ProtectedRoute = ({ children, requiredRole }) => {
         );
     }
 
-    if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
-    }
+    if (!isAuthenticated) return <Navigate to="/login" replace />;
 
-    if (requiredRole === 'admin') {
-        const isAdmin = user?.roles?.includes('ADMIN') || user?.role === 'ADMIN';
-        if (!isAdmin) {
-            return <Navigate to="/" replace />;
-        }
-    }
+    console.log('ProtectedRoute user:', user);
 
-    if (requiredRole === 'user') {
-        const isUser = user?.roles?.includes('USER') || user?.role === 'USER';
-        if (!isUser) {
-            return <Navigate to="/" replace />;
-        }
+    if (requiredRole) {
+        const roles = normalizeRoles(user); // e.g. ["ROLE_USER", "ROLE_ADMIN", "USER"]
+        const expected = requiredRole.toString().toUpperCase();
+        const expectedVariants = [expected, `ROLE_${expected}`]; // e.g. 'USER' & 'ROLE_USER'
+        const has = roles.some((r) => expectedVariants.includes(r));
+        if (!has) return <Navigate to="/" replace />;
     }
 
     return children;

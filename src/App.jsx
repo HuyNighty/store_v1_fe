@@ -22,7 +22,6 @@ function App() {
             return <div>Error: Component not found</div>;
         }
 
-        // Chỉ forward headerMode nếu Layout không phải Fragment
         const layoutProps = {};
         if (Layout !== React.Fragment) {
             // fallback default to 'auto' nếu không truyền
@@ -35,7 +34,7 @@ function App() {
             </Layout>
         );
 
-        if (isProtected && requiredRole) {
+        if (isProtected) {
             return <ProtectedRoute requiredRole={requiredRole}>{element}</ProtectedRoute>;
         }
 
@@ -47,17 +46,14 @@ function App() {
             <ToastProvider>
                 <WishlistProvider>
                     <Router>
-                        {/* THÊM SCROLLTOTOP COMPONENT Ở ĐÂY */}
                         <ScrollToTop />
 
                         <div className="App">
                             <Routes>
-                                {/* Public Routes - Ai cũng truy cập được */}
                                 {publicRoutes.map((route, index) => (
                                     <Route key={route.path || index} path={route.path} element={renderElement(route)} />
                                 ))}
 
-                                {/* Private Routes - Cần đăng nhập (chưa dùng trong code hiện tại) */}
                                 {privateRoutes.map((route, index) => (
                                     <Route
                                         key={route.path || index}
@@ -66,7 +62,6 @@ function App() {
                                     />
                                 ))}
 
-                                {/* Admin Routes - Chỉ ADMIN truy cập được */}
                                 {adminRoutes.map((route, index) => (
                                     <Route
                                         key={route.path || index}
@@ -75,7 +70,6 @@ function App() {
                                     />
                                 ))}
 
-                                {/* User Routes - Chỉ USER truy cập được */}
                                 {userRoutes.map((route, index) => (
                                     <Route
                                         key={route.path || index}

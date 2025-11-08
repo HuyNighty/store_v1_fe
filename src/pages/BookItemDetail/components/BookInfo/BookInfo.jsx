@@ -1,3 +1,4 @@
+// src/.../BookInfo.jsx
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
@@ -5,7 +6,15 @@ import styles from './BookInfo.module.scss';
 import Button from '../../../../Layouts/components/Button';
 import QuantityInput from '../../../../Layouts/components/QuantityInput';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faTruck, faBook, faTags, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
+import {
+    faShoppingCart,
+    faTruck,
+    faBook,
+    faTags,
+    faLayerGroup,
+    faHeart as faHeartSolid,
+} from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 
 const cx = classNames.bind(styles);
 
@@ -73,12 +82,9 @@ function BookInfo({
 
     const handleViewReviews = () => {
         setActiveTab('reviews');
-        // nếu BookTabs có id="reviews-section" thì scroll
         setTimeout(() => {
             const el = document.getElementById('reviews-section');
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
     };
 
@@ -239,18 +245,35 @@ function BookInfo({
                 </div>
             </div>
 
-            {/* Quantity */}
-            <div className={cx('quantity-section')}>
-                <label htmlFor="qty-input">Số lượng: </label>
-                <QuantityInput
-                    id="qty-input"
-                    value={quantity}
-                    onChange={setQuantity}
-                    min={1}
-                    max={stockQuantity}
-                    size="medium"
-                />
-                {isInCart && <p className={cx('cart-notice')}>Đã có {cartQuantity} sản phẩm trong giỏ hàng</p>}
+            <div className={cx('wishlist-wrapper')}>
+                {/* Quantity */}
+                <div className={cx('quantity-section')}>
+                    <label htmlFor="qty-input">Số lượng: </label>
+                    <QuantityInput
+                        id="qty-input"
+                        value={quantity}
+                        onChange={setQuantity}
+                        min={1}
+                        max={stockQuantity}
+                        size="medium"
+                    />
+                    {isInCart && <p className={cx('cart-notice')}>Đã có {cartQuantity} sản phẩm trong giỏ hàng</p>}
+                </div>
+
+                {/* Wishlist toggle */}
+                <Button
+                    shine
+                    outline
+                    type="button"
+                    onClick={handleWishlistToggle}
+                    className={cx('wishlist-btn', { wishlisted: isWishlisted })}
+                    aria-pressed={!!isWishlisted}
+                    aria-label={isWishlisted ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'}
+                    title={isWishlisted ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'}
+                >
+                    <FontAwesomeIcon icon={isWishlisted ? faHeartSolid : faHeartRegular} />
+                    <span className={cx('wishlist-text')}>{isWishlisted ? 'Yêu thích' : 'Thêm yêu thích'}</span>
+                </Button>
             </div>
 
             {/* Stock */}
@@ -268,8 +291,9 @@ function BookInfo({
                 </div>
             </div>
 
-            {/* Actions */}
+            {/* Actions (Add to cart + Wishlist + Buy now) */}
             <div className={cx('action-buttons')}>
+                {/* Add / Update Cart */}
                 {isInCart ? (
                     <Button
                         height={5}
@@ -301,6 +325,7 @@ function BookInfo({
                     </Button>
                 )}
 
+                {/* Buy now */}
                 <Button
                     height={5}
                     shine

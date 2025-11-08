@@ -75,9 +75,9 @@ function BookItem({ book }) {
 
         for (let i = 1; i <= 5; i++) {
             if (i <= fullStars) {
-                stars.push(<FaStar key={i} style={{ color: 'var(--primary-hover)', fontSize: '1.6rem' }} />);
+                stars.push(<FaStar key={i} style={{ color: 'var(--star-color)', fontSize: '1.6rem' }} />);
             } else if (i === fullStars + 1 && hasHalfStar) {
-                stars.push(<FaStarHalfAlt key="half" style={{ color: 'var(--primary-hover)', fontSize: '1.6rem' }} />);
+                stars.push(<FaStarHalfAlt key="half" style={{ color: 'var(--star-color)', fontSize: '1.6rem' }} />);
             } else {
                 stars.push(<FaRegStar key={i} style={{ color: '#e0e0e0', fontSize: '1.6rem' }} />);
             }

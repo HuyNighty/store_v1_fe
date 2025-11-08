@@ -2,7 +2,7 @@
     padding: 30px;
     max-width: 1400px;
     margin: 0 auto;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    background: transparent;
     min-height: 100vh;
 }
 
@@ -25,7 +25,7 @@
             transform: translateX(-50%);
             width: 60px;
             height: 4px;
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            background: linear-gradient(135deg, #d0a772ff, #f0c948);
             border-radius: 2px;
         }
     }
@@ -58,7 +58,8 @@
     }
 
     &:hover {
-        transform: translateY(-5px);
+        cursor: pointer;
+        transform: scale(1.05);
         box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
 }

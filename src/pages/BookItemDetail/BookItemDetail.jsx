@@ -174,7 +174,7 @@ function BookItemDetail() {
                             <FaStar
                                 className={cx('star', 'filled', 'interactive')}
                                 style={{
-                                    color: currentHoverRating >= i ? 'var(--primary-hover)' : 'var(--primary-hover)',
+                                    color: currentHoverRating >= i ? 'var(--star-color)' : 'var(--star-color)',
                                     fontSize: '2.5rem',
                                     position: 'relative',
                                     zIndex: 1,
@@ -184,8 +184,7 @@ function BookItemDetail() {
                             <FaStarHalfAlt
                                 className={cx('star', 'filled', 'interactive')}
                                 style={{
-                                    color:
-                                        currentHoverRating >= i - 0.5 ? 'var(--primary-hover)' : 'var(--primary-hover)',
+                                    color: currentHoverRating >= i - 0.5 ? 'var(--star-color)' : 'var(--star-color)',
                                     fontSize: '2.5rem',
                                     position: 'relative',
                                     zIndex: 1,
@@ -195,7 +194,7 @@ function BookItemDetail() {
                             <FaRegStar
                                 className={cx('star', 'empty', 'interactive')}
                                 style={{
-                                    color: currentHoverRating >= i ? 'var(--primary-hover)' : '#e0e0e0',
+                                    color: currentHoverRating >= i ? 'var(--star-color)' : '#e0e0e0',
                                     fontSize: '2.5rem',
                                     position: 'relative',
                                     zIndex: 1,
@@ -211,7 +210,7 @@ function BookItemDetail() {
                         <FaStar
                             key={i}
                             className={cx('star', 'filled')}
-                            style={{ color: '#ffc107', fontSize: '1.5rem' }}
+                            style={{ color: 'var(--star-color)', fontSize: '1.5rem' }}
                         />,
                     );
                 } else if (halfStar) {
@@ -219,7 +218,7 @@ function BookItemDetail() {
                         <FaStarHalfAlt
                             key={i}
                             className={cx('star', 'filled')}
-                            style={{ color: '#ffc107', fontSize: '1.5rem' }}
+                            style={{ color: 'var(--star-color)', fontSize: '1.5rem' }}
                         />,
                     );
                 } else {

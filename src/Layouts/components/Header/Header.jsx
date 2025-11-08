@@ -45,33 +45,46 @@ function Header({
 
     const headerRef = useRef(null);
 
-    // hiệu ứng set CSS var --header-height
     useEffect(() => {
-        if (!headerRef.current) return;
+        const el = headerRef.current;
+        if (!el) return;
 
-        const updateHeight = () => {
-            const h = headerRef.current.offsetHeight || 0;
-            // set CSS var trên root để toàn app có thể dùng
+        // updateHeight có thể được gọi bởi ResizeObserver (entries) hoặc chúng ta gọi thủ công
+        const updateHeight = (entries) => {
+            // Nếu được gọi bởi RO thì entries là mảng; nếu gọi thủ công có thể truyền dạng [{ target: el }]
+            const target = entries && entries.length ? entries[0].target : headerRef.current || el;
+            if (!target) return; // bảo vệ khi element đã unmount
+
+            const h = target.offsetHeight || 0;
             document.documentElement.style.setProperty('--header-height', `${h}px`);
         };
 
-        // update ngay
-        updateHeight();
+        // gọi ngay 1 lần với el hiện tại
+        updateHeight([{ target: el }]);
 
-        // ResizeObserver tốt để bắt mọi thay đổi kích thước (bao gồm khi .scrolled thay đổi padding)
         let ro;
         if (typeof ResizeObserver !== 'undefined') {
-            ro = new ResizeObserver(updateHeight);
-            ro.observe(headerRef.current);
+            ro = new ResizeObserver((entries) => {
+                try {
+                    updateHeight(entries);
+                } catch (err) {
+                    console.warn('ResizeObserver update error', err);
+                }
+            });
+            ro.observe(el);
         }
 
-        // also update on window resize just in case
-        window.addEventListener('resize', updateHeight);
+        const handleResize = () => {
+            const target = headerRef.current || el;
+            if (!target) return;
+            document.documentElement.style.setProperty('--header-height', `${target.offsetHeight || 0}px`);
+        };
 
-        // cleanup
+        window.addEventListener('resize', handleResize);
+
         return () => {
             if (ro) ro.disconnect();
-            window.removeEventListener('resize', updateHeight);
+            window.removeEventListener('resize', handleResize);
         };
     }, [isSolid]);
 
