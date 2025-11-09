@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+// src/pages/Books/Books.jsx
+import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Books.module.scss';
 import { Search, SlidersHorizontal, ChevronDown } from 'lucide-react';
@@ -9,6 +10,16 @@ import productApi from '../../api/productApi';
 import categoryApi from '../../api/categoryApi';
 
 const cx = classNames.bind(styles);
+
+// Hook debounce nhỏ gọn
+function useDebounced(value, delay = 250) {
+    const [v, setV] = useState(value);
+    useEffect(() => {
+        const t = setTimeout(() => setV(value), delay);
+        return () => clearTimeout(t);
+    }, [value, delay]);
+    return v;
+}
 
 function Books() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -23,22 +34,28 @@ function Books() {
     const [categoriesLoading, setCategoriesLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Fetch categories từ API
+    const debouncedSearch = useDebounced(searchQuery, 250);
+
+    // Fetch categories
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 setCategoriesLoading(true);
-                const response = await categoryApi.getAllCategories();
-
+                const res = await categoryApi.getAllCategories();
+                const payload = res?.data ?? res;
                 let categoriesData = [];
-                if (Array.isArray(response?.data?.result)) {
-                    categoriesData = response.data.result;
-                } else if (Array.isArray(response?.data)) {
-                    categoriesData = response.data;
-                }
 
-                // Chỉ lấy categories active
-                categoriesData = categoriesData.filter((cat) => cat.isActive);
+                if (Array.isArray(payload)) categoriesData = payload;
+                else if (Array.isArray(payload.result)) categoriesData = payload.result;
+                else if (Array.isArray(payload.data)) categoriesData = payload.data;
+
+                // normalize and only active categories
+                categoriesData = (categoriesData || []).filter((cat) => {
+                    const isActive = cat.isActive ?? cat.active ?? cat.activeFlag ?? true;
+                    if (typeof isActive === 'string') return isActive.toLowerCase() === 'true' || isActive === '1';
+                    if (typeof isActive === 'number') return isActive === 1;
+                    return Boolean(isActive);
+                });
                 setCategories(categoriesData);
             } catch (err) {
                 console.error('Lỗi khi tải categories:', err);
@@ -51,7 +68,7 @@ function Books() {
         fetchCategories();
     }, []);
 
-    // Fetch books từ API
+    // Fetch books
     useEffect(() => {
         const isActiveTrue = (v) => {
             if (v === true) return true;
@@ -66,21 +83,17 @@ function Books() {
                 setLoading(true);
                 setError(null);
 
-                const data = await productApi.getAll();
-
+                const res = await productApi.getAll();
+                const payload = res?.data ?? res;
                 let booksData = [];
-                if (Array.isArray(data)) {
-                    booksData = data;
-                } else if (Array.isArray(data?.result)) {
-                    booksData = data.result;
-                } else if (Array.isArray(data?.data)) {
-                    booksData = data.data;
-                } else if (Array.isArray(data?.items)) {
-                    booksData = data.items;
-                }
 
-                // FILTER: chỉ giữ product active
-                booksData = booksData.filter((b) => {
+                if (Array.isArray(payload)) booksData = payload;
+                else if (Array.isArray(payload.result)) booksData = payload.result;
+                else if (Array.isArray(payload.data)) booksData = payload.data;
+                else if (Array.isArray(payload.items)) booksData = payload.items;
+
+                // FILTER: only active products
+                booksData = (booksData || []).filter((b) => {
                     const val = b.isActive ?? b.active ?? b.is_active ?? b.activeFlag;
                     return isActiveTrue(val);
                 });
@@ -94,71 +107,105 @@ function Books() {
                 setLoading(false);
             }
         };
+
         fetchBooks();
     }, []);
 
-    // Xây dựng category tree để hiển thị phân cấp
-    const buildCategoryTree = (categories, parentId = 0, level = 0) => {
-        const children = categories.filter((cat) => cat.parentId === parentId);
-        if (children.length === 0) return [];
+    // Build category tree (supports parentId null/0/undefined)
+    const buildCategoryTree = (categoriesList, parentId = null, level = 0) => {
+        if (!Array.isArray(categoriesList) || categoriesList.length === 0) return [];
 
-        let result = [];
-        children.forEach((category) => {
-            result.push({
-                ...category,
-                level,
-                displayName: '  '.repeat(level) + category.categoryName,
-            });
-            const grandchildren = buildCategoryTree(categories, category.categoryId, level + 1);
-            result = result.concat(grandchildren);
+        const normalizeParent = (cat) => cat.parentId ?? cat.parent_id ?? cat.parent ?? null;
+
+        const children = categoriesList.filter((cat) => {
+            const pid = normalizeParent(cat);
+            // treat root as parentId === null OR pid === 0
+            if (parentId === null) return pid === null || pid === 0 || pid === undefined;
+            return String(pid) === String(parentId);
         });
 
-        return result;
+        if (children.length === 0) return [];
+
+        return children.flatMap((category) => {
+            const id = category.categoryId ?? category.id;
+            const displayName = '  '.repeat(level) + (category.categoryName ?? category.name ?? '—');
+            const node = { ...category, level, displayName, categoryId: id };
+            return [node, ...buildCategoryTree(categoriesList, id, level + 1)];
+        });
     };
 
-    const categoryTree = buildCategoryTree(categories);
+    const categoryTree = useMemo(() => buildCategoryTree(categories), [categories]);
 
     const sorts = ['Most Popular', 'Highest Rated', 'Price: Low to High', 'Price: High to Low'];
 
-    const filteredBooks = books.filter((book) => {
-        const search = searchQuery.toLowerCase();
+    // Filtered books (memoized & safe)
+    const filteredBooks = useMemo(() => {
+        const search = (debouncedSearch || '').trim().toLowerCase();
 
-        const matchesSearch =
-            book.productName?.toLowerCase().includes(search) ||
-            book.bookAuthors?.some((a) => a.authorName?.toLowerCase().includes(search)) ||
-            book.authorName?.toLowerCase().includes(search);
+        return (books || []).filter((book) => {
+            const productName = String(book.productName || book.name || '').toLowerCase();
+            const topAuthor = String(book.authorName || '').toLowerCase();
 
-        // Lọc theo category
-        const matchesCategory =
-            selectedCategoryId === null ||
-            (book.categories && book.categories.some((cat) => cat.categoryId === selectedCategoryId)) ||
-            (book.categoryIds && book.categoryIds.includes(selectedCategoryId)) ||
-            (book.productCategory && book.productCategory.some((pc) => pc.category?.categoryId === selectedCategoryId));
+            // authors array safe check
+            const authorMatch =
+                Array.isArray(book.bookAuthors) &&
+                book.bookAuthors.some((a) => {
+                    if (!a) return false;
+                    if (typeof a === 'string') return a.toLowerCase().includes(search);
+                    const aname = String(a.authorName || a.name || '').toLowerCase();
+                    return aname.includes(search);
+                });
 
-        return matchesSearch && matchesCategory;
-    });
+            const matchesSearch = !search || productName.includes(search) || topAuthor.includes(search) || authorMatch;
 
-    const sortedBooks = [...filteredBooks].sort((a, b) => {
-        switch (sortBy) {
-            case 'Price: Low to High':
-                return (a.salePrice ?? a.price) - (b.salePrice ?? b.price);
-            case 'Price: High to Low':
-                return (b.salePrice ?? b.price) - (a.salePrice ?? a.price);
-            case 'Highest Rated':
-                return (b.rating ?? b.averageRating ?? 0) - (a.rating ?? a.averageRating ?? 0);
-            default:
-                // Most Popular - có thể dựa vào số lượng bán hoặc view
-                return (b.popularity ?? b.soldCount ?? 0) - (a.popularity ?? a.soldCount ?? 0);
-        }
-    });
+            // category match - coerce to string
+            const matchesCategory =
+                selectedCategoryId == null ||
+                (Array.isArray(book.categories) &&
+                    book.categories.some((cat) => String(cat.categoryId ?? cat.id) === String(selectedCategoryId))) ||
+                (Array.isArray(book.categoryIds) &&
+                    book.categoryIds.map(String).includes(String(selectedCategoryId))) ||
+                (Array.isArray(book.productCategory) &&
+                    book.productCategory.some(
+                        (pc) => String(pc.category?.categoryId ?? pc.category?.id) === String(selectedCategoryId),
+                    ));
+
+            return matchesSearch && matchesCategory;
+        });
+    }, [books, debouncedSearch, selectedCategoryId]);
+
+    // Sorted books (memoized)
+    const sortedBooks = useMemo(() => {
+        const arr = [...filteredBooks];
+        arr.sort((a, b) => {
+            const aPrice = Number(a.salePrice ?? a.price) || 0;
+            const bPrice = Number(b.salePrice ?? b.price) || 0;
+            const aRating = Number(a.rating ?? a.averageRating) || 0;
+            const bRating = Number(b.rating ?? b.averageRating) || 0;
+            const aPop = Number(a.popularity ?? a.soldCount) || 0;
+            const bPop = Number(b.popularity ?? b.soldCount) || 0;
+
+            switch (sortBy) {
+                case 'Price: Low to High':
+                    return aPrice - bPrice;
+                case 'Price: High to Low':
+                    return bPrice - aPrice;
+                case 'Highest Rated':
+                    return bRating - aRating;
+                default:
+                    return bPop - aPop;
+            }
+        });
+        return arr;
+    }, [filteredBooks, sortBy]);
 
     const handleCategorySelect = (category) => {
         if (category === 'All') {
             setSelectedCategory('All');
             setSelectedCategoryId(null);
         } else {
-            setSelectedCategory(category.categoryName);
-            setSelectedCategoryId(category.categoryId);
+            setSelectedCategory(category.categoryName ?? category.displayName ?? 'Category');
+            setSelectedCategoryId(category.categoryId ?? category.categoryId ?? category.id);
         }
         setOpenCategory(false);
     };
@@ -183,6 +230,7 @@ function Books() {
                                 placeholder="Search books or authors..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
+                                aria-label="Search books or authors"
                             />
                         </div>
 
@@ -197,8 +245,11 @@ function Books() {
                                 <div className={cx('dropdown')} tabIndex="-1" {...attrs}>
                                     <PopperWrapper>
                                         <div
+                                            role="button"
+                                            tabIndex={0}
                                             className={cx('dropdown-item')}
                                             onClick={() => handleCategorySelect('All')}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleCategorySelect('All')}
                                         >
                                             All Categories
                                         </div>
@@ -207,15 +258,18 @@ function Books() {
                                         ) : (
                                             categoryTree.map((cat) => (
                                                 <div
-                                                    key={cat.categoryId}
+                                                    key={cat.categoryId ?? cat.id ?? cat.displayName}
                                                     className={cx('dropdown-item', 'category-item')}
                                                     style={{ paddingLeft: `${12 + cat.level * 16}px` }}
                                                     onClick={() => handleCategorySelect(cat)}
+                                                    onKeyDown={(e) => e.key === 'Enter' && handleCategorySelect(cat)}
+                                                    role="button"
+                                                    tabIndex={0}
                                                     title={cat.description}
                                                 >
                                                     <span className={cx('category-name')}>
                                                         {cat.level > 0 && '└─ '}
-                                                        {cat.categoryName}
+                                                        {cat.categoryName ?? cat.name}
                                                     </span>
                                                     {cat.description && (
                                                         <span className={cx('category-desc')}>{cat.description}</span>
@@ -227,11 +281,20 @@ function Books() {
                                 </div>
                             )}
                         >
-                            <div className={cx('select')} onClick={() => setOpenCategory(!openCategory)}>
+                            <button
+                                type="button"
+                                className={cx('select')}
+                                onClick={() => {
+                                    setOpenCategory((s) => !s);
+                                    setOpenSort(false);
+                                }}
+                                aria-haspopup="listbox"
+                                aria-expanded={openCategory}
+                            >
                                 <SlidersHorizontal className={cx('icon')} />
                                 <span>{selectedCategory}</span>
                                 <ChevronDown className={cx('chevron')} />
-                            </div>
+                            </button>
                         </Tippy>
 
                         {/* Sort Dropdown */}
@@ -248,10 +311,15 @@ function Books() {
                                             <div
                                                 key={sort}
                                                 className={cx('dropdown-item')}
+                                                role="button"
+                                                tabIndex={0}
                                                 onClick={() => {
                                                     setSortBy(sort);
                                                     setOpenSort(false);
                                                 }}
+                                                onKeyDown={(e) =>
+                                                    e.key === 'Enter' && (setSortBy(sort), setOpenSort(false))
+                                                }
                                             >
                                                 {sort}
                                             </div>
@@ -260,10 +328,19 @@ function Books() {
                                 </div>
                             )}
                         >
-                            <div className={cx('select')} onClick={() => setOpenSort(!openSort)}>
+                            <button
+                                type="button"
+                                className={cx('select')}
+                                onClick={() => {
+                                    setOpenSort((s) => !s);
+                                    setOpenCategory(false);
+                                }}
+                                aria-haspopup="listbox"
+                                aria-expanded={openSort}
+                            >
                                 <span>{sortBy}</span>
                                 <ChevronDown className={cx('chevron')} />
-                            </div>
+                            </button>
                         </Tippy>
                     </div>
                 </div>
@@ -284,7 +361,7 @@ function Books() {
                 ) : sortedBooks.length > 0 ? (
                     <div className={cx('books-grid')}>
                         {sortedBooks.map((book) => (
-                            <BookItem key={book.productId} book={book} />
+                            <BookItem key={book.productId ?? book.id ?? book.sku ?? Math.random()} book={book} />
                         ))}
                     </div>
                 ) : (

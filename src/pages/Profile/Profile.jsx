@@ -182,7 +182,7 @@ function Profile() {
     return (
         <div className={cx('profile-container')}>
             <div className={cx('profile-header')}>
-                <h1 className={cx('profile-title')}>User Profile</h1>
+                {/* <h1 className={cx('profile-title')}>User Profile</h1> */}
                 <button onClick={handleLogout} className={cx('logout-btn')}>
                     Logout
                 </button>
