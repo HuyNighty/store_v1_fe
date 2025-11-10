@@ -7,6 +7,7 @@ import { ToastProvider } from './contexts/Toast/ToastContext';
 import ProtectedRoute from './routes/components/ProtectedRoute/ProtectedRoute';
 import { WishlistProvider } from './contexts/WishlistContext';
 import ScrollToTop from './utils/ScrollToTop';
+import ClickSpark from './components/Animations/ClickSpark';
 
 function App() {
     const renderElement = (route, isProtected = false, requiredRole = null) => {
@@ -47,38 +48,49 @@ function App() {
                 <WishlistProvider>
                     <Router>
                         <ScrollToTop />
+                        <ClickSpark
+                            sparkColor="#975d34ff"
+                            sparkSize={10}
+                            sparkRadius={10}
+                            sparkCount={10}
+                            duration={400}
+                        >
+                            <div className="App">
+                                <Routes>
+                                    {publicRoutes.map((route, index) => (
+                                        <Route
+                                            key={route.path || index}
+                                            path={route.path}
+                                            element={renderElement(route)}
+                                        />
+                                    ))}
 
-                        <div className="App">
-                            <Routes>
-                                {publicRoutes.map((route, index) => (
-                                    <Route key={route.path || index} path={route.path} element={renderElement(route)} />
-                                ))}
+                                    {privateRoutes.map((route, index) => (
+                                        <Route
+                                            key={route.path || index}
+                                            path={route.path}
+                                            element={renderElement(route, true)}
+                                        />
+                                    ))}
 
-                                {privateRoutes.map((route, index) => (
-                                    <Route
-                                        key={route.path || index}
-                                        path={route.path}
-                                        element={renderElement(route, true)}
-                                    />
-                                ))}
+                                    {adminRoutes.map((route, index) => (
+                                        <Route
+                                            key={route.path || index}
+                                            path={route.path}
+                                            element={renderElement(route, true, 'admin')}
+                                        />
+                                    ))}
 
-                                {adminRoutes.map((route, index) => (
-                                    <Route
-                                        key={route.path || index}
-                                        path={route.path}
-                                        element={renderElement(route, true, 'admin')}
-                                    />
-                                ))}
-
-                                {userRoutes.map((route, index) => (
-                                    <Route
-                                        key={route.path || index}
-                                        path={route.path}
-                                        element={renderElement(route, true, 'user')}
-                                    />
-                                ))}
-                            </Routes>
-                        </div>
+                                    {userRoutes.map((route, index) => (
+                                        <Route
+                                            key={route.path || index}
+                                            path={route.path}
+                                            element={renderElement(route, true, 'user')}
+                                        />
+                                    ))}
+                                </Routes>
+                            </div>
+                        </ClickSpark>
                     </Router>
                 </WishlistProvider>
             </ToastProvider>

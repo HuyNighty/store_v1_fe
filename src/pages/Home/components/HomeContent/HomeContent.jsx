@@ -89,9 +89,9 @@ function HomeContent() {
                         textColors={['white', '#f0f0e5ff', '#f7eac5ff']}
                         variableSpeed={{ min: 30, max: 120 }}
                         startOnVisible={true}
-                        onSentenceComplete={(sentence, index) => {
-                            console.log('Câu hoàn tất:', index, sentence);
-                        }}
+                        // onSentenceComplete={(sentence, index) => {
+                        //     console.log('Câu hoàn tất:', index, sentence);
+                        // }}
                         loop={true}
                     />
 

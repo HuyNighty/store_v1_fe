@@ -4,6 +4,7 @@ import Button from '../../Layouts/components/Button';
 import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import reviewApi from '../../api/reviewApi';
+import Magnet from '../Animations/Magnet';
 
 const cx = classNames.bind(styles);
 
@@ -122,34 +123,36 @@ function BookItem({ book }) {
 
                 <div className={cx('book-item-footer')}>
                     <p className={cx('book-item-price')}>{displayPrice / 1000}.000 đ</p>
-                    <Button
-                        small
-                        outline
-                        shine
-                        className={cx('book-item-view-btn')}
-                        to="/book-item"
-                        state={{
-                            book: {
-                                productId,
-                                productName,
-                                productAssets,
-                                featured,
-                                bookAuthors,
-                                salePrice,
-                                price,
-                                rating: displayRating,
-                                reviews,
-                                stockQuantity,
-                                weightG,
-                                sku,
-                                slug,
-                                imageUrl,
-                            },
-                        }}
-                        scrollToTop
-                    >
-                        Xem chi tiết
-                    </Button>
+                    <Magnet magnetStrength={10}>
+                        <Button
+                            small
+                            outline
+                            shine
+                            className={cx('book-item-view-btn')}
+                            to="/book-item"
+                            state={{
+                                book: {
+                                    productId,
+                                    productName,
+                                    productAssets,
+                                    featured,
+                                    bookAuthors,
+                                    salePrice,
+                                    price,
+                                    rating: displayRating,
+                                    reviews,
+                                    stockQuantity,
+                                    weightG,
+                                    sku,
+                                    slug,
+                                    imageUrl,
+                                },
+                            }}
+                            scrollToTop
+                        >
+                            Xem chi tiết
+                        </Button>
+                    </Magnet>
                 </div>
             </div>
         </div>
