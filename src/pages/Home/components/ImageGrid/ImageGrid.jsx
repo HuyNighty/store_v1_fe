@@ -1,6 +1,6 @@
 import classNames from 'classnames/bind';
 import styles from './ImageGrid.module.scss';
-import Button from '../../../../../Layouts/components/Button';
+import Button from '../../../../Layouts/components/Button';
 
 const cx = classNames.bind(styles);
 

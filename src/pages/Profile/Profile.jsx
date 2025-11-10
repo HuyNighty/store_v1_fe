@@ -1,320 +1,255 @@
-// Profile.js - Sửa phần hiển thị ảnh
 import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Profile.module.scss';
-import authApi from '../../api/authApi';
 import customerApi from '../../api/customerApi';
 import { useAuth } from '../../contexts/AuthContext';
 
 const cx = classNames.bind(styles);
 
-function Profile() {
+function getImageUrl(imagePath) {
+    if (!imagePath) return null;
+    if (/^https?:\/\//i.test(imagePath)) return imagePath;
+    const base = 'http://localhost:8080';
+    return `${base.replace(/\/$/, '')}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+}
+
+export default function Profile() {
     const { isAuthenticated } = useAuth();
     const [userInfo, setUserInfo] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [imageError, setImageError] = useState(false);
-    const fileInputRef = useRef(null);
+    const fileRef = useRef(null);
 
     useEffect(() => {
         if (!isAuthenticated) {
             setLoading(false);
-            setError('Please login to view your profile');
+            setUserInfo(null);
             return;
         }
-        fetchUserInfo();
+        fetchProfile();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated]);
 
-    const fetchUserInfo = async () => {
+    const fetchProfile = async () => {
         try {
             setLoading(true);
-            setError(null);
+            const res = await customerApi.getMyProfile();
+            const payload = res?.data?.result ?? res?.data ?? res;
+            setUserInfo(payload || null);
             setImageError(false);
-
-            const response = await customerApi.getMyProfile();
-
-            if (response.data?.result) {
-                setUserInfo(response.data.result);
-            } else {
-                throw new Error('No user data found in response');
-            }
         } catch (err) {
-            console.error('Error fetching user info:', err);
-            setError(err.response?.data?.message || err.message || 'Failed to fetch user information');
+            console.error('[Profile] fetch error', err);
+            setUserInfo(null);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleImageUpload = async (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
+    const onSelectFile = () => fileRef.current?.click();
 
+    const handleUpload = async (e) => {
+        const file = e?.target?.files?.[0];
+        if (!file) return;
         if (!file.type.startsWith('image/')) {
-            alert('Please select an image file (JPEG, PNG, GIF, etc.)');
+            alert('Vui lòng chọn file ảnh.');
             return;
         }
-
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Image size should be less than 5MB');
+        if (file.size > 8 * 1024 * 1024) {
+            alert('Ảnh phải nhỏ hơn 8MB.');
             return;
         }
 
         try {
             setUploading(true);
+            const fd = new FormData();
+            fd.append('file', file);
+            const res = await customerApi.uploadProfileImage(fd);
+            const result = res?.data?.result ?? res?.data ?? res;
+            // backend may return full path or url
+            setUserInfo((prev) => ({ ...(prev || {}), profileImage: result ?? result?.path ?? result }));
             setImageError(false);
-
-            const response = await customerApi.uploadProfileImage(file);
-
-            setUserInfo((prev) => ({
-                ...prev,
-                profileImage: response.data.result,
-            }));
         } catch (err) {
-            console.error('Error uploading image:', err);
-            alert(err.response?.data?.message || 'Failed to upload image. Please try again.');
+            console.error('[Profile] upload', err);
+            alert(err?.response?.data?.message ?? 'Tải ảnh thất bại.');
         } finally {
             setUploading(false);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
+            if (fileRef.current) fileRef.current.value = '';
         }
     };
 
     const handleRemoveImage = async () => {
-        if (!window.confirm('Are you sure you want to remove your profile image?')) {
-            return;
-        }
-
+        if (!window.confirm('Bạn có chắc chắn muốn xóa ảnh đại diện?')) return;
         try {
+            setUploading(true);
             await customerApi.removeProfileImage();
-            setUserInfo((prev) => ({
-                ...prev,
-                profileImage: null,
-            }));
+            setUserInfo((prev) => ({ ...(prev || {}), profileImage: null }));
             setImageError(false);
         } catch (err) {
-            console.error('Error removing image:', err);
-            alert(err.response?.data?.message || 'Failed to remove image. Please try again.');
+            console.error('[Profile] remove image', err);
+            alert('Xóa ảnh thất bại.');
+        } finally {
+            setUploading(false);
         }
     };
 
-    const handleImageClick = () => {
-        fileInputRef.current?.click();
-    };
+    const onImageError = () => setImageError(true);
 
-    const handleImageError = () => {
-        console.error('🖼️ Image failed to load');
-        setImageError(true);
-    };
-
-    const handleLogout = async () => {
-        try {
-            await authApi.logout();
-            localStorage.removeItem('access_token');
-            window.location.href = '/';
-        } catch (err) {
-            console.error('Logout error:', err);
-            localStorage.removeItem('access_token');
-            window.location.href = '/';
-        }
-    };
-
-    // Construct full image URL
-    const getImageUrl = (imagePath) => {
-        if (!imagePath) return null;
-
-        // Nếu đã là full URL, return luôn
-        if (imagePath.startsWith('http')) {
-            return imagePath;
-        }
-
-        // eslint-disable-next-line no-undef
-        const baseUrl = 'http://localhost:8080';
-        const fullUrl = `${baseUrl}/Store${imagePath}`;
-        return fullUrl;
-    };
+    // derived values (no fake data)
+    const fullName = `${userInfo?.firstName ?? ''} ${userInfo?.lastName ?? ''}`.trim() || userInfo?.userName || '—';
+    const avatarUrl = userInfo?.profileImage ? getImageUrl(userInfo.profileImage) : null;
 
     if (loading) {
         return (
-            <div className={cx('profile-container')}>
-                <div className={cx('loading')}>
-                    <div className={cx('spinner')}></div>
-                    <p>Loading your profile...</p>
-                </div>
+            <div className={cx('profile-root')}>
+                <header className={cx('header', 'skeleton')}>
+                    <div className={cx('header-inner')}>
+                        <div className={cx('avatar-skel')} />
+                        <div className={cx('text-skel')} />
+                    </div>
+                </header>
+                <main className={cx('main', 'skeleton-main')}>
+                    <div className={cx('stats-grid-skel')} />
+                </main>
             </div>
         );
     }
-
-    if (error) {
-        return (
-            <div className={cx('profile-container')}>
-                <div className={cx('error-message')}>
-                    <div className={cx('error-icon')}>⚠️</div>
-                    <h3>Something went wrong</h3>
-                    <p>{error}</p>
-                    <button onClick={fetchUserInfo} className={cx('retry-btn')}>
-                        Try Again
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    if (!userInfo) {
-        return (
-            <div className={cx('profile-container')}>
-                <div className={cx('error-message')}>
-                    <div className={cx('error-icon')}>❓</div>
-                    <h3>No Profile Data</h3>
-                    <p>Unable to load profile information</p>
-                    <button onClick={fetchUserInfo} className={cx('retry-btn')}>
-                        Retry
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    const shouldShowPlaceholder = !userInfo.profileImage || imageError;
 
     return (
-        <div className={cx('profile-container')}>
-            <div className={cx('profile-header')}>
-                {/* <h1 className={cx('profile-title')}>User Profile</h1> */}
-                <button onClick={handleLogout} className={cx('logout-btn')}>
-                    Logout
-                </button>
-            </div>
-
-            <div className={cx('profile-content')}>
-                {/* Welcome Section */}
-                <div className={cx('welcome-section')}>
-                    <div className={cx('avatar-section')}>
-                        <div className={cx('avatar-container')} onClick={handleImageClick}>
-                            {userInfo.profileImage && !imageError ? (
-                                <img
-                                    src={getImageUrl(userInfo.profileImage)}
-                                    alt="Profile"
-                                    className={cx('avatar-image')}
-                                    onError={handleImageError}
-                                />
-                            ) : null}
-
-                            {shouldShowPlaceholder && (
-                                <div className={cx('avatar-placeholder')}>
-                                    {userInfo.firstName?.charAt(0) || 'U'}
-                                    {userInfo.lastName?.charAt(0) || 'S'}
+        <div className={cx('profile-root')}>
+            <header className={cx('header')}>
+                <div className={cx('header-inner')}>
+                    <div className={cx('avatar-block')}>
+                        <div className={cx('avatar-wrap')}>
+                            {avatarUrl && !imageError ? (
+                                <img src={avatarUrl} alt="avatar" className={cx('avatar-img')} onError={onImageError} />
+                            ) : (
+                                <div className={cx('avatar-fallback')}>
+                                    {(userInfo?.firstName || userInfo?.userName || 'U').charAt(0).toUpperCase()}
                                 </div>
                             )}
-
-                            {uploading && (
-                                <div className={cx('upload-overlay')}>
-                                    <div className={cx('upload-spinner')}></div>
-                                </div>
-                            )}
-
-                            <div className={cx('avatar-edit-hint')}>Click to change photo</div>
-                        </div>
-
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleImageUpload}
-                            accept="image/*"
-                            style={{ display: 'none' }}
-                        />
-
-                        <div className={cx('avatar-actions')}>
-                            <button
-                                onClick={handleImageClick}
-                                className={cx('avatar-btn', 'change-btn')}
-                                disabled={uploading}
-                            >
-                                {uploading ? 'Uploading...' : 'Change Photo'}
-                            </button>
-                            {userInfo.profileImage && !imageError && (
-                                <button
-                                    onClick={handleRemoveImage}
-                                    className={cx('avatar-btn', 'remove-btn')}
-                                    disabled={uploading}
-                                >
-                                    Remove
+                            <div className={cx('avatar-actions')}>
+                                <button className={cx('btn', 'btn-upload')} onClick={onSelectFile} disabled={uploading}>
+                                    {uploading ? 'Đang tải...' : 'Đổi ảnh'}
                                 </button>
-                            )}
+                                {userInfo?.profileImage && !imageError && (
+                                    <button
+                                        className={cx('btn', 'btn-remove')}
+                                        onClick={handleRemoveImage}
+                                        disabled={uploading}
+                                    >
+                                        Xóa
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
 
-                    <div className={cx('welcome-text')}>
-                        <h2>
-                            Welcome back, {userInfo.firstName || 'User'} {userInfo.lastName || ''}!
-                        </h2>
-                        <p>Here's your profile information</p>
+                    <div className={cx('header-info')}>
+                        <h1 className={cx('name')}>{fullName}</h1>
+                        <p className={cx('email')}>{userInfo?.email ?? '—'}</p>
+
+                        <div className={cx('meta')}>
+                            <div className={cx('meta-item')}>
+                                <span className={cx('meta-label')}>Tham gia</span>
+                                <span className={cx('meta-value')}>
+                                    {userInfo?.createdAt ? new Date(userInfo.createdAt).getFullYear() : '—'}
+                                </span>
+                            </div>
+                            <div className={cx('meta-sep')}>•</div>
+                            <div className={cx('meta-item')}>
+                                <span className={cx('meta-label')}>Quyền</span>
+                                <span className={cx('meta-value')}>
+                                    {(userInfo?.role || (userInfo?.roles && userInfo.roles[0])) ?? '—'}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </header>
 
-                {/* Personal Information Section */}
-                <div className={cx('profile-section')}>
-                    <h2 className={cx('section-title')}>Personal Information</h2>
+            <main className={cx('main')}>
+                {/* Stats */}
+                <section className={cx('stats')}>
+                    <div className={cx('stat-card')}>
+                        <div className={cx('stat-left')}>
+                            <div className={cx('stat-label')}>Đơn hàng</div>
+                            <div className={cx('stat-value')}>{userInfo?.totalOrders ?? '—'}</div>
+                        </div>
+                        <div className={cx('stat-icon')}>🛍️</div>
+                    </div>
+
+                    <div className={cx('stat-card')}>
+                        <div className={cx('stat-left')}>
+                            <div className={cx('stat-label')}>Tổng chi tiêu</div>
+                            <div className={cx('stat-value')}>
+                                {typeof userInfo?.totalSpent === 'number'
+                                    ? new Intl.NumberFormat('vi-VN').format(userInfo.totalSpent) + ' ₫'
+                                    : userInfo?.totalSpent ?? '—'}
+                            </div>
+                        </div>
+                        <div className={cx('stat-icon')}>💰</div>
+                    </div>
+
+                    <div className={cx('stat-card')}>
+                        <div className={cx('stat-left')}>
+                            <div className={cx('stat-label')}>Yêu thích</div>
+                            <div className={cx('stat-value')}>{userInfo?.favoritesCount ?? '—'}</div>
+                        </div>
+                        <div className={cx('stat-icon')}>❤️</div>
+                    </div>
+
+                    <div className={cx('stat-card')}>
+                        <div className={cx('stat-left')}>
+                            <div className={cx('stat-label')}>Đánh giá</div>
+                            <div className={cx('stat-value')}>{userInfo?.reviewsCount ?? '—'}</div>
+                        </div>
+                        <div className={cx('stat-icon')}>⭐</div>
+                    </div>
+                </section>
+
+                {/* Personal Info (UI only) */}
+                <section className={cx('panel')}>
+                    <div className={cx('panel-header')}>
+                        <h2>Thông tin cá nhân</h2>
+                    </div>
+
                     <div className={cx('info-grid')}>
-                        <InfoItem label="Username" value={userInfo.userName} />
-                        <InfoItem label="First Name" value={userInfo.firstName} />
-                        <InfoItem label="Last Name" value={userInfo.lastName} />
-                        <InfoItem label="Email" value={userInfo.email} />
-                        <InfoItem label="Phone Number" value={userInfo.phoneNumber} />
-                        <InfoItem label="Address" value={userInfo.address} />
-                        <InfoItem label="Loyalty Points" value={userInfo.loyaltyPoints} isPoints={true} />
-                    </div>
-                </div>
+                        <div className={cx('info-item')}>
+                            <div className={cx('info-label')}>Username</div>
+                            <div className={cx('info-value')}>{userInfo?.userName ?? '—'}</div>
+                        </div>
 
-                {/* Account Summary Section */}
-                <div className={cx('profile-section')}>
-                    <h2 className={cx('section-title')}>Account Summary</h2>
-                    <div className={cx('summary-cards')}>
-                        <SummaryCard
-                            title="Loyalty Status"
-                            value={getLoyaltyStatus(userInfo.loyaltyPoints || 0)}
-                            className={getLoyaltyClass(userInfo.loyaltyPoints || 0)}
-                        />
-                        <SummaryCard title="Member Since" value="2024" />
-                        <SummaryCard title="Account Type" value="Premium Member" />
+                        <div className={cx('info-item')}>
+                            <div className={cx('info-label')}>Họ</div>
+                            <div className={cx('info-value')}>{userInfo?.firstName ?? '—'}</div>
+                        </div>
+
+                        <div className={cx('info-item')}>
+                            <div className={cx('info-label')}>Tên</div>
+                            <div className={cx('info-value')}>{userInfo?.lastName ?? '—'}</div>
+                        </div>
+
+                        <div className={cx('info-item')}>
+                            <div className={cx('info-label')}>Email</div>
+                            <div className={cx('info-value')}>{userInfo?.email ?? '—'}</div>
+                        </div>
+
+                        <div className={cx('info-item')}>
+                            <div className={cx('info-label')}>Số điện thoại</div>
+                            <div className={cx('info-value')}>{userInfo?.phoneNumber ?? '—'}</div>
+                        </div>
+
+                        <div className={cx('info-item', 'full')}>
+                            <div className={cx('info-label')}>Địa chỉ</div>
+                            <div className={cx('info-value')}>{userInfo?.address ?? '—'}</div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                </section>
+            </main>
+
+            {/* hidden file input */}
+            <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleUpload} />
         </div>
     );
 }
-
-// Helper Component for Info Items
-const InfoItem = ({ label, value, isPoints = false }) => (
-    <div className={cx('info-item')}>
-        <span className={cx('info-label')}>{label}</span>
-        <span className={cx('info-value', { points: isPoints })}>{value || value === 0 ? value : 'N/A'}</span>
-    </div>
-);
-
-// Helper Component for Summary Cards
-const SummaryCard = ({ title, value, className = '' }) => (
-    <div className={cx('summary-card', className)}>
-        <h3 className={cx('summary-title')}>{title}</h3>
-        <p className={cx('summary-value')}>{value}</p>
-    </div>
-);
-
-// Helper functions
-const getLoyaltyStatus = (points) => {
-    if (points >= 1000) return 'Gold Member 🥇';
-    if (points >= 500) return 'Silver Member 🥈';
-    if (points >= 100) return 'Bronze Member 🥉';
-    return 'New Member 🌟';
-};
-
-const getLoyaltyClass = (points) => {
-    if (points >= 1000) return 'gold';
-    if (points >= 500) return 'silver';
-    if (points >= 100) return 'bronze';
-    return 'new-member';
-};
-
-export default Profile;
