@@ -2,6 +2,7 @@ import Header from '../components/Header';
 import Footer from './Footer';
 import classNames from 'classnames/bind';
 import styles from './DefaultLayout.module.scss';
+import AnimatedContent from '../../components/Animations/AnimatedContent';
 
 const cx = classNames.bind(styles);
 
@@ -15,7 +16,9 @@ function DefaultLayout({ children, headerMode = 'auto' }) {
             >
                 {children}
             </div>
-            <Footer />
+            <AnimatedContent>
+                <Footer />
+            </AnimatedContent>
         </div>
     );
 }

@@ -8,6 +8,7 @@ import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons
 import { motion, AnimatePresence } from 'framer-motion';
 import productApi from '../../api/productApi';
 import Button from '../../Layouts/components/Button';
+import AnimatedContent from '../Animations/AnimatedContent';
 
 const cx = classNames.bind(styles);
 
@@ -114,7 +115,9 @@ function BookCarousel() {
                         <FontAwesomeIcon icon={faChevronLeft} />
                     </button>
 
-                    <div className={cx('fea-text')}>Featured Books</div>
+                    <AnimatedContent>
+                        <div className={cx('fea-text')}>Featured Books</div>
+                    </AnimatedContent>
 
                     <button
                         className={cx('nav-btn')}

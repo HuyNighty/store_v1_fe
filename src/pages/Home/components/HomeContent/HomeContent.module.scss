@@ -54,7 +54,7 @@
 
     .title {
         font-size: 6.8rem;
-        font-weight: 700;
+        font-weight: 100;
         color: var(--white);
         margin-bottom: 1.2rem;
         text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
@@ -62,11 +62,6 @@
         transform: translateY(30px);
         animation: fadeUp 0.8s ease-out forwards 0.2s;
         font-family: var(--font-family-primary);
-
-        span {
-            color: var(--white);
-            display: block;
-        }
     }
 
     .subtitle {

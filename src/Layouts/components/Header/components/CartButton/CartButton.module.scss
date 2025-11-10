@@ -11,13 +11,12 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform var(--transition-base, 0.18s) ease, color var(--transition-base, 0.18s) ease,
-        background 0.18s ease;
+    transition: all 0.2s ease;
     border: none;
     background: transparent;
     padding: 6px;
     border-radius: 8px;
-    color: var(--primary-color-bold); // default
+    color: var(--primary-color-bold);
     outline: none;
 
     &:hover {
@@ -25,7 +24,7 @@
     }
 
     &:active {
-        transform: scale(0.98);
+        transform: scale(1);
     }
 
     // variant: header trong suốt (trên Hero)
@@ -43,7 +42,7 @@
 
         &:hover {
             color: var(--primary-hover);
-            background: rgba(101, 85, 72, 0.06);
+            background: transparent;
         }
     }
 

@@ -4,6 +4,7 @@ import classNames from 'classnames/bind';
 import styles from './HomeContent.module.scss';
 import Button from '../../../../Layouts/components/Button';
 import { Sparkles, ArrowRight, Star, Users, Award } from 'lucide-react';
+import TextType from '../../../../components/Animations/TextType';
 
 const cx = classNames.bind(styles);
 
@@ -14,26 +15,18 @@ function HomeContent() {
         const img = new Image();
         const imageUrl = 'https://i.pinimg.com/736x/3b/30/b6/3b30b6bc5b1a89ce7857999dd0672ef0.jpg';
 
-        console.log('Loading image:', imageUrl);
+        console.log('Đang tải ảnh nền:', imageUrl);
 
         img.src = imageUrl;
         img.onload = () => {
-            console.log('Image loaded successfully');
+            console.log('Ảnh nền tải thành công');
             setBgLoaded(true);
         };
         img.onerror = () => {
-            console.error('Failed to load image');
+            console.error('Không tải được ảnh nền');
             setBgLoaded(false);
         };
     }, []);
-
-    // // Stats data
-    // const stats = [
-    //     { icon: Star, value: '10,000+', label: 'Books Available', delay: 0.2 },
-    //     { icon: Users, value: '50,000+', label: 'Happy Readers', delay: 0.4 },
-    //     { icon: Star, value: '4.9/5', label: 'Average Rating', delay: 0.6 },
-    //     { icon: Award, value: '100+', label: 'Awards Won', delay: 0.8 },
-    // ];
 
     // Floating books positions
     const floatingBooks = [...Array(6)].map((_, i) => i);
@@ -75,22 +68,41 @@ function HomeContent() {
                         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                     >
                         <Sparkles className={cx('badge-icon')} />
-                        Discover Endless Knowledge
+                        Khám phá kiến thức vô tận
                     </motion.div>
 
-                    <div className={cx('title')}>
-                        <span>Discover Your</span>
-                        <span>Next Great Read</span>
-                    </div>
+                    {/* Title (TextType) - đã chuyển sang tiếng Việt và tối ưu nội dung tiêu đề) */}
+                    <TextType
+                        className={cx('title')}
+                        text={[
+                            'Thư viện Kiến thức Vô tận',
+                            'Hàng ngàn sách — mọi chủ đề',
+                            'Bắt đầu hành trình đọc ngay',
+                        ]}
+                        typingSpeed={70}
+                        pauseDuration={1500}
+                        deletingSpeed={30}
+                        showCursor={true}
+                        cursorCharacter="|"
+                        cursorBlinkDuration={0.45}
+                        hideCursorWhileTyping={false}
+                        textColors={['white', '#f0f0e5ff', '#f7eac5ff']}
+                        variableSpeed={{ min: 30, max: 120 }}
+                        startOnVisible={true}
+                        onSentenceComplete={(sentence, index) => {
+                            console.log('Câu hoàn tất:', index, sentence);
+                        }}
+                        loop={true}
+                    />
 
                     <p className={cx('subtitle')}>
-                        Browse thousands of books across all genres. From timeless classics to modern bestsellers, find
-                        your perfect story today.
+                        Duyệt hàng nghìn đầu sách ở mọi thể loại. Từ cổ điển bất hủ đến sách bán chạy hiện đại — tìm câu
+                        chuyện phù hợp với bạn ngay hôm nay.
                     </p>
 
                     <div className={cx('actions')}>
                         <Button to="/books" className={cx('btn', 'btn-primary')}>
-                            Browse Collection
+                            Khám phá bộ sưu tập
                             <motion.div
                                 whileHover={{ x: 5 }}
                                 transition={{ type: 'spring', stiffness: 400, damping: 10 }}
@@ -98,7 +110,7 @@ function HomeContent() {
                                 <ArrowRight className={cx('btn-icon')} />
                             </motion.div>
                         </Button>
-                        <Button className={cx('btn', 'btn-outline')}>View Bestsellers</Button>
+                        <Button className={cx('btn', 'btn-outline')}>Xem sách bán chạy</Button>
                     </div>
                 </div>
 
@@ -118,7 +130,7 @@ function HomeContent() {
                 </motion.div>
             </section>
 
-            {/* Stats Section */}
+            {/* Stats Section (đang để comment, khi cần mình sẽ dịch/hiện lại) */}
             {/* <section className={cx('stats-section')}>
                 <div className={cx('stats-container')}>
                     <div className={cx('stats-grid')}>

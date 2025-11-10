@@ -1,6 +1,7 @@
 import classNames from 'classnames/bind';
 import styles from './ImageGrid.module.scss';
 import Button from '../../../../Layouts/components/Button';
+import AnimatedContent from '../../../../components/Animations/AnimatedContent';
 
 const cx = classNames.bind(styles);
 
@@ -45,28 +46,30 @@ const images = [
 
 function ImageGrid() {
     return (
-        <section className={cx('image-grid-section')}>
-            <div className={cx('container')}>
-                <h2 className={cx('section-title')}>Featured Collections</h2>
-                <p className={cx('section-subtitle')}>Explore our curated book collections across various genres</p>
+        <AnimatedContent>
+            <section className={cx('image-grid-section')}>
+                <div className={cx('container')}>
+                    <h2 className={cx('section-title')}>Featured Collections</h2>
+                    <p className={cx('section-subtitle')}>Explore our curated book collections across various genres</p>
 
-                <div className={cx('image-grid')}>
-                    {images.map((image, index) => (
-                        <div key={image.id} className={cx('grid-item', `item-${index + 1}`)}>
-                            <div className={cx('image-container')}>
-                                <img src={image.src} alt={image.alt} className={cx('grid-image')} />
-                                <div className={cx('image-overlay')}>
-                                    <h3 className={cx('image-title')}>{image.title}</h3>
-                                    <Button shine className={cx('explore-btn')}>
-                                        Explore
-                                    </Button>
+                    <div className={cx('image-grid')}>
+                        {images.map((image, index) => (
+                            <div key={image.id} className={cx('grid-item', `item-${index + 1}`)}>
+                                <div className={cx('image-container')}>
+                                    <img src={image.src} alt={image.alt} className={cx('grid-image')} />
+                                    <div className={cx('image-overlay')}>
+                                        <h3 className={cx('image-title')}>{image.title}</h3>
+                                        <Button shine className={cx('explore-btn')}>
+                                            Explore
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </AnimatedContent>
     );
 }
 

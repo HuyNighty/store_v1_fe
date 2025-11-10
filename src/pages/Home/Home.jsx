@@ -8,7 +8,7 @@ import FlowingMenu from './components/FollowingMenu';
 const cx = classNames.bind(styles);
 
 function Home() {
-    const demoItems = [
+    const Items = [
         {
             link: '#',
             text: 'Mojave',
@@ -34,7 +34,7 @@ function Home() {
                     <HomeContent />
                 </div>
                 <ImageGrid />
-                <FlowingMenu items={demoItems} />
+                <FlowingMenu items={Items} />
                 <BookCarousel />
             </div>
         </>
