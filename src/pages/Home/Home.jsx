@@ -1,3 +1,4 @@
+// Home.jsx (đã sửa)
 import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
 import { BookCarousel } from '../../components/BookItem';
@@ -33,7 +34,9 @@ function Home() {
                 <div className={cx('home-content')}>
                     <HomeContent />
                 </div>
-                <ImageGrid />
+                <div className={cx('image-grid-container')}>
+                    <ImageGrid />
+                </div>
                 <FlowingMenu items={Items} />
                 <BookCarousel />
             </div>

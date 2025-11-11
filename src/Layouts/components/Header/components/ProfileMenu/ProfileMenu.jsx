@@ -10,10 +10,10 @@ const cx = classNames.bind(styles);
 
 function ProfileMenu({ onProfileInteract, onLogout, user }) {
     const profileMenuItems = [
-        { label: 'Thông tin cá nhân', icon: faUser, to: '/profile' },
-        { label: 'Đơn hàng', icon: faBox, to: '/orders' },
+        { key: 1, label: 'Thông tin cá nhân', icon: faUser, to: '/profile' },
+        { key: 2, label: 'Đơn hàng', icon: faBox, to: '/orders' },
         // { label: 'Cài đặt', icon: faGear, to: '/settings' },
-        { label: 'Đăng xuất', icon: faRightFromBracket, onClick: onLogout },
+        { key: 3, label: 'Đăng xuất', icon: faRightFromBracket, onClick: onLogout },
     ];
 
     // Hàm để xử lý URL ảnh
@@ -34,7 +34,7 @@ function ProfileMenu({ onProfileInteract, onLogout, user }) {
         <PopperWrapper>
             <div className={cx('profile-menu')}>
                 {profileMenuItems.map((item) => (
-                    <Link key={item.to} to={item.to} className={cx('menu-item')} onClick={item.onClick}>
+                    <Link key={item.key} to={item.to} className={cx('menu-item')} onClick={item.onClick}>
                         <FontAwesomeIcon icon={item.icon} />
                         <span className={cx('text-item')}>{item.label}</span>
                     </Link>

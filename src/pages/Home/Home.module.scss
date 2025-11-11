@@ -1,10 +1,11 @@
 .wrapper {
     width: 100%;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 20px;
     justify-content: flex-start;
     max-width: var(--container-width);
+    margin: 0 auto;
     animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -12,7 +13,12 @@
     align-items: center;
     display: flex;
     flex-direction: column;
-    width: 98.7%;
+    width: 100%;
+}
+
+.image-grid-container {
+    width: 100%;
+    display: block;
 }
 
 @keyframes fadeSlideUp {

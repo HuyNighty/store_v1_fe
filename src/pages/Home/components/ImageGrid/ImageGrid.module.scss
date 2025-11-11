@@ -1,4 +1,3 @@
-// ImageGrid.module.scss
 .image-grid-section {
     padding: 6rem 2rem;
     background-color: var(--background-color);
@@ -50,17 +49,10 @@
     &:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-
-        .image-overlay {
-            opacity: 1;
-        }
-
-        .grid-image {
-            transform: scale(1.05);
-        }
     }
 }
 
+// Image Container - GIỮ LẠI để đảm bảo layout
 .image-container {
     position: relative;
     width: 100%;
@@ -68,11 +60,39 @@
     overflow: hidden;
 }
 
+// Pixel Transition Wrapper
+.pixel-transition-wrapper {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+
+    // Đảm bảo PixelTransition chiếm toàn bộ container
+    .pixelated-image-card {
+        width: 100%;
+        height: 100%;
+
+        // Xóa padding-top mặc định để không làm hỏng layout
+        & > div:first-child {
+            display: none;
+        }
+
+        .pixelated-image-card__default,
+        .pixelated-image-card__active,
+        .pixelated-image-card__pixels {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
 .grid-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
 }
 
 // Image Overlay
@@ -87,8 +107,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    opacity: 0;
-    transition: opacity var(--transition-base);
     padding: 2rem;
     text-align: center;
 }

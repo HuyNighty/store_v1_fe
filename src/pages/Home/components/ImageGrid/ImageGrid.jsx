@@ -1,7 +1,10 @@
+// ImageGrid.jsx (đã sửa)
 import classNames from 'classnames/bind';
 import styles from './ImageGrid.module.scss';
 import Button from '../../../../Layouts/components/Button';
 import AnimatedContent from '../../../../components/Animations/AnimatedContent';
+import PixelTransition from '../../../../components/Animations/PixelTransition';
+import Magnet from '../../../../components/Animations/Magnet';
 
 const cx = classNames.bind(styles);
 
@@ -56,13 +59,27 @@ function ImageGrid() {
                         {images.map((image, index) => (
                             <div key={image.id} className={cx('grid-item', `item-${index + 1}`)}>
                                 <div className={cx('image-container')}>
-                                    <img src={image.src} alt={image.alt} className={cx('grid-image')} />
-                                    <div className={cx('image-overlay')}>
-                                        <h3 className={cx('image-title')}>{image.title}</h3>
-                                        <Button shine className={cx('explore-btn')}>
-                                            Explore
-                                        </Button>
-                                    </div>
+                                    <PixelTransition
+                                        firstContent={
+                                            <img src={image.src} alt={image.alt} className={cx('grid-image')} />
+                                        }
+                                        secondContent={
+                                            <div className={cx('image-overlay')}>
+                                                <h3 className={cx('image-title')}>{image.title}</h3>
+                                                <Magnet>
+                                                    <Button shine className={cx('explore-btn')}>
+                                                        Explore
+                                                    </Button>
+                                                </Magnet>
+                                            </div>
+                                        }
+                                        gridSize={10}
+                                        pixelColor="#655548"
+                                        animationStepDuration={0.5}
+                                        once={false}
+                                        aspectRatio={null}
+                                        className={cx('pixel-transition-wrapper')}
+                                    />
                                 </div>
                             </div>
                         ))}
