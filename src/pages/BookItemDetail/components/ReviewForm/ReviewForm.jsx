@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './ReviewForm.module.scss';
 import Button from '../../../../Layouts/components/Button';
-import { AuthContext } from '../../../../contexts/AuthContext';
+import { AuthContext } from '../../../../contexts/Auth/AuthContext';
 
 const cx = classNames.bind(styles);
 

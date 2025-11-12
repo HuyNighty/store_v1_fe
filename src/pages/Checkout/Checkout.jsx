@@ -6,7 +6,7 @@ import styles from './Checkout.module.scss';
 import Button from '../../Layouts/components/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faCreditCard, faTruck, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
-import { useCart } from '../../contexts/CartContext';
+import { useCart } from '../../contexts/Cart/CartContext';
 import { useToast } from '../../contexts/Toast/ToastContext';
 import orderApi from '../../api/orderApi';
 

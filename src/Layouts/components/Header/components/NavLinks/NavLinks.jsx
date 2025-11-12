@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from 'react';
 import classNames from 'classnames/bind';
 import styles from './NavLinks.module.scss';
 import Button from '../../../Button';
-import { AuthContext } from '../../../../../contexts/AuthContext';
+import { AuthContext } from '../../../../../contexts/Auth/AuthContext';
 
 const cx = classNames.bind(styles);
 

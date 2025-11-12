@@ -4,7 +4,7 @@ import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import styles from './CartButton.module.scss';
 import classNames from 'classnames/bind';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../../../../contexts/CartContext';
+import { useCart } from '../../../../../contexts/Cart/CartContext';
 
 const cx = classNames.bind(styles);
 

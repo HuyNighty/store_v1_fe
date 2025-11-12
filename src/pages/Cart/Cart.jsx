@@ -6,7 +6,7 @@ import Button from '../../Layouts/components/Button';
 import QuantityInput from '../../Layouts/components/QuantityInput';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faTrash, faShoppingBag, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { useCart } from '../../contexts/CartContext';
+import { useCart } from '../../contexts/Cart/CartContext';
 import { useToast } from '../../contexts/Toast/ToastContext';
 
 const cx = classNames.bind(styles);

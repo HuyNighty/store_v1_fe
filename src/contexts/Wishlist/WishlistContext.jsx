@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { useToast } from './Toast/ToastContext';
+import { useToast } from '../Toast/ToastContext';
 
 const WishlistContext = createContext();
 

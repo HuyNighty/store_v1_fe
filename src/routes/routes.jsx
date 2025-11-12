@@ -16,7 +16,7 @@ import UserOrders from '../pages/UserOrders';
 import AdminOrders from '../pages/Admin/components/AdminOrders';
 import OrderDetail from '../pages/OrderDetail';
 import UserOrderDetail from '../pages/UserOrderDetail';
-import Wishlist from '../pages/Wishlist';
+import Wishlist from '../Layouts/Wishlist';
 import Author from '../pages/Author';
 import FAQ from '../pages/FAQ';
 

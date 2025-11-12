@@ -27,7 +27,7 @@ function Author() {
 
                 // Sử dụng API public endpoints
                 const [authorResponse, booksResponse] = await Promise.all([
-                    authorApi.getAuthorDetail(authorId), // Sửa thành getAuthorDetail
+                    authorApi.getAuthorDetail(authorId),
                     authorApi.getAuthorBooks(authorId),
                 ]);
 

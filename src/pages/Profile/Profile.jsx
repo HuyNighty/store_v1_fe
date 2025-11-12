@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Profile.module.scss';
 import customerApi from '../../api/customerApi';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/Auth/AuthContext';
 
 const cx = classNames.bind(styles);
 

@@ -10,8 +10,8 @@ import ProfileMenu from './components/ProfileMenu/ProfileMenu';
 import Button from '../Button/Button';
 import Logo from '../../../components/Logo';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AuthContext } from '../../../contexts/AuthContext';
-import { useWishlist } from '../../../contexts/WishlistContext';
+import { AuthContext } from '../../../contexts/Auth/AuthContext';
+import { useWishlist } from '../../../contexts/Wishlist/WishlistContext';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 

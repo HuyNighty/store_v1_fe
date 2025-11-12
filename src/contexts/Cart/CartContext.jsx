@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import cartApi from '../api/cartApi';
+import cartApi from '../../api/cartApi';
 
 // Tạo context
 const CartContext = createContext();

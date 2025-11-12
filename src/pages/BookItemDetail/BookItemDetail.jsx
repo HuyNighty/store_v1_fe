@@ -4,9 +4,9 @@ import classNames from 'classnames/bind';
 import styles from './BookItemDetail.module.scss';
 import Button from '../../Layouts/components/Button';
 import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
-import { useCart } from '../../contexts/CartContext';
+import { useCart } from '../../contexts/Cart/CartContext';
 import { useToast } from '../../contexts/Toast/ToastContext';
-import { useWishlist } from '../../contexts/WishlistContext';
+import { useWishlist } from '../../contexts/Wishlist/WishlistContext';
 import reviewApi from '../../api/reviewApi';
 
 // Import components

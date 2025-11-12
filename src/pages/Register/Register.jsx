@@ -2,7 +2,7 @@ import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './Register.module.scss';
-import { AuthContext } from '../../contexts/AuthContext';
+import { AuthContext } from '../../contexts/Auth/AuthContext';
 import Button from '../../Layouts/components/Button';
 import authApi from '../../api/authApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

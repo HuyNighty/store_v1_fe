@@ -2,10 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { publicRoutes, privateRoutes, adminRoutes, userRoutes } from './routes/routes';
 import DefaultLayout from './Layouts/DefaultLayout';
-import { CartProvider } from './contexts/CartContext';
-import { ToastProvider } from './contexts/Toast/ToastContext';
 import ProtectedRoute from './routes/components/ProtectedRoute/ProtectedRoute';
-import { WishlistProvider } from './contexts/WishlistContext';
+import { ToastProvider } from './contexts/Toast/ToastContext';
+import { CartProvider } from './contexts/Cart/CartContext';
+import { WishlistProvider } from './contexts/Wishlist/WishlistContext';
 import ScrollToTop from './utils/ScrollToTop';
 import ClickSpark from './components/Animations/ClickSpark';
 

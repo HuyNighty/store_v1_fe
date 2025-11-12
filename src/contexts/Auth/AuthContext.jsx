@@ -1,7 +1,7 @@
-// src/contexts/AuthContext.jsx
+// src/contexts/Auth/AuthContext.jsx
 import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
-import authApi from '../api/authApi';
-import customerApi from '../api/customerApi';
+import authApi from '../../api/authApi';
+import customerApi from '../../api/customerApi';
 import * as jwtDecodeLib from 'jwt-decode';
 
 // Context mặc định

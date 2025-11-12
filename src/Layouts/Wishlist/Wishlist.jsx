@@ -2,11 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './Wishlist.module.scss';
-import Button from '../../Layouts/components/Button';
+import Button from '../components/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faShoppingCart, faTrash, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { useWishlist } from '../../contexts/WishlistContext';
-import { useCart } from '../../contexts/CartContext';
+import { useWishlist } from '../../contexts/Wishlist/WishlistContext';
+import { useCart } from '../../contexts/Cart/CartContext';
 import { useToast } from '../../contexts/Toast/ToastContext';
 
 const cx = classNames.bind(styles);

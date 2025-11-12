@@ -20,18 +20,133 @@
 
 .author-profile {
     display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 40px;
-    margin-bottom: 50px;
-    padding: 30px;
-    background: white;
+    grid-template-columns: 320px 1fr;
+    gap: 28px;
+    align-items: start;
+    background: #fff;
+    padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
 
-    @media (max-width: 768px) {
+    @media (max-width: 880px) {
         grid-template-columns: 1fr;
-        gap: 20px;
-        padding: 20px;
+    }
+
+    .left {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .author-portrait {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        background: linear-gradient(180deg, #fafafa, #fff);
+
+        .portrait {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.28s ease;
+        }
+        .portrait.loading {
+            filter: blur(3px);
+            opacity: 0.9;
+        }
+        .image-placeholder {
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 1.1rem;
+        }
+
+        .portrait-placeholder {
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #eee;
+            background: #fbfbfb;
+            .placeholder-inner {
+                text-align: center;
+                color: #7a6f66;
+                .plus-icon {
+                    font-size: 28px;
+                    margin-bottom: 8px;
+                    background: #fff;
+                    padding: 8px;
+                    border-radius: 50%;
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+                }
+                .placeholder-text {
+                    font-weight: 600;
+                    margin-bottom: 4px;
+                }
+                .placeholder-sub {
+                    font-size: 0.9rem;
+                    color: #a59f98;
+                }
+            }
+        }
+    }
+
+    .meta-box {
+        background: #fff;
+        border-radius: 10px;
+        padding: 12px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.04);
+        .meta-row {
+            padding: 8px 0;
+            border-bottom: 1px solid #f2f2f2;
+            font-size: 0.95rem;
+            &:last-child {
+                border-bottom: none;
+            }
+            strong {
+                color: #333;
+                margin-right: 8px;
+            }
+        }
+    }
+
+    .right {
+        .author-name {
+            font-size: 2rem;
+            margin: 0 0 12px 0;
+            color: #222;
+            font-weight: 600;
+        }
+        .author-bio {
+            margin-bottom: 14px;
+            h3 {
+                margin: 0 0 8px 0;
+                font-weight: 600;
+                color: #333;
+            }
+            .bio-text {
+                color: #555;
+                line-height: 1.6;
+                max-height: 8.8rem;
+                overflow: hidden;
+            }
+        }
+        .author-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .books-section {
+            margin-top: 12px;
+            .books-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 12px;
+            }
+        }
     }
 }
 
@@ -161,6 +276,110 @@
     p {
         margin: 0;
         font-size: 1.6rem;
+    }
+}
+
+/* Add to Author.module.scss (append or merge) */
+
+.author-portrait {
+    position: relative;
+    .portrait,
+    .portrait-placeholder {
+        width: 100%;
+        height: 100%;
+        border-radius: 12px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .portrait {
+        height: 400px;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+        transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.2, 1);
+        will-change: transform;
+    }
+
+    .portrait-placeholder {
+        height: 400px;
+        background: linear-gradient(135deg, #fafafa, #f4f0ec);
+        border: 2px dashed #e0dcd6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+        .placeholder-inner {
+            text-align: center;
+            color: #8a7f76;
+            .plus-icon {
+                font-size: 2.4rem;
+                margin-bottom: 8px;
+                background: rgba(255, 255, 255, 0.7);
+                padding: 12px;
+                border-radius: 50%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            }
+            .placeholder-text {
+                font-size: 1.2rem;
+            }
+        }
+    }
+
+    /* overlay revealed by PixelTransition secondContent */
+    .portrait-overlay {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 20px;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.45));
+        color: #fff;
+        text-align: center;
+
+        .overlay-name {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+        .overlay-actions {
+            display: flex;
+            gap: 10px;
+            button {
+                min-width: 120px;
+            }
+        }
+    }
+}
+
+/* small polish */
+.author-info {
+    min-height: 200px;
+}
+.author-actions {
+    margin-top: 16px;
+}
+.author-social {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+.social-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+    .author-portrait .portrait,
+    .author-portrait .portrait-placeholder {
+        height: 300px;
     }
 }
 

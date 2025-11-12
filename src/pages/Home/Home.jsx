@@ -1,4 +1,3 @@
-// Home.jsx (đã sửa)
 import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
 import { BookCarousel } from '../../components/BookItem';
@@ -12,7 +11,7 @@ function Home() {
     const Items = [
         {
             link: '#',
-            text: 'Mojave',
+            text: 'Trending',
             image: 'https://i.pinimg.com/1200x/40/07/79/400779b11c63675794518da05b7d7d8e.jpg',
         },
         { link: '#', text: 'Sonoma', image: 'https://i.pinimg.com/736x/0b/c4/f9/0bc4f9649242499a374bb3f7e5bb3fd4.jpg' },
