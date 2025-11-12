@@ -1,6 +1,5 @@
 @import 'normalize.css';
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Lobster&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 :root {
     --primary: rgba(#ebe5d8);
     background-color: #f6f4ef;
@@ -15,7 +14,7 @@ html {
 }
 
 body {
-    font-family: 'Instrument Serif', serif;
+    font-family: var(--font-family-primary);
     font-style: normal;
     font-size: 1.6rem;
     line-height: 1.5;
@@ -34,7 +33,7 @@ body {
     --star-color: #8b703f;
 
     // Font
-    --font-family-primary: 'Instrument Serif', serif;
+    --font-family-primary: 'Noto Sans', sans-serif;
     --font-size-base: 1.6rem;
     --font-size-logo: 2.6rem;
     --font-size-nav: 2.2rem;
