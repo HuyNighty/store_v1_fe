@@ -74,7 +74,7 @@ function ImageGrid() {
                                             </div>
                                         }
                                         gridSize={10}
-                                        pixelColor="#655548"
+                                        pixelColor="#a18f81ff"
                                         animationStepDuration={0.5}
                                         once={false}
                                         aspectRatio={null}
