@@ -237,6 +237,178 @@
     }
 }
 
+/* --- Advanced Filters (mở rộng) --- */
+.filters {
+    .advanced-filters {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-left: 8px;
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 140px;
+
+            label {
+                font-size: 0.85rem;
+                color: #666;
+                font-weight: 600;
+            }
+
+            input[type='number'],
+            input[type='text'],
+            select {
+                background: var(--white);
+                border: 1px solid #e6e6e6;
+                padding: 0.55rem 0.8rem;
+                border-radius: 8px;
+                min-width: 120px;
+                font-size: 1rem;
+                color: var(--primary-color-bold);
+                transition: box-shadow 0.18s ease, border-color 0.18s ease;
+
+                &:focus {
+                    outline: none;
+                    border-color: var(--primary-color);
+                    box-shadow: 0 6px 18px rgba(147, 125, 107, 0.08);
+                }
+            }
+
+            &.toggles {
+                flex-direction: row;
+                align-items: center;
+                gap: 12px;
+
+                label {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 0.95rem;
+                    font-weight: 500;
+                    color: #444;
+
+                    input[type='checkbox'] {
+                        width: 18px;
+                        height: 18px;
+                        accent-color: var(--primary-color);
+                    }
+                }
+            }
+        }
+
+        .price-inputs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            input {
+                width: 84px;
+            }
+
+            span {
+                color: #999;
+                font-weight: 700;
+            }
+        }
+
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .btn-reset {
+                background: transparent;
+                border: 1px solid #e6e6e6;
+                padding: 0.5rem 0.8rem;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                color: #666;
+                transition: background 0.15s ease, color 0.15s ease, transform 0.08s ease;
+
+                &:hover {
+                    background: #faf7f3;
+                    color: var(--primary-color-bold);
+                    transform: translateY(-1px);
+                    border-color: var(--primary-color);
+                }
+            }
+        }
+    }
+
+    /* small tweaks for desktop and mobile */
+    @media (max-width: 880px) {
+        .advanced-filters {
+            width: 100%;
+            justify-content: space-between;
+
+            .filter-item {
+                min-width: 120px;
+            }
+            .filter-actions {
+                margin-left: auto;
+            }
+        }
+    }
+
+    @media (max-width: 480px) {
+        .advanced-filters {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+
+            .filter-item {
+                width: 100%;
+            }
+            .price-inputs {
+                justify-content: space-between;
+            }
+            .filter-actions {
+                justify-content: flex-end;
+            }
+        }
+    }
+}
+
+/* Dropdown small states */
+.dropdown {
+    .dropdown-loading {
+        padding: 0.9rem 1.2rem;
+        color: #888;
+        font-size: 1rem;
+    }
+
+    .category-desc {
+        display: block;
+        margin-top: 6px;
+        font-size: 0.85rem;
+        color: #999;
+    }
+}
+
+/* Result info compact tags */
+.result-info {
+    p {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+
+        & > span {
+            background: #f4f2ef;
+            color: #6b5b50;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            margin-left: 6px;
+            font-weight: 600;
+        }
+    }
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .books-grid {

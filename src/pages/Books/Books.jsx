@@ -22,40 +22,79 @@ function useDebounced(value, delay = 250) {
 }
 
 function Books() {
+    // --- states
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('Most Popular');
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [selectedCategoryId, setSelectedCategoryId] = useState(null);
     const [openCategory, setOpenCategory] = useState(false);
     const [openSort, setOpenSort] = useState(false);
+
+    // advanced filters (client)
+    const [minPrice, setMinPrice] = useState('');
+    const [maxPrice, setMaxPrice] = useState('');
+    const [minRating, setMinRating] = useState('0');
+    const [onlyFeatured, setOnlyFeatured] = useState(false);
+    const [inStockOnly, setInStockOnly] = useState(false);
+
     const [books, setBooks] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [categoriesLoading, setCategoriesLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const debouncedSearch = useDebounced(searchQuery, 250);
+    const debouncedSearch = useDebounced(searchQuery, 300);
 
-    // Fetch categories
+    // helper to extract array from various backend shapes - SỬA LẠI
+    const extractArray = (payload) => {
+        if (!payload) return [];
+        console.log('API Response:', payload); // Debug log
+        if (Array.isArray(payload)) return payload;
+        if (Array.isArray(payload.result)) return payload.result;
+        if (Array.isArray(payload.data)) return payload.data;
+        if (Array.isArray(payload.data?.result)) return payload.data.result; // THÊM DÒNG NÀY
+        if (Array.isArray(payload.items)) return payload.items;
+        return [];
+    };
+
+    // Fetch categories - SỬA LẠI HOÀN TOÀN
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 setCategoriesLoading(true);
                 const res = await categoryApi.getAllCategories();
-                const payload = res?.data ?? res;
+                console.log('Raw API response:', res); // Debug log
+
+                // Dựa vào JSON response của bạn, data nằm trong res.data.result
                 let categoriesData = [];
 
-                if (Array.isArray(payload)) categoriesData = payload;
-                else if (Array.isArray(payload.result)) categoriesData = payload.result;
-                else if (Array.isArray(payload.data)) categoriesData = payload.data;
+                if (res && res.data && Array.isArray(res.data.result)) {
+                    categoriesData = res.data.result;
+                } else if (Array.isArray(res?.result)) {
+                    categoriesData = res.result;
+                } else if (Array.isArray(res?.data)) {
+                    categoriesData = res.data;
+                } else if (Array.isArray(res)) {
+                    categoriesData = res;
+                }
 
-                // normalize and only active categories
-                categoriesData = (categoriesData || []).filter((cat) => {
+                console.log('Extracted categories:', categoriesData); // Debug log
+
+                // Filter active categories
+                categoriesData = categoriesData.filter((cat) => {
                     const isActive = cat.isActive ?? cat.active ?? cat.activeFlag ?? true;
                     if (typeof isActive === 'string') return isActive.toLowerCase() === 'true' || isActive === '1';
                     if (typeof isActive === 'number') return isActive === 1;
                     return Boolean(isActive);
                 });
+
+                // Filter out categories with empty or whitespace names
+                categoriesData = categoriesData.filter((cat) => {
+                    const categoryName = cat.categoryName ?? cat.name ?? '';
+                    return categoryName.trim() !== '';
+                });
+
+                console.log('Filtered categories:', categoriesData); // Debug log
                 setCategories(categoriesData);
             } catch (err) {
                 console.error('Lỗi khi tải categories:', err);
@@ -68,7 +107,7 @@ function Books() {
         fetchCategories();
     }, []);
 
-    // Fetch books
+    // Fetch books using API filter/search/getAll
     useEffect(() => {
         const isActiveTrue = (v) => {
             if (v === true) return true;
@@ -78,27 +117,64 @@ function Books() {
             return Boolean(v);
         };
 
+        const toNumberOrUndefined = (val) => {
+            if (val === null || val === undefined || val === '') return undefined;
+            const n = Number(val);
+            return Number.isFinite(n) ? n : undefined;
+        };
+
         const fetchBooks = async () => {
             try {
                 setLoading(true);
                 setError(null);
 
+                // If search present (>= 3 chars) -> use search endpoint for better relevance
+                if (debouncedSearch && debouncedSearch.trim().length >= 3) {
+                    const res = await productApi.searchByName(debouncedSearch.trim());
+                    const booksData = extractArray(res);
+                    // still filter server results by isActive
+                    setBooks(
+                        (booksData || []).filter((b) => {
+                            const val = b.isActive ?? b.active ?? b.is_active ?? b.activeFlag;
+                            return isActiveTrue(val);
+                        }),
+                    );
+                    return;
+                }
+
+                // If any server-filter inputs exist -> call filter endpoint
+                const catIdNum = toNumberOrUndefined(selectedCategoryId);
+                const minP = toNumberOrUndefined(minPrice);
+                const maxP = toNumberOrUndefined(maxPrice);
+
+                const hasServerFilter = catIdNum !== undefined || minP !== undefined || maxP !== undefined;
+
+                if (hasServerFilter) {
+                    const filters = {};
+                    if (catIdNum !== undefined) filters.categoryId = catIdNum;
+                    if (minP !== undefined) filters.minPrice = minP;
+                    if (maxP !== undefined) filters.maxPrice = maxP;
+
+                    const res = await productApi.filterProducts(filters);
+                    const booksData = extractArray(res);
+                    setBooks(
+                        (booksData || []).filter((b) => {
+                            const val = b.isActive ?? b.active ?? b.is_active ?? b.activeFlag;
+                            return isActiveTrue(val);
+                        }),
+                    );
+                    return;
+                }
+
+                // else fetch all
                 const res = await productApi.getAll();
-                const payload = res?.data ?? res;
-                let booksData = [];
-
-                if (Array.isArray(payload)) booksData = payload;
-                else if (Array.isArray(payload.result)) booksData = payload.result;
-                else if (Array.isArray(payload.data)) booksData = payload.data;
-                else if (Array.isArray(payload.items)) booksData = payload.items;
-
-                // FILTER: only active products
-                booksData = (booksData || []).filter((b) => {
-                    const val = b.isActive ?? b.active ?? b.is_active ?? b.activeFlag;
-                    return isActiveTrue(val);
-                });
-
-                setBooks(booksData);
+                const booksData = extractArray(res);
+                setBooks(
+                    (booksData || []).filter((b) => {
+                        const val = b.isActive ?? b.active ?? b.is_active ?? b.activeFlag;
+                        return isActiveTrue(val);
+                    }),
+                );
             } catch (err) {
                 console.error('Lỗi khi tải sách:', err);
                 setError('Không thể tải danh sách sách.');
@@ -109,44 +185,110 @@ function Books() {
         };
 
         fetchBooks();
-    }, []);
+    }, [debouncedSearch, selectedCategoryId, minPrice, maxPrice]);
 
-    // Build category tree (supports parentId null/0/undefined)
-    const buildCategoryTree = (categoriesList, parentId = null, level = 0) => {
+    // --- helpers (normalize ids)
+    const normalizeId = (v) => {
+        if (v === null || v === undefined) return null;
+        if (typeof v === 'number') {
+            if (v === 0) return '0';
+            return String(v);
+        }
+        const s = String(v).trim();
+        if (s === '' || s === '0') return '0';
+        return s;
+    };
+
+    // Build category tree (returns flat list with level)
+    const buildCategoryTree = (categoriesList) => {
         if (!Array.isArray(categoriesList) || categoriesList.length === 0) return [];
 
-        const normalizeParent = (cat) => cat.parentId ?? cat.parent_id ?? cat.parent ?? null;
+        const nodesById = new Map();
+        const childrenMap = new Map();
 
-        const children = categoriesList.filter((cat) => {
-            const pid = normalizeParent(cat);
-            // treat root as parentId === null OR pid === 0
-            if (parentId === null) return pid === null || pid === 0 || pid === undefined;
-            return String(pid) === String(parentId);
+        categoriesList.forEach((raw) => {
+            const rawId = raw.categoryId ?? raw.id ?? raw._id ?? raw.code;
+            const id = normalizeId(rawId);
+            const parentRaw = raw.parentId ?? raw.parent ?? raw.parent_id ?? null;
+            const parentId = normalizeId(parentRaw);
+
+            const node = {
+                original: raw,
+                id,
+                parentId,
+                categoryName: raw.categoryName ?? raw.name ?? raw.title ?? '—',
+                description: raw.description ?? raw.desc ?? raw.note,
+            };
+
+            nodesById.set(id, node);
+
+            const list = childrenMap.get(parentId) ?? [];
+            list.push(node);
+            childrenMap.set(parentId, list);
         });
 
-        if (children.length === 0) return [];
+        // stable sort children by name
+        for (const [p, arr] of childrenMap.entries()) {
+            arr.sort((a, b) => (a.categoryName || '').localeCompare(b.categoryName || ''));
+        }
 
-        return children.flatMap((category) => {
-            const id = category.categoryId ?? category.id;
-            const displayName = '  '.repeat(level) + (category.categoryName ?? category.name ?? '—');
-            const node = { ...category, level, displayName, categoryId: id };
-            return [node, ...buildCategoryTree(categoriesList, id, level + 1)];
-        });
+        const roots = childrenMap.get(null) || [];
+        const zeroRoots = childrenMap.get('0') || [];
+
+        const out = [];
+        const visited = new Set();
+
+        const visit = (node, level = 0) => {
+            out.push({
+                ...node.original,
+                categoryId: node.id,
+                level,
+                displayName: node.categoryName,
+                description: node.description,
+            });
+            visited.add(node.id);
+            const kids = childrenMap.get(node.id) || [];
+            for (const kid of kids) visit(kid, level + 1);
+        };
+
+        const visitRoots = (arr) => {
+            for (const r of arr) {
+                if (!visited.has(r.id)) visit(r, 0);
+            }
+        };
+
+        visitRoots(roots);
+        visitRoots(zeroRoots);
+
+        // handle orphan nodes
+        for (const node of nodesById.values()) {
+            if (!visited.has(node.id)) {
+                visit(node, 0);
+            }
+        }
+
+        return out;
     };
 
     const categoryTree = useMemo(() => buildCategoryTree(categories), [categories]);
 
     const sorts = ['Most Popular', 'Highest Rated', 'Price: Low to High', 'Price: High to Low'];
 
-    // Filtered books (memoized & safe)
+    // Filtered books (apply search + category + new client filters)
     const filteredBooks = useMemo(() => {
         const search = (debouncedSearch || '').trim().toLowerCase();
+        const selCatId = normalizeId(selectedCategoryId);
+
+        // parse numeric filter values
+        const minP = parseFloat(minPrice === '' ? NaN : minPrice);
+        const maxP = parseFloat(maxPrice === '' ? NaN : maxPrice);
+        const minR = parseFloat(minRating || '0');
 
         return (books || []).filter((book) => {
+            // --- search
             const productName = String(book.productName || book.name || '').toLowerCase();
             const topAuthor = String(book.authorName || '').toLowerCase();
 
-            // authors array safe check
             const authorMatch =
                 Array.isArray(book.bookAuthors) &&
                 book.bookAuthors.some((a) => {
@@ -158,21 +300,48 @@ function Books() {
 
             const matchesSearch = !search || productName.includes(search) || topAuthor.includes(search) || authorMatch;
 
-            // category match - coerce to string
-            const matchesCategory =
-                selectedCategoryId == null ||
-                (Array.isArray(book.categories) &&
-                    book.categories.some((cat) => String(cat.categoryId ?? cat.id) === String(selectedCategoryId))) ||
-                (Array.isArray(book.categoryIds) &&
-                    book.categoryIds.map(String).includes(String(selectedCategoryId))) ||
-                (Array.isArray(book.productCategory) &&
-                    book.productCategory.some(
-                        (pc) => String(pc.category?.categoryId ?? pc.category?.id) === String(selectedCategoryId),
-                    ));
+            if (!matchesSearch) return false;
 
-            return matchesSearch && matchesCategory;
+            // --- category matching (defensive; server may have already filtered)
+            if (selCatId) {
+                let matchesCategory = false;
+                if (Array.isArray(book.categories)) {
+                    matchesCategory = book.categories
+                        .map((c) => normalizeId(c.categoryId ?? c.id ?? c._id ?? c.code))
+                        .includes(selCatId);
+                }
+                if (!matchesCategory && Array.isArray(book.categoryIds)) {
+                    matchesCategory = book.categoryIds.map((v) => normalizeId(v)).includes(selCatId);
+                }
+                if (!matchesCategory && Array.isArray(book.productCategory)) {
+                    matchesCategory = book.productCategory
+                        .map((pc) => normalizeId(pc.category?.categoryId ?? pc.category?.id ?? pc.category?._id))
+                        .includes(selCatId);
+                }
+                if (!matchesCategory) return false;
+            }
+
+            // --- price filter (client side safety)
+            const price = Number(book.salePrice ?? book.price ?? book.listPrice ?? 0);
+            if (!isNaN(minP) && price < minP) return false;
+            if (!isNaN(maxP) && price > maxP) return false;
+
+            // --- rating filter
+            const rating = Number(book.rating ?? book.averageRating ?? book.avgRating ?? 0);
+            if (!isNaN(minR) && rating < minR) return false;
+
+            // --- featured filter
+            if (onlyFeatured && !(book.featured ?? book.isFeatured ?? book.is_featured)) return false;
+
+            // --- stock filter
+            if (inStockOnly) {
+                const stock = Number(book.stockQuantity ?? book.stock ?? book.qty ?? 0);
+                if (isNaN(stock) || stock <= 0) return false;
+            }
+
+            return true;
         });
-    }, [books, debouncedSearch, selectedCategoryId]);
+    }, [books, debouncedSearch, selectedCategoryId, minPrice, maxPrice, minRating, onlyFeatured, inStockOnly]);
 
     // Sorted books (memoized)
     const sortedBooks = useMemo(() => {
@@ -200,15 +369,34 @@ function Books() {
     }, [filteredBooks, sortBy]);
 
     const handleCategorySelect = (category) => {
-        if (category === 'All') {
+        if (!category || category === 'All') {
             setSelectedCategory('All');
             setSelectedCategoryId(null);
         } else {
-            setSelectedCategory(category.categoryName ?? category.displayName ?? 'Category');
-            setSelectedCategoryId(category.categoryId ?? category.categoryId ?? category.id);
+            const id = normalizeId(category.categoryId ?? category.id ?? category._id ?? category.code);
+            const name = category.categoryName ?? category.name ?? category.title ?? category.displayName ?? 'Category';
+            setSelectedCategory(name);
+            setSelectedCategoryId(id === '0' ? null : id);
         }
         setOpenCategory(false);
     };
+
+    const resetFilters = () => {
+        setSearchQuery('');
+        setSelectedCategory('All');
+        setSelectedCategoryId(null);
+        setMinPrice('');
+        setMaxPrice('');
+        setMinRating('0');
+        setOnlyFeatured(false);
+        setInStockOnly(false);
+    };
+
+    // Debug: Log categories để kiểm tra
+    useEffect(() => {
+        console.log('Categories state:', categories);
+        console.log('Category tree:', categoryTree);
+    }, [categories, categoryTree]);
 
     return (
         <div className={cx('wrapper')}>
@@ -251,16 +439,16 @@ function Books() {
                                             onClick={() => handleCategorySelect('All')}
                                             onKeyDown={(e) => e.key === 'Enter' && handleCategorySelect('All')}
                                         >
-                                            All Categories
+                                            All
                                         </div>
                                         {categoriesLoading ? (
                                             <div className={cx('dropdown-loading')}>Loading categories...</div>
-                                        ) : (
+                                        ) : categoryTree.length > 0 ? (
                                             categoryTree.map((cat) => (
                                                 <div
-                                                    key={cat.categoryId ?? cat.id ?? cat.displayName}
+                                                    key={cat.categoryId ?? cat.id}
                                                     className={cx('dropdown-item', 'category-item')}
-                                                    style={{ paddingLeft: `${12 + cat.level * 16}px` }}
+                                                    style={{ paddingLeft: `${12 + (cat.level || 0) * 16}px` }}
                                                     onClick={() => handleCategorySelect(cat)}
                                                     onKeyDown={(e) => e.key === 'Enter' && handleCategorySelect(cat)}
                                                     role="button"
@@ -271,11 +459,10 @@ function Books() {
                                                         {cat.level > 0 && '└─ '}
                                                         {cat.categoryName ?? cat.name}
                                                     </span>
-                                                    {cat.description && (
-                                                        <span className={cx('category-desc')}>{cat.description}</span>
-                                                    )}
                                                 </div>
                                             ))
+                                        ) : (
+                                            <div className={cx('dropdown-loading')}>No categories available</div>
                                         )}
                                     </PopperWrapper>
                                 </div>
@@ -343,6 +530,67 @@ function Books() {
                             </button>
                         </Tippy>
                     </div>
+
+                    {/* --- Advanced small filters UI --- */}
+                    <div className={cx('filter-group', 'advanced-filters')}>
+                        <div className={cx('filter-item')}>
+                            <label>Price</label>
+                            <div className={cx('price-inputs')}>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={minPrice}
+                                    placeholder="Min"
+                                    onChange={(e) => setMinPrice(e.target.value)}
+                                />
+                                <span>-</span>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={maxPrice}
+                                    placeholder="Max"
+                                    onChange={(e) => setMaxPrice(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={cx('filter-item')}>
+                            <label>Min Rating</label>
+                            <select value={minRating} onChange={(e) => setMinRating(e.target.value)}>
+                                <option value="0">Any</option>
+                                <option value="1">≥ 1</option>
+                                <option value="2">≥ 2</option>
+                                <option value="3">≥ 3</option>
+                                <option value="4">≥ 4</option>
+                                <option value="4.5">≥ 4.5</option>
+                            </select>
+                        </div>
+
+                        <div className={cx('filter-item', 'toggles')}>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={onlyFeatured}
+                                    onChange={() => setOnlyFeatured((s) => !s)}
+                                />{' '}
+                                Featured
+                            </label>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={inStockOnly}
+                                    onChange={() => setInStockOnly((s) => !s)}
+                                />{' '}
+                                In stock
+                            </label>
+                        </div>
+
+                        <div className={cx('filter-actions')}>
+                            <button className={cx('btn-reset')} onClick={resetFilters}>
+                                Reset
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Result Info */}
@@ -350,6 +598,11 @@ function Books() {
                     <p>
                         Showing {sortedBooks.length} {sortedBooks.length === 1 ? 'book' : 'books'}
                         {selectedCategoryId && ` in "${selectedCategory}"`}
+                        {onlyFeatured && ' · Featured'}
+                        {inStockOnly && ' · In stock'}
+                        {(!isNaN(parseFloat(minPrice)) || !isNaN(parseFloat(maxPrice))) &&
+                            ` · Price ${minPrice || 0} - ${maxPrice || '∞'}`}
+                        {minRating && minRating !== '0' && ` · Rating ≥ ${minRating}`}
                     </p>
                 </div>
 

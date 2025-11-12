@@ -3,7 +3,7 @@ import axiosClient from './axiosClient';
 const categoryApi = {
     // Lấy tất cả categories
     getAllCategories: () => {
-        const url = '/categories';
+        const url = '/categories/public';
         return axiosClient.get(url);
     },
 
