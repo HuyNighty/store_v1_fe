@@ -7,6 +7,7 @@ import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import { useCart } from '../../contexts/Cart/CartContext';
 import { useToast } from '../../contexts/Toast/ToastContext';
 import { useWishlist } from '../../contexts/Wishlist/WishlistContext';
+import { useAuth } from '../../contexts/Auth/AuthContext';
 import reviewApi from '../../api/reviewApi';
 
 // Import components
@@ -38,6 +39,9 @@ function BookItemDetail() {
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
     const [reviews, setReviews] = useState([]);
     const [userReview, setUserReview] = useState(null);
+
+    const { user } = useAuth();
+    const isAdmin = user?.role === 'ADMIN';
 
     // Định nghĩa các hàm trước useEffect
     const loadReviews = useCallback(async () => {
@@ -461,6 +465,21 @@ function BookItemDetail() {
                     ←
                 </Button>
                 <h1>Chi tiết sách</h1>
+                {isAdmin && (
+                    <Button
+                        outline
+                        shine
+                        scale
+                        small
+                        onClick={() => {
+                            const pid = book?.productId ?? book?.id ?? book?.product_id;
+                            navigate(`/admin/books/edit/${pid}`, { state: { initialData: book } });
+                        }}
+                        style={{ marginLeft: '1rem' }}
+                    >
+                        Chỉnh sửa
+                    </Button>
+                )}
             </div>
 
             {/* Breadcrumb */}

@@ -26,7 +26,7 @@ function Admin() {
             icon: faBook,
             color: '#d0a772ff',
             moreInfo: '15',
-            to: '/admin-books',
+            to: '/admin/books/create',
         },
         {
             title: 'Total Products',

@@ -7,7 +7,6 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Admin from '../pages/Admin';
 import Products from '../pages/Admin/components/Product';
-import CreateBookForm from '../pages/Admin/components/CreateBookForm';
 // import FooterOnly from '../Layouts/FooterOnly';
 // import Footer from '../Layouts/DefaultLayout/Footer';
 import Cart from '../pages/Cart';
@@ -19,6 +18,8 @@ import UserOrderDetail from '../pages/UserOrderDetail';
 import Wishlist from '../Layouts/Wishlist';
 import Author from '../pages/Author';
 import FAQ from '../pages/FAQ';
+import CreateBook from '../pages/Admin/components/Books/CreateBook';
+import EditBook from '../pages/Admin/components/Books/EditBook';
 
 const publicRoutes = [
     { path: '/', component: Home, headerMode: 'auto' },
@@ -46,7 +47,8 @@ const userRoutes = [
 const adminRoutes = [
     { path: '/admin', component: Admin, layout: HeaderOnly, headerMode: 'solid' },
     { path: '/admin-products', component: Products, layout: null },
-    { path: '/admin-books', component: CreateBookForm, layout: null },
+    { path: '/admin/books/create', component: CreateBook, layout: null },
+    { path: '/admin/books/edit/:productId', component: EditBook, layout: null },
     { path: '/admin-orders', component: AdminOrders, layout: null },
     { path: '/admin/orders/:orderId', component: OrderDetail, layout: null },
 ];

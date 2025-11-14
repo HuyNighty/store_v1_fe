@@ -1,0 +1,338 @@
+:root {
+    --input-bg: var(--white);
+    --input-border: var(--border-color, #e6e6e6);
+    --input-focus: var(--primary-color, #937d6b);
+    --muted: #6b7280;
+    --radius: 8px;
+}
+
+/* Root + variants */
+.root {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-family: var(--font-family-primary);
+    position: relative;
+
+    /* size variants */
+    &.small .input {
+        font-size: 1.2rem;
+        padding: 8px 10px;
+    }
+    &.large .input {
+        font-size: 2rem;
+        padding: 12px 16px;
+    }
+
+    /* primary style */
+    &.primary {
+        .input {
+            background: transparent;
+            color: #000;
+            border: 1px solid var(--primary-color);
+
+            &:hover {
+                border: 1px solid var(--primary-hover);
+            }
+        }
+        .label {
+            color: var(--white);
+            opacity: 0.95;
+        }
+    }
+
+    /* secondary / danger / success / warning / info */
+    &.secondary .input {
+        background: var(--secondary-color);
+        color: var(--white);
+        border: 2px solid var(--secondary-color);
+    }
+    &.danger .input {
+        background: var(--danger-color);
+        color: var(--white);
+        border: 2px solid var(--danger-color);
+    }
+    &.success .input {
+        background: var(--success-color);
+        color: var(--white);
+        border: 2px solid var(--success-color);
+    }
+    &.warning .input {
+        background: var(--warning-color);
+        color: #111;
+        border: 2px solid var(--warning-color);
+    }
+    &.info .input {
+        background: var(--info-color);
+        color: var(--white);
+        border: 2px solid var(--info-color);
+    }
+
+    /* disabled */
+    &.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    /* animation/interaction modifiers (basic implementations) */
+
+    /* Pulse */
+    &.pulse {
+        animation: pulse 2s infinite;
+        &:hover {
+            animation-duration: 1s;
+        }
+    }
+
+    /* Bounce */
+    &.bounce {
+        animation: bounce 2s infinite;
+        &:hover {
+            animation-duration: 1s;
+        }
+    }
+    /* Float */
+    &.float {
+        animation: float 6s ease-in-out infinite;
+        &:hover {
+            animation-duration: 3s;
+        }
+    }
+
+    /* Scale */
+    &.scale {
+        transition: transform 0.18s ease;
+        &:hover {
+            transform: scale(1.03);
+        }
+    }
+
+    /* Glow */
+    &.glow {
+        box-shadow: 0 0 8px rgba(149, 125, 107, 0.18);
+        &:hover {
+            box-shadow: 0 0 18px rgba(149, 125, 107, 0.28);
+        }
+    }
+
+    /* Ripple (click effect) - uses pseudo element on .input */
+    &.ripple {
+        .input {
+            position: relative;
+            overflow: hidden;
+        }
+        .input::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease, opacity 0.4s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .input:active::after {
+            width: 300px;
+            height: 300px;
+            opacity: 1;
+            transition: width 0.1s ease, height 0.1s ease, opacity 0.4s ease;
+        }
+    }
+
+    /* Slide (bg gradient slide) */
+    &.slide {
+        .input {
+            background: linear-gradient(90deg, var(--primary-color) 50%, var(--input-bg) 50%);
+            background-size: 200% 100%;
+            background-position: right center;
+            transition: background-position 0.3s ease, color 0.2s ease;
+        }
+        &:hover .input {
+            background-position: left center;
+            color: var(--white);
+        }
+    }
+
+    /* borderDraw (corner-draw effect) */
+    &.borderDraw {
+        .input {
+            background: transparent !important;
+            border: 2px solid transparent !important;
+            position: relative;
+        }
+        &::before,
+        &::after {
+            content: '';
+            position: absolute;
+            pointer-events: none;
+        }
+        &::before {
+            top: -2px;
+            left: -2px;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.25s;
+        }
+        &::after {
+            bottom: -2px;
+            right: -2px;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.25s;
+        }
+        &:hover::before,
+        &:hover::after {
+            width: calc(100% + 4px);
+        }
+    }
+
+    /* lift3d */
+    &.lift3d {
+        perspective: 600px;
+        transform-style: preserve-3d;
+        &:hover {
+            transform: translateY(-6px) rotateX(6deg);
+            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.12);
+        }
+    }
+
+    /* magnetic */
+    &.magnetic {
+        .control .magnetic-content {
+            transition: transform 0.25s ease;
+        }
+        &:hover .control .magnetic-content {
+            transform: scale(1.03);
+        }
+    }
+}
+
+/* Control + input core */
+.control {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    outline: none;
+    font-size: 0.95rem;
+    transition: box-shadow 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+    color: var(--text-color, #333);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* textarea variant */
+.input.textarea {
+    min-height: 6rem;
+    resize: vertical;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+/* icons */
+.icon {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0.9;
+}
+.icon.left {
+    left: 10px;
+}
+.icon.right-icon {
+    right: 44px;
+}
+.with-left .input {
+    padding-left: 38px;
+}
+.with-right .input {
+    padding-right: 96px;
+}
+
+/* right controls (clear/toggle) */
+.right {
+    position: absolute;
+    right: 8px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+.clear,
+.toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: background 0.12s;
+}
+.clear:hover,
+.toggle:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+/* error text */
+.error {
+    color: var(--error-color);
+    font-size: 0.9rem;
+    margin-top: 6px;
+}
+
+/* small responsive tweak */
+@media (max-width: 480px) {
+    .input {
+        padding: 10px;
+    }
+    .with-right .input {
+        padding-right: 64px;
+    }
+}
+
+/* animation keyframes (re-used from global, but safe fallback) */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.03);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+@keyframes bounce {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}

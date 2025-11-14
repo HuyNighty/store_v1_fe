@@ -67,7 +67,7 @@ function ImageGrid() {
                                             <div className={cx('image-overlay')}>
                                                 <h3 className={cx('image-title')}>{image.title}</h3>
                                                 <Magnet>
-                                                    <Button shine className={cx('explore-btn')}>
+                                                    <Button scale shine className={cx('explore-btn')}>
                                                         Explore
                                                     </Button>
                                                 </Magnet>

@@ -1,3 +1,4 @@
+// src/pages/Admin/Products/Products.jsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Products.module.scss';
@@ -52,6 +53,18 @@ const normalizeProduct = (p) => ({
     ...p,
 });
 
+// simple slugify — giữ đơn giản, an toàn cho URL
+const slugify = (text = '') =>
+    text
+        .toString()
+        .normalize('NFKD')
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '')
+        .toLowerCase();
+
 function Products() {
     // data
     const [products, setProducts] = useState([]);
@@ -81,12 +94,18 @@ function Products() {
     const [formLoading, setFormLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
 
-    // fetch all products
-    const fetchProducts = useCallback(async () => {
+    // fetch all products / search
+    const fetchProducts = useCallback(async (opts = {}) => {
+        // opts: { search: string } -> if present, do server search
         try {
             setLoadingList(true);
             setListError('');
-            const resp = await productApi.getAll();
+            let resp;
+            if (opts.search && opts.search.trim().length >= 3) {
+                resp = await productApi.searchByName(opts.search.trim());
+            } else {
+                resp = await productApi.getAll();
+            }
             const list = normalizeListResponse(resp).map(normalizeProduct);
             setProducts(list);
         } catch (err) {
@@ -104,12 +123,21 @@ function Products() {
 
     // debounce searchQuery -> searchDebounce
     useEffect(() => {
-        const t = setTimeout(() => setSearchDebounce(searchQuery.trim()), 350);
+        const t = setTimeout(() => {
+            const q = searchQuery.trim();
+            setSearchDebounce(q);
+            // trigger server search if >= 3 chars, otherwise load all
+            if (q.length >= 3) {
+                fetchProducts({ search: q });
+            } else if (q.length === 0) {
+                // restore all when cleared
+                fetchProducts();
+            } else {
+                // keep client-side filtering for short queries
+            }
+        }, 350);
         return () => clearTimeout(t);
-    }, [searchQuery]);
-
-    // optional: if you want server-side search instead of client-side,
-    // replace the useMemo below with an effect that calls productApi.searchByName(searchDebounce).
+    }, [searchQuery, fetchProducts]);
 
     // filteredProducts: apply filter + local-search (case-insensitive)
     const filteredProducts = useMemo(() => {
@@ -181,12 +209,23 @@ function Products() {
 
     const validateForm = (m) => {
         const errs = {};
-        if (!m.sku?.trim()) errs.sku = 'SKU is required';
-        if (!m.productName?.trim()) errs.productName = 'Product name is required';
-        if (m.price === '' || isNaN(m.price)) errs.price = 'Price must be a valid number';
-        if (m.stockQuantity === '' || isNaN(m.stockQuantity))
+        if (!m.sku?.toString().trim()) errs.sku = 'SKU is required';
+        if (!m.productName?.toString().trim()) errs.productName = 'Product name is required';
+        if (m.price === '' || m.price === null || isNaN(Number(m.price))) errs.price = 'Price must be a valid number';
+        if (m.stockQuantity === '' || m.stockQuantity === null || isNaN(Number(m.stockQuantity)))
             errs.stockQuantity = 'Stock quantity must be a valid number';
         return errs;
+    };
+
+    const mapServerErrors = (err) => {
+        const resp = err?.response?.data ?? err?.response ?? err;
+        // try multiple shapes
+        if (resp == null) return { _server: 'Unknown server error' };
+        if (resp?.result && typeof resp.result === 'object') return resp.result;
+        if (resp?.errors && typeof resp.errors === 'object') return resp.errors;
+        if (resp?.fieldErrors && typeof resp.fieldErrors === 'object') return resp.fieldErrors;
+        if (resp?.message) return { _server: resp.message };
+        return { _server: 'An error occurred. Please try again.' };
     };
 
     const handleFormSubmit = async (e) => {
@@ -202,15 +241,23 @@ function Products() {
             return;
         }
 
+        // prepare payload: normalize types
         const payload = {
             ...formModel,
-            sku: formModel.sku?.trim(),
-            slug: formModel.slug?.trim(),
-            productName: formModel.productName?.trim(),
-            price: formModel.price === '' ? null : Number(formModel.price),
-            salePrice: formModel.salePrice === '' ? null : Number(formModel.salePrice),
-            stockQuantity: formModel.stockQuantity === '' ? null : Number(formModel.stockQuantity),
-            weightG: formModel.weightG === '' ? null : Number(formModel.weightG),
+            sku: formModel.sku?.toString().trim(),
+            slug: formModel.slug?.toString().trim() || slugify(formModel.productName || ''),
+            productName: formModel.productName?.toString().trim(),
+            // price must be number (server expects BigDecimal-equivalent)
+            price: formModel.price === '' || formModel.price === null ? null : parseFloat(formModel.price),
+            salePrice:
+                formModel.salePrice === '' || formModel.salePrice === null ? null : parseFloat(formModel.salePrice),
+            stockQuantity:
+                formModel.stockQuantity === '' || formModel.stockQuantity === null
+                    ? null
+                    : parseInt(formModel.stockQuantity, 10),
+            weightG: formModel.weightG === '' || formModel.weightG === null ? null : parseFloat(formModel.weightG),
+            isActive: Boolean(formModel.isActive),
+            featured: Boolean(formModel.featured),
         };
 
         try {
@@ -225,12 +272,7 @@ function Products() {
             setShowForm(false);
         } catch (err) {
             console.error('Submit error', err);
-            const resp = err?.response?.data;
-            let errs = { _server: 'An error occurred. Please try again.' };
-            if (resp) {
-                if (typeof resp.result === 'object') errs = resp.result;
-                else if (resp.message) errs._server = resp.message;
-            }
+            const errs = mapServerErrors(err);
             setFormErrors(errs);
         } finally {
             setFormLoading(false);
@@ -249,7 +291,6 @@ function Products() {
             // Prefer backend soft-delete via DELETE if implemented
             await adminApi.deleteProduct(id);
             setSuccessMessage('Xóa thành công.');
-            // refresh to ensure server state consistency
             await fetchProducts();
         } catch (err) {
             console.warn('delete fallback/update', err);

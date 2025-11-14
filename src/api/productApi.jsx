@@ -1,4 +1,3 @@
-// productApi.js - đã cập nhật
 import axiosClient from './axiosClient';
 
 const normalize = (res) => {

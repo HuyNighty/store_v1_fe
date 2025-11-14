@@ -128,6 +128,7 @@ function BookItem({ book }) {
                             small
                             outline
                             shine
+                            scale
                             className={cx('book-item-view-btn')}
                             to="/book-item"
                             state={{

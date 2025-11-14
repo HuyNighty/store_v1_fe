@@ -8,6 +8,10 @@ const adminApi = {
     updateProduct: (id, payload) => axiosClient.patch(`/products/${id}`, payload),
     deleteProduct: (id) => axiosClient.delete(`/products/${id}`),
 
+    getFullBook: (id) => axiosClient.get(`/full-books/${id}`),
+    createFullBook: (payload) => axiosClient.post(`/full-books`, payload),
+    updateFullBook: (id, payload) => axiosClient.patch(`/full-books/${id}`, payload),
+
     createAsset: (payload) => axiosClient.post(`/product-assets`, payload),
     getAsset: (id) => axiosClient.get(`/product-assets/${id}`),
     deleteAsset: (id) => axiosClient.delete(`/product-assets/${id}`),
