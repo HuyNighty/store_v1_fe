@@ -236,7 +236,7 @@ function Register() {
     const testimonial = {
         rating: 5,
         text: 'BookVerse đã thay đổi hoàn toàn thói quen đọc sách của tôi. Giao diện đẹp, kho sách phong phú, và cộng đồng thân thiện!',
-        author: 'Minh Anh',
+        author: 'Quang Huy',
         role: 'Độc giả thân thiết',
     };
 
@@ -593,6 +593,7 @@ function Register() {
                                             type="submit"
                                             shine
                                             primary
+                                            scale
                                             width={60}
                                             height={5}
                                             disabled={disabledSubmit}
@@ -600,8 +601,10 @@ function Register() {
                                         >
                                             {loading ? (
                                                 <>
-                                                    <div className={cx('loading-spinner')}></div>
-                                                    Đang đăng ký...
+                                                    <div className={cx('loading')}>
+                                                        <div className={cx('loading-spinner')}></div>
+                                                        Đang đăng ký...
+                                                    </div>
                                                 </>
                                             ) : (
                                                 'Tạo tài khoản'

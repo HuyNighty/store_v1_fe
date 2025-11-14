@@ -270,6 +270,7 @@ function Login() {
                                             type="submit"
                                             shine
                                             primary
+                                            scale
                                             width={60}
                                             height={5}
                                             disabled={loading}
@@ -277,8 +278,10 @@ function Login() {
                                         >
                                             {loading ? (
                                                 <>
-                                                    <div className={cx('loading-spinner')}></div>
-                                                    Đang đăng nhập...
+                                                    <div className={cx('loading')}>
+                                                        <div className={cx('loading-spinner')}></div>
+                                                        Đang đăng nhập...
+                                                    </div>
                                                 </>
                                             ) : (
                                                 'Đăng nhập'

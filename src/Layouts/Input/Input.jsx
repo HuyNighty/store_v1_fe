@@ -9,10 +9,12 @@ export default function Input({
     name,
     value,
     defaultValue,
+    checked, // support controlled checkbox
     onChange,
     type = 'text',
     placeholder = '',
     label = '',
+    labelPosition = 'right', // 'right' (default) or 'left' for checkboxes
     error = '',
     disabled = false,
     required = false,
@@ -72,10 +74,12 @@ export default function Input({
         if (autoFocus && inputRef.current) inputRef.current.focus();
     }, [autoFocus]);
 
+    // Generic emit — for consistency with existing handlers: emit { target: { name, value } }
     const emitChange = (val, ev) => {
         if (typeof onChange === 'function') onChange({ target: { name, value: val } }, ev);
     };
 
+    // Text-like change (debounce)
     const handleChange = (ev) => {
         const val = ev?.target?.value;
         if (!isControlled) setInternal(val);
@@ -99,6 +103,29 @@ export default function Input({
         if (inputRef.current) inputRef.current.focus();
     };
 
+    // --- Checkbox handling ---
+    const isCheckbox = type === 'checkbox';
+    const isRadio = type === 'radio';
+
+    const checkboxChecked = (() => {
+        // priority: explicit checked prop (controlled checkbox) -> value if boolean -> fallback false
+        if (typeof checked === 'boolean') return checked;
+        if (typeof value === 'boolean') return value;
+        return false;
+    })();
+
+    const handleCheckboxToggle = (ev) => {
+        if (disabled) return;
+        const newChecked = ev?.target?.checked ?? !checkboxChecked;
+        // emit boolean
+        emitChange(newChecked, ev);
+        // if uncontrolled and using checked prop not provided, allow internal state change via value
+        if (!isControlled && typeof value !== 'boolean') {
+            setInternal(newChecked);
+        }
+    };
+
+    // finalize type for text/password
     const finalType = type === 'password' && showPassword ? 'text' : type;
     const displayedValue = isControlled ? value : internal;
 
@@ -114,6 +141,7 @@ export default function Input({
             textarea,
             // variants
             primary,
+            outline,
             secondary,
             danger,
             success,
@@ -132,6 +160,9 @@ export default function Input({
             borderDraw,
             lift3d,
             magnetic,
+            // checkbox/radio state classes
+            checkbox: isCheckbox,
+            radio: isRadio,
         },
         className,
     );
@@ -146,11 +177,11 @@ export default function Input({
         id,
         name,
         ref: inputRef,
-        value: displayedValue ?? '',
+        value: isCheckbox || isRadio ? undefined : displayedValue ?? '',
         placeholder,
         disabled,
         required,
-        onChange: handleChange,
+        onChange: isCheckbox || isRadio ? handleCheckboxToggle : handleChange,
         onFocus: () => setFocused(true),
         onBlur: () => setFocused(false),
         onKeyDown: handleKeyDown,
@@ -162,6 +193,44 @@ export default function Input({
         ...passProps,
     };
 
+    if (isCheckbox || isRadio) {
+        return (
+            <div className={classes} style={inlineStyle}>
+                <label
+                    htmlFor={id}
+                    className={cx('checkbox-label-wrapper', {
+                        leftLabel: label && (passProps.labelPosition === 'left' || passProps.labelPosition === 'left'),
+                    })}
+                >
+                    <span className={cx('checkbox-control')} aria-hidden="true">
+                        <input
+                            id={id}
+                            name={name}
+                            type={isCheckbox ? 'checkbox' : 'radio'}
+                            checked={checkboxChecked}
+                            disabled={disabled}
+                            onChange={handleCheckboxToggle}
+                            aria-checked={checkboxChecked}
+                            aria-required={required || undefined}
+                            className={cx('native-input')}
+                            {...passProps}
+                        />
+                        <span className={cx('checkbox-faux')} />
+                    </span>
+
+                    {label && <span className={cx('checkbox-text')}>{label}</span>}
+                </label>
+
+                {error ? (
+                    <p id={errorId} className={cx('error')} role="alert" aria-live="assertive">
+                        {error}
+                    </p>
+                ) : null}
+            </div>
+        );
+    }
+
+    // regular text/textarea render
     return (
         <div className={classes} style={inlineStyle}>
             {label && (

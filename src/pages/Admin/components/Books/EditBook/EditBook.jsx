@@ -280,7 +280,7 @@ export default function EditBook({ productId: propProductId, initialData: propIn
     return (
         <div className={cx('root')}>
             <div className={cx('header')}>
-                <Button to="/admin">Quay về</Button>
+                <Button to="/">Quay về</Button>
 
                 <h1 className={cx('headerTitle')}>Chỉnh sửa Sách</h1>
             </div>

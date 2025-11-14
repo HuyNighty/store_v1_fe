@@ -257,8 +257,12 @@
 .with-left .input {
     padding-left: 38px;
 }
-.with-right .input {
+.with-right.icon-only .input {
     padding-right: 96px;
+}
+
+.with-right.no-icons .input {
+    padding-right: 12px;
 }
 
 /* right controls (clear/toggle) */
@@ -288,6 +292,118 @@
     color: var(--error-color);
     font-size: 0.9rem;
     margin-top: 6px;
+}
+
+.checkbox-label-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    /* ensure label doesn't shrink */
+    white-space: nowrap;
+}
+
+/* the control area that contains the native input (hidden) and the faux */
+.checkbox-control {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* keep native input accessible but visually hidden and exactly over faux */
+.native-input {
+    position: absolute;
+    inset: 0; /* top:0; right:0; bottom:0; left:0 */
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+    /* keep it focusable and keyboard-operable */
+}
+
+/* faux box (visible) */
+.checkbox-faux {
+    position: relative;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    border: 2px solid var(--input-border);
+    background: var(--input-bg);
+    box-sizing: border-box;
+    z-index: 1;
+    transition: all 0.12s ease;
+}
+
+/* radio uses circle */
+.root.radio .checkbox-faux {
+    border-radius: 50%;
+}
+
+/* checked styles (use sibling selector with input) */
+.native-input:checked + .checkbox-faux {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* check mark for checkbox (pure CSS) */
+.native-input:checked + .checkbox-faux::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 6px;
+    height: 10px;
+    border: 2px solid #fff;
+    border-top: 0;
+    border-left: 0;
+    transform: rotate(40deg);
+}
+
+/* text (label) style */
+.checkbox-text {
+    font-size: 1.4rem;
+    color: var(--text-color);
+    line-height: 1;
+    display: inline-block;
+}
+
+/* disabled state */
+.root.disabled .checkbox-faux,
+.root.disabled .checkbox-text {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* focus-visible outline for accessibility */
+.native-input:focus + .checkbox-faux {
+    box-shadow: 0 0 0 4px rgba(147, 125, 107, 0.12);
+    outline: none;
+}
+
+/* responsive small adjustments */
+@media (max-width: 480px) {
+    .checkbox-control {
+        width: 18px;
+        height: 18px;
+    }
+    .checkbox-faux {
+        width: 16px;
+        height: 16px;
+    }
+    .checkbox-text {
+        font-size: 1.3rem;
+    }
 }
 
 /* small responsive tweak */

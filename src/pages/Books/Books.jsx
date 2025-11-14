@@ -8,6 +8,9 @@ import Tippy from '@tippyjs/react/headless';
 import { Wrapper as PopperWrapper } from '../../Layouts/Popper';
 import productApi from '../../api/productApi';
 import categoryApi from '../../api/categoryApi';
+import QuantityInput from '../../Layouts/components/QuantityInput';
+import Input from '../../Layouts/Input';
+import Button from '../../Layouts/components/Button';
 
 const cx = classNames.bind(styles);
 
@@ -29,6 +32,7 @@ function Books() {
     const [selectedCategoryId, setSelectedCategoryId] = useState(null);
     const [openCategory, setOpenCategory] = useState(false);
     const [openSort, setOpenSort] = useState(false);
+    const [openRating, setOpenRating] = useState(false);
 
     // advanced filters (client)
     const [minPrice, setMinPrice] = useState('');
@@ -45,29 +49,28 @@ function Books() {
 
     const debouncedSearch = useDebounced(searchQuery, 300);
 
-    // helper to extract array from various backend shapes - SỬA LẠI
+    // quantity map: key -> quantity (for each book)
+    const [quantities, setQuantities] = useState({});
+
+    // helper to extract array from various backend shapes
     const extractArray = (payload) => {
         if (!payload) return [];
-        console.log('API Response:', payload); // Debug log
         if (Array.isArray(payload)) return payload;
         if (Array.isArray(payload.result)) return payload.result;
         if (Array.isArray(payload.data)) return payload.data;
-        if (Array.isArray(payload.data?.result)) return payload.data.result; // THÊM DÒNG NÀY
+        if (Array.isArray(payload.data?.result)) return payload.data.result;
         if (Array.isArray(payload.items)) return payload.items;
         return [];
     };
 
-    // Fetch categories - SỬA LẠI HOÀN TOÀN
+    // Fetch categories
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 setCategoriesLoading(true);
                 const res = await categoryApi.getAllCategories();
-                console.log('Raw API response:', res); // Debug log
 
-                // Dựa vào JSON response của bạn, data nằm trong res.data.result
                 let categoriesData = [];
-
                 if (res && res.data && Array.isArray(res.data.result)) {
                     categoriesData = res.data.result;
                 } else if (Array.isArray(res?.result)) {
@@ -78,9 +81,6 @@ function Books() {
                     categoriesData = res;
                 }
 
-                console.log('Extracted categories:', categoriesData); // Debug log
-
-                // Filter active categories
                 categoriesData = categoriesData.filter((cat) => {
                     const isActive = cat.isActive ?? cat.active ?? cat.activeFlag ?? true;
                     if (typeof isActive === 'string') return isActive.toLowerCase() === 'true' || isActive === '1';
@@ -88,13 +88,11 @@ function Books() {
                     return Boolean(isActive);
                 });
 
-                // Filter out categories with empty or whitespace names
                 categoriesData = categoriesData.filter((cat) => {
                     const categoryName = cat.categoryName ?? cat.name ?? '';
                     return categoryName.trim() !== '';
                 });
 
-                console.log('Filtered categories:', categoriesData); // Debug log
                 setCategories(categoriesData);
             } catch (err) {
                 console.error('Lỗi khi tải categories:', err);
@@ -107,7 +105,7 @@ function Books() {
         fetchCategories();
     }, []);
 
-    // Fetch books using API filter/search/getAll
+    // Fetch books (unchanged logic)
     useEffect(() => {
         const isActiveTrue = (v) => {
             if (v === true) return true;
@@ -128,11 +126,9 @@ function Books() {
                 setLoading(true);
                 setError(null);
 
-                // If search present (>= 3 chars) -> use search endpoint for better relevance
                 if (debouncedSearch && debouncedSearch.trim().length >= 3) {
                     const res = await productApi.searchByName(debouncedSearch.trim());
                     const booksData = extractArray(res);
-                    // still filter server results by isActive
                     setBooks(
                         (booksData || []).filter((b) => {
                             const val = b.isActive ?? b.active ?? b.is_active ?? b.activeFlag;
@@ -142,7 +138,6 @@ function Books() {
                     return;
                 }
 
-                // If any server-filter inputs exist -> call filter endpoint
                 const catIdNum = toNumberOrUndefined(selectedCategoryId);
                 const minP = toNumberOrUndefined(minPrice);
                 const maxP = toNumberOrUndefined(maxPrice);
@@ -166,7 +161,6 @@ function Books() {
                     return;
                 }
 
-                // else fetch all
                 const res = await productApi.getAll();
                 const booksData = extractArray(res);
                 setBooks(
@@ -199,7 +193,7 @@ function Books() {
         return s;
     };
 
-    // Build category tree (returns flat list with level)
+    // Build category tree (unchanged)
     const buildCategoryTree = (categoriesList) => {
         if (!Array.isArray(categoriesList) || categoriesList.length === 0) return [];
 
@@ -227,7 +221,6 @@ function Books() {
             childrenMap.set(parentId, list);
         });
 
-        // stable sort children by name
         for (const [p, arr] of childrenMap.entries()) {
             arr.sort((a, b) => (a.categoryName || '').localeCompare(b.categoryName || ''));
         }
@@ -260,7 +253,6 @@ function Books() {
         visitRoots(roots);
         visitRoots(zeroRoots);
 
-        // handle orphan nodes
         for (const node of nodesById.values()) {
             if (!visited.has(node.id)) {
                 visit(node, 0);
@@ -279,13 +271,11 @@ function Books() {
         const search = (debouncedSearch || '').trim().toLowerCase();
         const selCatId = normalizeId(selectedCategoryId);
 
-        // parse numeric filter values
         const minP = parseFloat(minPrice === '' ? NaN : minPrice);
         const maxP = parseFloat(maxPrice === '' ? NaN : maxPrice);
         const minR = parseFloat(minRating || '0');
 
         return (books || []).filter((book) => {
-            // --- search
             const productName = String(book.productName || book.name || '').toLowerCase();
             const topAuthor = String(book.authorName || '').toLowerCase();
 
@@ -302,7 +292,6 @@ function Books() {
 
             if (!matchesSearch) return false;
 
-            // --- category matching (defensive; server may have already filtered)
             if (selCatId) {
                 let matchesCategory = false;
                 if (Array.isArray(book.categories)) {
@@ -321,19 +310,15 @@ function Books() {
                 if (!matchesCategory) return false;
             }
 
-            // --- price filter (client side safety)
             const price = Number(book.salePrice ?? book.price ?? book.listPrice ?? 0);
             if (!isNaN(minP) && price < minP) return false;
             if (!isNaN(maxP) && price > maxP) return false;
 
-            // --- rating filter
             const rating = Number(book.rating ?? book.averageRating ?? book.avgRating ?? 0);
             if (!isNaN(minR) && rating < minR) return false;
 
-            // --- featured filter
             if (onlyFeatured && !(book.featured ?? book.isFeatured ?? book.is_featured)) return false;
 
-            // --- stock filter
             if (inStockOnly) {
                 const stock = Number(book.stockQuantity ?? book.stock ?? book.qty ?? 0);
                 if (isNaN(stock) || stock <= 0) return false;
@@ -390,6 +375,17 @@ function Books() {
         setMinRating('0');
         setOnlyFeatured(false);
         setInStockOnly(false);
+    };
+
+    // quantity handlers for per-book selector
+    const handleQuantityChange = (key, newValue) => {
+        setQuantities((prev) => ({ ...prev, [key]: newValue }));
+    };
+
+    const addToCart = (book, qty) => {
+        const q = Number(qty) || 0;
+        // TODO: replace with real cart action
+        console.log('Add to cart:', { bookId: book.productId ?? book.id ?? book.sku, qty: q });
     };
 
     // Debug: Log categories để kiểm tra
@@ -531,64 +527,125 @@ function Books() {
                         </Tippy>
                     </div>
 
-                    {/* --- Advanced small filters UI --- */}
                     <div className={cx('filter-group', 'advanced-filters')}>
                         <div className={cx('filter-item')}>
                             <label>Price</label>
                             <div className={cx('price-inputs')}>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    value={minPrice}
+                                <QuantityInput
+                                    value={minPrice === '' ? '' : Number(minPrice)}
+                                    onChange={(v) => setMinPrice(v === '' ? '' : String(v))}
+                                    min={0}
+                                    step={1000}
+                                    size="small"
                                     placeholder="Min"
-                                    onChange={(e) => setMinPrice(e.target.value)}
+                                    enforceMinOnBlur={false}
                                 />
                                 <span>-</span>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    value={maxPrice}
+                                <QuantityInput
+                                    value={maxPrice === '' ? '' : Number(maxPrice)}
+                                    onChange={(v) => setMaxPrice(v === '' ? '' : String(v))}
+                                    min={0}
+                                    step={1000}
+                                    size="small"
                                     placeholder="Max"
-                                    onChange={(e) => setMaxPrice(e.target.value)}
+                                    enforceMinOnBlur={false}
                                 />
                             </div>
                         </div>
 
                         <div className={cx('filter-item')}>
-                            <label>Min Rating</label>
-                            <select value={minRating} onChange={(e) => setMinRating(e.target.value)}>
-                                <option value="0">Any</option>
-                                <option value="1">≥ 1</option>
-                                <option value="2">≥ 2</option>
-                                <option value="3">≥ 3</option>
-                                <option value="4">≥ 4</option>
-                                <option value="4.5">≥ 4.5</option>
-                            </select>
+                            {/* Min Rating (Popper) */}
+                            <Tippy
+                                offset={[-90, 10]}
+                                placement="bottom"
+                                interactive
+                                visible={openRating}
+                                onClickOutside={() => setOpenRating(false)}
+                                render={(attrs) => (
+                                    <div className={cx('dropdown')} tabIndex="-1" {...attrs}>
+                                        <PopperWrapper>
+                                            <div
+                                                role="listbox"
+                                                aria-label="Minimum rating"
+                                                className={cx('rating-list')}
+                                            >
+                                                {['0', '1', '2', '3', '4', '4.5'].map((r) => (
+                                                    <div
+                                                        key={r}
+                                                        role="option"
+                                                        tabIndex={0}
+                                                        aria-selected={String(minRating) === r}
+                                                        className={cx('dropdown-item', {
+                                                            selected: String(minRating) === r,
+                                                        })}
+                                                        onClick={() => {
+                                                            setMinRating(r);
+                                                            setOpenRating(false);
+                                                        }}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                                e.preventDefault();
+                                                                setMinRating(r);
+                                                                setOpenRating(false);
+                                                            }
+                                                        }}
+                                                    >
+                                                        {r === '0' ? 'Any' : `≥ ${r}`}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </PopperWrapper>
+                                    </div>
+                                )}
+                            >
+                                <div className={cx('filter-item')}>
+                                    <label id="min-rating-label">Min Rating</label>
+                                    <button
+                                        type="button"
+                                        className={cx('select')}
+                                        aria-haspopup="listbox"
+                                        aria-expanded={openRating}
+                                        aria-labelledby="min-rating-label"
+                                        onClick={() => {
+                                            setOpenRating((s) => !s);
+                                            setOpenCategory(false);
+                                            setOpenSort(false);
+                                        }}
+                                    >
+                                        <span>{minRating === '0' ? 'Any' : `≥ ${minRating}`}</span>
+                                        <ChevronDown className={cx('chevron')} />
+                                    </button>
+                                </div>
+                            </Tippy>
                         </div>
 
                         <div className={cx('filter-item', 'toggles')}>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={onlyFeatured}
-                                    onChange={() => setOnlyFeatured((s) => !s)}
-                                />{' '}
-                                Featured
-                            </label>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={inStockOnly}
-                                    onChange={() => setInStockOnly((s) => !s)}
-                                />{' '}
-                                In stock
-                            </label>
+                            <Input
+                                scale
+                                type="checkbox"
+                                id="filter-featured"
+                                name="onlyFeatured"
+                                label="Featured"
+                                checked={onlyFeatured}
+                                onChange={() => setOnlyFeatured((s) => !s)}
+                                small
+                            />
+                            <Input
+                                scale
+                                type="checkbox"
+                                id="filter-instock"
+                                name="inStockOnly"
+                                label="In stock"
+                                checked={inStockOnly}
+                                onChange={() => setInStockOnly((s) => !s)}
+                                small
+                            />
                         </div>
 
                         <div className={cx('filter-actions')}>
-                            <button className={cx('btn-reset')} onClick={resetFilters}>
+                            <Button shine scale className={cx('btn-reset')} onClick={resetFilters}>
                                 Reset
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -613,9 +670,15 @@ function Books() {
                     <div className={cx('error')}>{error}</div>
                 ) : sortedBooks.length > 0 ? (
                     <div className={cx('books-grid')}>
-                        {sortedBooks.map((book) => (
-                            <BookItem key={book.productId ?? book.id ?? book.sku ?? Math.random()} book={book} />
-                        ))}
+                        {sortedBooks.map((book) => {
+                            const key = book.productId ?? book.id ?? book.sku ?? book.code ?? Math.random();
+                            const qty = quantities[key] ?? 1;
+                            return (
+                                <div key={key} className={cx('book-card')}>
+                                    <BookItem book={book} />
+                                </div>
+                            );
+                        })}
                     </div>
                 ) : (
                     <div className={cx('no-results')}>

@@ -245,7 +245,7 @@ function Header({
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                         >
-                            <Button outline shine onClick={handleLoginClick}>
+                            <Button outline shine scale onClick={handleLoginClick}>
                                 Đăng nhập
                             </Button>
                         </motion.div>

@@ -1,36 +1,60 @@
+// src/components/QuantityInput/QuantityInput.jsx
 import React from 'react';
 import classNames from 'classnames/bind';
 import styles from './QuantityInput.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
-import Button from '../Button';
 
 const cx = classNames.bind(styles);
 
-function QuantityInput({ value = 0, onChange, min = 0, max = 9999, step = 1, disabled = false, size = 'medium' }) {
+function QuantityInput({
+    value = 0,
+    onChange,
+    min = 0,
+    max = 999999999999999,
+    step = 1,
+    disabled = false,
+    size = 'medium',
+    placeholder = '',
+    enforceMinOnBlur = true,
+}) {
+    // convert possibly-string value to number safely for increment/decrement
+    const toNumberSafe = (v) => {
+        if (v === '' || v === null || v === undefined) return NaN;
+        const n = Number(v);
+        return Number.isFinite(n) ? n : NaN;
+    };
+
+    const currentNum = toNumberSafe(value);
+
     const handleIncrement = () => {
-        const newValue = Math.min(max, value + step);
+        // if empty => start from min (or 0) then + step
+        const base = Number.isFinite(currentNum) ? currentNum : min;
+        const newValue = Math.min(max, base + step);
         onChange(newValue);
     };
 
     const handleDecrement = () => {
-        const newValue = Math.max(min, value - step);
+        const base = Number.isFinite(currentNum) ? currentNum : min;
+        const newValue = Math.max(min, base - step);
         onChange(newValue);
     };
 
     const handleInputChange = (e) => {
         const inputValue = e.target.value;
 
-        // Allow empty input for better UX
+        // allow user to clear the field (empty string)
         if (inputValue === '') {
             onChange('');
             return;
         }
 
-        // Only allow numbers
-        const numericValue = inputValue.replace(/[^0-9]/g, '');
-        if (numericValue === '') {
-            onChange(min);
+        // extract digits (allowing leading +)
+        const numericValue = inputValue.replace(/[^0-9\-+.]/g, '');
+
+        // if nothing left -> keep empty (so user can type)
+        if (numericValue === '' || numericValue === '-' || numericValue === '+' || numericValue === '+-') {
+            onChange('');
             return;
         }
 
@@ -42,7 +66,8 @@ function QuantityInput({ value = 0, onChange, min = 0, max = 9999, step = 1, dis
     };
 
     const handleBlur = (e) => {
-        if (e.target.value === '') {
+        // If input left empty and enforceMinOnBlur => set to min, otherwise keep ''
+        if (e.target.value === '' && enforceMinOnBlur) {
             onChange(min);
         }
     };
@@ -53,27 +78,32 @@ function QuantityInput({ value = 0, onChange, min = 0, max = 9999, step = 1, dis
                 type="button"
                 className={cx('quantity-btn', 'decrement')}
                 onClick={handleDecrement}
-                disabled={disabled || value <= min}
+                disabled={disabled || (!Number.isFinite(currentNum) ? min <= 0 : currentNum <= min)}
+                aria-label="decrease"
             >
                 <FontAwesomeIcon icon={faMinus} />
             </button>
 
             <input
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 className={cx('quantity-field')}
-                value={value}
+                value={value === null || value === undefined ? '' : value}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
                 disabled={disabled}
-                min={min}
-                max={max}
+                placeholder={placeholder}
+                aria-valuemin={min}
+                aria-valuemax={max}
             />
 
             <button
                 type="button"
                 className={cx('quantity-btn', 'increment')}
                 onClick={handleIncrement}
-                disabled={disabled || value >= max}
+                disabled={disabled || (!Number.isFinite(currentNum) ? false : currentNum >= max)}
+                aria-label="increase"
             >
                 <FontAwesomeIcon icon={faPlus} />
             </button>
