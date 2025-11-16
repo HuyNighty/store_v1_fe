@@ -1,4 +1,3 @@
-// src/components/QuantityInput/QuantityInput.jsx
 import React from 'react';
 import classNames from 'classnames/bind';
 import styles from './QuantityInput.module.scss';
@@ -18,7 +17,6 @@ function QuantityInput({
     placeholder = '',
     enforceMinOnBlur = true,
 }) {
-    // convert possibly-string value to number safely for increment/decrement
     const toNumberSafe = (v) => {
         if (v === '' || v === null || v === undefined) return NaN;
         const n = Number(v);
@@ -28,7 +26,6 @@ function QuantityInput({
     const currentNum = toNumberSafe(value);
 
     const handleIncrement = () => {
-        // if empty => start from min (or 0) then + step
         const base = Number.isFinite(currentNum) ? currentNum : min;
         const newValue = Math.min(max, base + step);
         onChange(newValue);
@@ -43,16 +40,13 @@ function QuantityInput({
     const handleInputChange = (e) => {
         const inputValue = e.target.value;
 
-        // allow user to clear the field (empty string)
         if (inputValue === '') {
             onChange('');
             return;
         }
 
-        // extract digits (allowing leading +)
         const numericValue = inputValue.replace(/[^0-9\-+.]/g, '');
 
-        // if nothing left -> keep empty (so user can type)
         if (numericValue === '' || numericValue === '-' || numericValue === '+' || numericValue === '+-') {
             onChange('');
             return;
@@ -66,7 +60,6 @@ function QuantityInput({
     };
 
     const handleBlur = (e) => {
-        // If input left empty and enforceMinOnBlur => set to min, otherwise keep ''
         if (e.target.value === '' && enforceMinOnBlur) {
             onChange(min);
         }

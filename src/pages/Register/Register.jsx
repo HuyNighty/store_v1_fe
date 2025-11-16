@@ -207,10 +207,8 @@ function Register() {
     const shouldShowPasswordIcon = form.password.length > 0;
     const shouldShowConfirmPasswordIcon = form.confirmPassword.length > 0;
 
-    // Floating particles data
     const floatingParticles = Array.from({ length: 8 }, (_, i) => i);
 
-    // Benefits data
     const benefits = [
         {
             icon: faStar,
@@ -232,7 +230,6 @@ function Register() {
         },
     ];
 
-    // Testimonial data
     const testimonial = {
         rating: 5,
         text: 'BookVerse đã thay đổi hoàn toàn thói quen đọc sách của tôi. Giao diện đẹp, kho sách phong phú, và cộng đồng thân thiện!',
@@ -242,32 +239,25 @@ function Register() {
 
     return (
         <div className={cx('register-wrapper')}>
-            {/* Background Image with Overlay */}
             <div className={cx('background-overlay')}>
                 <div className={cx('background-image')}></div>
                 <div className={cx('gradient-overlay')}></div>
                 <div className={cx('radial-overlay')}></div>
             </div>
 
-            {/* Animated particles */}
             {floatingParticles.map((i) => (
                 <div key={i} className={cx('floating-particle', `particle-${i}`)}>
                     <FontAwesomeIcon icon={faBook} />
                 </div>
             ))}
 
-            {/* Content */}
             <div className={cx('register-container')}>
                 <div className={cx('content-grid')}>
-                    {/* Left side - Registration Form */}
                     <div className={cx('form-section')}>
-                        {/* Glass morphism card */}
                         <div className={cx('form-card')}>
-                            {/* Glow effect */}
                             <div className={cx('card-glow')} />
 
                             <div className={cx('card-content')}>
-                                {/* Mobile logo */}
                                 <div className={cx('mobile-logo')}>
                                     <FontAwesomeIcon icon={faBook} />
                                 </div>
@@ -300,7 +290,6 @@ function Register() {
 
                                 <form onSubmit={handleSubmit} className={cx('register-form')} noValidate>
                                     <div className={cx('form-grid')}>
-                                        {/* UserName Input */}
                                         <div className={cx('input-group')}>
                                             <label htmlFor="userName" className={cx('input-label')}>
                                                 Tên đăng nhập *
@@ -332,7 +321,6 @@ function Register() {
                                             )}
                                         </div>
 
-                                        {/* Email Input */}
                                         <div className={cx('input-group')}>
                                             <label htmlFor="email" className={cx('input-label')}>
                                                 Email *
@@ -364,7 +352,6 @@ function Register() {
                                             )}
                                         </div>
 
-                                        {/* Password Input */}
                                         <div className={cx('input-group')}>
                                             <label htmlFor="password" className={cx('input-label')}>
                                                 Mật khẩu *
@@ -406,7 +393,6 @@ function Register() {
                                             )}
                                         </div>
 
-                                        {/* Confirm Password Input */}
                                         <div className={cx('input-group')}>
                                             <label htmlFor="confirmPassword" className={cx('input-label')}>
                                                 Xác nhận mật khẩu *
@@ -450,7 +436,6 @@ function Register() {
                                             )}
                                         </div>
 
-                                        {/* First Name Input */}
                                         <div className={cx('input-group')}>
                                             <label htmlFor="firstName" className={cx('input-label')}>
                                                 Họ
@@ -477,7 +462,6 @@ function Register() {
                                             </div>
                                         </div>
 
-                                        {/* Last Name Input */}
                                         <div className={cx('input-group')}>
                                             <label htmlFor="lastName" className={cx('input-label')}>
                                                 Tên
@@ -504,7 +488,6 @@ function Register() {
                                             </div>
                                         </div>
 
-                                        {/* Phone Number Input */}
                                         <div className={cx('input-group')}>
                                             <label htmlFor="phoneNumber" className={cx('input-label')}>
                                                 Số điện thoại *
@@ -536,7 +519,6 @@ function Register() {
                                             )}
                                         </div>
 
-                                        {/* Address Input */}
                                         <div className={cx('input-group', 'full-width')}>
                                             <label htmlFor="address" className={cx('input-label')}>
                                                 Địa chỉ *
@@ -569,7 +551,6 @@ function Register() {
                                         </div>
                                     </div>
 
-                                    {/* Terms Checkbox */}
                                     <div className={cx('terms-section')}>
                                         <label className={cx('terms-label')}>
                                             <input type="checkbox" required />
@@ -587,7 +568,6 @@ function Register() {
                                         </label>
                                     </div>
 
-                                    {/* Submit Button */}
                                     <div className={cx('submit-section')}>
                                         <Button
                                             type="submit"
@@ -613,12 +593,10 @@ function Register() {
                                     </div>
                                 </form>
 
-                                {/* Divider */}
                                 <div className={cx('divider')}>
                                     <span>HOẶC</span>
                                 </div>
 
-                                {/* Social Register */}
                                 <div className={cx('social-register')}>
                                     <Button type="button" outline className={cx('social-button')}>
                                         <svg className={cx('social-icon')} viewBox="0 0 24 24">
@@ -649,7 +627,6 @@ function Register() {
                                     </Button>
                                 </div>
 
-                                {/* Login Link */}
                                 <div className={cx('login-link-section')}>
                                     <Button type="button" shine outline to="/login" className={cx('login-link')}>
                                         <FontAwesomeIcon icon={faArrowLeft} className={cx('login-link-icon')} />
@@ -660,7 +637,6 @@ function Register() {
                         </div>
                     </div>
 
-                    {/* Right side - Benefits */}
                     <div className={cx('benefits-section')}>
                         <div className={cx('benefits-content')}>
                             <div className={cx('branding-section')}>
@@ -675,7 +651,6 @@ function Register() {
                                 </div>
                             </div>
 
-                            {/* Benefits */}
                             <div className={cx('benefits-list')}>
                                 {benefits.map((benefit, index) => (
                                     <div key={index} className={cx('benefit-item', benefit.gradient)}>
@@ -690,7 +665,6 @@ function Register() {
                                 ))}
                             </div>
 
-                            {/* Testimonial */}
                             <div className={cx('testimonial-section')}>
                                 <div className={cx('testimonial-rating')}>
                                     {[...Array(testimonial.rating)].map((_, i) => (

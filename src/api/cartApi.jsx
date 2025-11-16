@@ -12,7 +12,6 @@ const cartApi = {
     addToCart: (payload) =>
         axiosClient.post('/cart-items/me/items', payload).catch((error) => {
             if (error.response?.status === 401 && !localStorage.getItem('access_token')) {
-                // Có thể redirect đến login hoặc throw error với message phù hợp
                 throw new Error('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
             }
             throw error;
@@ -44,7 +43,6 @@ const cartApi = {
 
     getCartItemCount: () =>
         axiosClient.get('/cart-items/me/items/count').catch((error) => {
-            // Nếu là 401 và không có token, trả về count = 0
             if (error.response?.status === 401 && !localStorage.getItem('access_token')) {
                 return { data: 0 };
             }

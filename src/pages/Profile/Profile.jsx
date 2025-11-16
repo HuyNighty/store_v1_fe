@@ -66,7 +66,6 @@ export default function Profile() {
             fd.append('file', file);
             const res = await customerApi.uploadProfileImage(fd);
             const result = res?.data?.result ?? res?.data ?? res;
-            // backend may return full path or url
             setUserInfo((prev) => ({ ...(prev || {}), profileImage: result ?? result?.path ?? result }));
             setImageError(false);
         } catch (err) {
@@ -95,7 +94,6 @@ export default function Profile() {
 
     const onImageError = () => setImageError(true);
 
-    // derived values (no fake data)
     const fullName = `${userInfo?.firstName ?? ''} ${userInfo?.lastName ?? ''}`.trim() || userInfo?.userName || '—';
     const avatarUrl = userInfo?.profileImage ? getImageUrl(userInfo.profileImage) : null;
 
@@ -169,7 +167,6 @@ export default function Profile() {
             </header>
 
             <main className={cx('main')}>
-                {/* Stats */}
                 <section className={cx('stats')}>
                     <div className={cx('stat-card')}>
                         <div className={cx('stat-left')}>
@@ -208,7 +205,6 @@ export default function Profile() {
                     </div>
                 </section>
 
-                {/* Personal Info (UI only) */}
                 <section className={cx('panel')}>
                     <div className={cx('panel-header')}>
                         <h2>Thông tin cá nhân</h2>
@@ -248,7 +244,6 @@ export default function Profile() {
                 </section>
             </main>
 
-            {/* hidden file input */}
             <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleUpload} />
         </div>
     );

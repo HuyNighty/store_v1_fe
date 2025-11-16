@@ -33,7 +33,6 @@ function BookTabs({
     handleSubmitReview,
     handleDeleteReview,
 }) {
-    // Tab definitions - dễ mở rộng
     const tabs = [
         { id: 'description', label: 'Mô tả sản phẩm' },
         { id: 'details', label: 'Thông tin chi tiết' },
@@ -41,11 +40,9 @@ function BookTabs({
         { id: 'shipping', label: 'Vận chuyển & Trả hàng' },
     ];
 
-    // refs cho keyboard navigation
     const tabRefs = useRef([]);
 
     useEffect(() => {
-        // đảm bảo focus vào tab active khi activeTab thay đổi (hữu ích khi đổi bằng code)
         const idx = tabs.findIndex((t) => t.id === activeTab);
         if (idx >= 0 && tabRefs.current[idx]) {
             tabRefs.current[idx].setAttribute('tabindex', '0');

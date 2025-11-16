@@ -7,8 +7,7 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Admin from '../pages/Admin';
 import Products from '../pages/Admin/components/Product';
-// import FooterOnly from '../Layouts/FooterOnly';
-// import Footer from '../Layouts/DefaultLayout/Footer';
+
 import Cart from '../pages/Cart';
 import Checkout from '../pages/Checkout';
 import UserOrders from '../pages/UserOrders';

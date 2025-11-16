@@ -42,7 +42,6 @@
     }
 }
 
-// Reviews Section Styles
 .reviews-container {
     padding: 20px 0;
 }
@@ -325,7 +324,6 @@
     padding: 40px 0;
 }
 
-// Responsive Design
 @media (max-width: 768px) {
     .review-summary {
         flex-direction: column;
@@ -366,7 +364,6 @@
     }
 }
 
-// Images Section
 .images-section {
     .main-image {
         position: relative;
@@ -435,7 +432,6 @@
     }
 }
 
-// Info Section
 .info-section {
     .product-title {
         margin: 0 0 20px 0;
@@ -717,9 +713,7 @@
         .wishlist-btn,
         .share-btn {
             border-color: transparent;
-            // width: 50px;
-            // height: 50px;
-            // border-radius: 50%;
+
             background-color: transparent;
             color: var(--primary-color);
 
@@ -770,7 +764,6 @@
     }
 }
 
-// Tabs Section
 .tabs-section {
     margin-top: 40px;
     border: 1px solid #e0e0e0;
@@ -970,7 +963,6 @@
     }
 }
 
-// Responsive
 @media (max-width: 768px) {
     .container {
         padding: 15px;

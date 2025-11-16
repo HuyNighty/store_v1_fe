@@ -33,7 +33,6 @@ function BookItem({ book }) {
     const imageUrl = productAssets[0]?.url || '/images/default-book.jpg';
     const displayPrice = salePrice ?? price;
 
-    // Load reviews khi component mount
     useEffect(() => {
         const loadReviews = async () => {
             if (!productId) return;

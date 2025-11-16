@@ -11,8 +11,8 @@ function Checkbox({
     checked = false,
     onChange,
     disabled = false,
-    size = 'medium', // 'small' | 'medium' | 'large'
-    variant = 'default', // 'default' | 'primary' | 'success' | 'warning' | 'danger'
+    size = 'medium',
+    variant = 'default',
     className,
     ...passProps
 }) {

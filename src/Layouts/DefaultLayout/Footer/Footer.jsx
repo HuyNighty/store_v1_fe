@@ -90,7 +90,6 @@ function Footer() {
                 </div>
             </div>
 
-            {/* --- Copyright --- */}
             <div className={cx('copyright')}>© 2025 BookStore. All rights reserved.</div>
         </footer>
     );

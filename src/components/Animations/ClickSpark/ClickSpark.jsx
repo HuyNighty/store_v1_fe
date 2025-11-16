@@ -1,4 +1,3 @@
-// ClickSpark.jsx
 import React, { useRef, useEffect, useCallback } from 'react';
 
 const ClickSpark = ({
@@ -10,14 +9,13 @@ const ClickSpark = ({
     easing = 'ease-out',
     extraScale = 1.0,
     children,
-    debug = false, // bật log khi cần
+    debug = false,
 }) => {
     const canvasRef = useRef(null);
     const sparksRef = useRef([]);
     const rafRef = useRef(null);
     const parentRef = useRef(null);
 
-    // Resize + DPR aware
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -33,10 +31,8 @@ const ClickSpark = ({
             const w = Math.round(rect.width);
             const h = Math.round(rect.height);
             if (!w || !h) return;
-            // set CSS size
             canvas.style.width = `${w}px`;
             canvas.style.height = `${h}px`;
-            // set backing store for DPR
             canvas.width = Math.round(w * dpr);
             canvas.height = Math.round(h * dpr);
             const ctx = canvas.getContext('2d');
@@ -48,7 +44,6 @@ const ClickSpark = ({
         resizeObserver = new ResizeObserver(resize);
         resizeObserver.observe(parent);
 
-        // also handle window resize
         window.addEventListener('resize', resize);
 
         return () => {
@@ -67,14 +62,12 @@ const ClickSpark = ({
                 case 'ease-in-out':
                     return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
                 default:
-                    // ease-out quadratic
                     return t * (2 - t);
             }
         },
         [easing],
     );
 
-    // draw loop
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -125,14 +118,13 @@ const ClickSpark = ({
         };
     }, [duration, easeFunc, extraScale]);
 
-    // add sparks
     const pushSparks = useCallback(
         (x, y) => {
             const now = performance.now();
             const newSparks = Array.from({ length: sparkCount }).map((_, i) => ({
                 x,
                 y,
-                angle: (2 * Math.PI * i) / sparkCount + (Math.random() - 0.5) * 0.2, // small random offset
+                angle: (2 * Math.PI * i) / sparkCount + (Math.random() - 0.5) * 0.2,
                 startTime: now,
                 radius: sparkRadius * (0.9 + Math.random() * 0.3),
                 size: sparkSize * (0.7 + Math.random() * 0.6),
@@ -144,17 +136,14 @@ const ClickSpark = ({
         [sparkCount, sparkRadius, sparkSize, sparkColor, debug],
     );
 
-    // robust event handler: use pointerdown capture so we catch before children that might stop propagation
     useEffect(() => {
         const parent = parentRef.current;
         if (!parent) return;
         const handler = (ev) => {
-            // compute relative coordinates to parent
             const rect = parent.getBoundingClientRect();
             const x = ev.clientX - rect.left;
             const y = ev.clientY - rect.top;
 
-            // if parent size is zero -> ignore
             if (rect.width === 0 || rect.height === 0) {
                 if (debug) console.warn('[ClickSpark] parent rect is zero, ignore click');
                 return;
@@ -163,7 +152,6 @@ const ClickSpark = ({
             pushSparks(x, y);
         };
 
-        // pointerdown captures mouse + touch
         parent.addEventListener('pointerdown', handler, { capture: true, passive: true });
 
         return () => {
@@ -171,7 +159,6 @@ const ClickSpark = ({
         };
     }, [pushSparks, debug]);
 
-    // render
     return (
         <div
             style={{
@@ -190,7 +177,7 @@ const ClickSpark = ({
                     position: 'absolute',
                     top: 0,
                     left: 0,
-                    pointerEvents: 'none', // canvas shouldn't block clicks
+                    pointerEvents: 'none',
                     zIndex: 9999,
                 }}
             />

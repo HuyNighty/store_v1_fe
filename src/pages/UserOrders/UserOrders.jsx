@@ -5,17 +5,15 @@ import orderApi from '../../api/orderApi';
 import OrderStatus from '../../components/OrderStatus/OrderStatus';
 import Button from '../../Layouts/components/Button';
 import { useToast } from '../../contexts/Toast/ToastContext';
-import { useAuth } from '../../contexts/Auth/AuthContext'; // Thêm import useAuth
+import { useAuth } from '../../contexts/Auth/AuthContext';
 
 const cx = classNames.bind(styles);
 
-// Đưa hàm formatPrice ra ngoài component
 const formatPrice = (price) => {
     if (!price) return '0';
     return (price / 1000).toLocaleString();
 };
 
-// Component con để hiển thị từng sản phẩm
 const OrderItem = ({ item }) => {
     return (
         <div className={cx('order-item')}>
@@ -42,7 +40,7 @@ function UserOrders() {
     const [cancellingOrder, setCancellingOrder] = useState(null);
     const [deletingOrder, setDeletingOrder] = useState(null);
     const { addToast } = useToast();
-    const { isAuthenticated } = useAuth(); // Sử dụng useAuth
+    const { isAuthenticated } = useAuth();
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -72,7 +70,7 @@ function UserOrders() {
         try {
             await orderApi.cancelOrder(orderId);
             addToast('Đã hủy đơn hàng thành công', 'success');
-            fetchOrders(); // Refresh danh sách
+            fetchOrders();
         } catch (error) {
             console.error('Error cancelling order:', error);
             const errorMessage = error.response?.data?.message || 'Lỗi khi hủy đơn hàng';
@@ -91,7 +89,7 @@ function UserOrders() {
         try {
             await orderApi.deleteOrder(orderId);
             addToast('Đã xóa đơn hàng thành công', 'success');
-            // Cập nhật UI ngay lập tức
+
             setOrders((prevOrders) => prevOrders.filter((order) => order.orderId !== orderId));
         } catch (error) {
             console.error('Error deleting order:', error);
@@ -103,7 +101,6 @@ function UserOrders() {
     };
 
     const handleConfirmReceived = async (orderId, orderNumber) => {
-        // TODO: Thêm API xác nhận đã nhận hàng nếu backend có
         addToast(`Đã xác nhận nhận hàng cho đơn hàng #${orderNumber}`, 'success');
     };
 
@@ -117,7 +114,6 @@ function UserOrders() {
         });
     };
 
-    // Phân loại đơn hàng theo trạng thái
     const activeOrders = orders.filter(
         (order) => order.statusOrder !== 'CANCELLED' && order.statusOrder !== 'COMPLETED',
     );
@@ -166,7 +162,6 @@ function UserOrders() {
                 </div>
             ) : (
                 <div className={cx('orders-container')}>
-                    {/* Đơn hàng đang hoạt động */}
                     {activeOrders.length > 0 && (
                         <div className={cx('orders-section')}>
                             <h2>Đơn hàng đang xử lý ({activeOrders.length})</h2>
@@ -187,7 +182,6 @@ function UserOrders() {
                         </div>
                     )}
 
-                    {/* Đơn hàng đã hoàn thành */}
                     {completedOrders.length > 0 && (
                         <div className={cx('orders-section')}>
                             <h2>Đơn hàng đã hoàn thành ({completedOrders.length})</h2>
@@ -208,7 +202,6 @@ function UserOrders() {
                         </div>
                     )}
 
-                    {/* Đơn hàng đã hủy */}
                     {cancelledOrders.length > 0 && (
                         <div className={cx('orders-section')}>
                             <h2>Đơn hàng đã hủy ({cancelledOrders.length})</h2>
@@ -234,7 +227,6 @@ function UserOrders() {
     );
 }
 
-// Component con để hiển thị từng order card
 const OrderCard = ({ order, onCancel, onConfirm, onDelete, cancellingOrder, deletingOrder, formatDate }) => {
     return (
         <div className={cx('order-card')}>

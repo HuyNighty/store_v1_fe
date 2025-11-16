@@ -1,4 +1,3 @@
-// Button.js - Đảm bảo có xử lý state
 import classNames from 'classnames/bind';
 import styles from './Button.module.scss';
 import { Link, useLocation } from 'react-router-dom';
@@ -8,7 +7,7 @@ const cx = classNames.bind(styles);
 function Button({
     to,
     href,
-    state, // Đảm bảo có prop state
+    state,
     primary,
     outline,
     secondary,
@@ -73,12 +72,10 @@ function Button({
         ...passProps,
     };
 
-    // QUAN TRỌNG: Thêm state vào props nếu có
     if (to && state) {
         props.state = state;
     }
 
-    // Remove event listeners when button is disabled
     if (disabled) {
         Object.keys(props).forEach((key) => {
             if (key.startsWith('on') && typeof props[key] === 'function') {

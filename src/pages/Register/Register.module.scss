@@ -5,7 +5,6 @@
     font-family: var(--font-family-primary);
 }
 
-// Background styles
 .background-overlay {
     position: absolute;
     inset: 0;
@@ -14,6 +13,7 @@
         position: absolute;
         inset: 0;
         background-image: url('https://images.unsplash.com/photo-1648405898502-c07cdf83d1af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920');
+
         background-size: cover;
         background-position: center;
     }
@@ -40,7 +40,6 @@
     display: flex;
 }
 
-// Floating particles
 .floating-particle {
     position: absolute;
     display: none;
@@ -112,7 +111,6 @@
     }
 }
 
-// Main container - SỬA QUAN TRỌNG
 .register-container {
     position: relative;
     z-index: 10;
@@ -200,7 +198,6 @@
     }
 }
 
-// Form Header - SỬA CĂN CHỈNH
 .form-header {
     display: flex;
     justify-content: space-between;
@@ -613,7 +610,6 @@
     }
 }
 
-// Benefits section - SỬA LAYOUT
 .benefits-section {
     color: var(--white);
     display: none;
@@ -816,7 +812,6 @@
     }
 }
 
-// Animations
 @keyframes scaleIn {
     from {
         opacity: 0;
@@ -837,7 +832,6 @@
     }
 }
 
-// Responsive design - SỬA QUAN TRỌNG
 @media (max-width: 1023px) {
     .content-grid {
         grid-template-columns: 1fr;
@@ -909,7 +903,6 @@
     }
 }
 
-// Mobile-specific fixes
 @media (max-width: 375px) {
     .form-card .card-content {
         padding: 16px;

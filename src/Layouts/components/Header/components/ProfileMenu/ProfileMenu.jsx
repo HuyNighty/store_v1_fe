@@ -16,7 +16,6 @@ function ProfileMenu({ onProfileInteract, onLogout, user }) {
         { key: 3, label: 'Đăng xuất', icon: faRightFromBracket, onClick: onLogout },
     ];
 
-    // Hàm để xử lý URL ảnh
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
 

@@ -1,4 +1,3 @@
-// ImageGrid.jsx (đã sửa)
 import classNames from 'classnames/bind';
 import styles from './ImageGrid.module.scss';
 import Button from '../../../../Layouts/components/Button';

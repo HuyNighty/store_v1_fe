@@ -22,7 +22,6 @@
         }
     }
 
-    // Sizes
     &.small {
         font-size: 1.2rem;
 
@@ -77,7 +76,6 @@
         }
     }
 
-    // Variants
     &.primary {
         .checkmark {
             border-color: var(--primary-color);
@@ -135,7 +133,6 @@
     }
 }
 
-// Hide default checkbox
 .checkbox input[type='checkbox'] {
     position: absolute;
     opacity: 0;
@@ -144,7 +141,6 @@
     height: 0;
 }
 
-// Custom checkmark
 .checkmark {
     position: relative;
     display: inline-block;
@@ -166,7 +162,6 @@
     }
 }
 
-// Checked state
 .checkbox input[type='checkbox']:checked + .checkmark {
     border-color: var(--primary-color);
     background-color: var(--primary-color);
@@ -176,7 +171,6 @@
     }
 }
 
-// Checked state for variants
 .checkbox.primary input[type='checkbox']:checked + .checkmark {
     border-color: var(--primary-color);
     background-color: var(--primary-color);
@@ -197,14 +191,12 @@
     background-color: var(--danger-color);
 }
 
-// Label
 .label {
     color: var(--text-color);
     font-weight: 500;
     line-height: 1.2;
 }
 
-// Focus state
 .checkbox input[type='checkbox']:focus + .checkmark {
     box-shadow: 0 0 0 3px rgba(147, 125, 107, 0.15);
     border-color: var(--primary-color);

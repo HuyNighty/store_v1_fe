@@ -27,7 +27,6 @@
         transform: scale(1);
     }
 
-    // variant: header trong suốt (trên Hero)
     &.transparent {
         color: var(--white);
 
@@ -36,7 +35,6 @@
         }
     }
 
-    // variant: header có background (sau scroll)
     &.solid {
         color: var(--primary-color-bold);
 
@@ -46,14 +44,13 @@
         }
     }
 
-    // Icon dùng currentColor để dễ thay đổi màu
     .icon-btn {
         font-size: 18px;
         width: var(--icon-size);
         height: auto;
         display: inline-block;
         line-height: 1;
-        // đảm bảo icon nhận màu từ color trên container
+
         color: currentColor;
     }
 

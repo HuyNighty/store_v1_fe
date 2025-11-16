@@ -1,4 +1,3 @@
-// src/hooks/useProductImage.js
 import { useState, useEffect } from 'react';
 import productApi from '../api/productApi';
 

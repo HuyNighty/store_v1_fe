@@ -1,4 +1,3 @@
-// src/pages/Checkout/Checkout.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
@@ -21,17 +20,15 @@ function Checkout() {
     const [formData, setFormData] = useState({
         shippingAddress: '',
         note: '',
-        paymentMethod: 'COD', // Mặc định thanh toán khi nhận hàng
+        paymentMethod: 'COD',
     });
 
-    // Payment methods
     const paymentMethods = [
         { value: 'COD', label: 'Thanh toán khi nhận hàng (COD)', icon: faTruck },
         { value: 'BANK_TRANSFER', label: 'Chuyển khoản ngân hàng', icon: faCreditCard },
         { value: 'CREDIT_CARD', label: 'Thẻ tín dụng/Ghi nợ', icon: faCreditCard },
     ];
 
-    // Format price function - Đưa ra ngoài component hoặc dùng useCallback
     const formatPrice = useCallback((price) => {
         if (typeof price !== 'number' || isNaN(price)) {
             return '0';
@@ -40,12 +37,11 @@ function Checkout() {
     }, []);
 
     useEffect(() => {
-        // Redirect nếu giỏ hàng trống
         if (cartItems.length === 0) {
             addToast('Giỏ hàng trống, vui lòng thêm sản phẩm', 'warning');
             navigate('/cart');
         }
-    }, [cartItems, navigate, addToast]); // Chỉ phụ thuộc vào các giá trị thực sự thay đổi
+    }, [cartItems, navigate, addToast]);
 
     const handleBack = () => {
         navigate(-1);
@@ -88,12 +84,10 @@ function Checkout() {
             const response = await orderApi.checkout(orderData);
             console.log('Order created:', response.data);
 
-            // Xóa giỏ hàng sau khi đặt hàng thành công
             await clearCart();
 
             addToast('Đặt hàng thành công!', 'success');
 
-            // Chuyển hướng đến trang xác nhận đơn hàng
             navigate('/order-success', {
                 state: {
                     order: response.data.result,
@@ -110,12 +104,11 @@ function Checkout() {
     };
 
     const totalPrice = getTotalPrice();
-    const shippingCost = totalPrice >= 300000 ? 0 : 30000; // Miễn phí ship từ 300k
+    const shippingCost = totalPrice >= 300000 ? 0 : 30000;
     const finalTotal = totalPrice + shippingCost;
 
     return (
         <div className={cx('container')}>
-            {/* Header */}
             <div className={cx('header')}>
                 <Button back onClick={handleBack}>
                     <FontAwesomeIcon icon={faArrowLeft} />
@@ -125,7 +118,6 @@ function Checkout() {
 
             <div className={cx('content')}>
                 <form onSubmit={handleSubmitOrder} className={cx('checkout-form')}>
-                    {/* Thông tin giao hàng */}
                     <div className={cx('section')}>
                         <h2 className={cx('section-title')}>
                             <FontAwesomeIcon icon={faMapMarkerAlt} />
@@ -158,7 +150,6 @@ function Checkout() {
                         </div>
                     </div>
 
-                    {/* Phương thức thanh toán */}
                     <div className={cx('section')}>
                         <h2 className={cx('section-title')}>
                             <FontAwesomeIcon icon={faCreditCard} />
@@ -184,7 +175,6 @@ function Checkout() {
                         </div>
                     </div>
 
-                    {/* Tóm tắt đơn hàng */}
                     <div className={cx('section')}>
                         <h2 className={cx('section-title')}>Tóm tắt đơn hàng</h2>
 
@@ -238,7 +228,6 @@ function Checkout() {
                         </div>
                     </div>
 
-                    {/* Nút đặt hàng */}
                     <div className={cx('checkout-actions')}>
                         <Button
                             shine

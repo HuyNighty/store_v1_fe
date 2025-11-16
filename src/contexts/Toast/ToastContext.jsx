@@ -30,7 +30,6 @@ export const ToastProvider = ({ children }) => {
             },
         ]);
 
-        // Update progress bar
         const progressInterval = setInterval(() => {
             setToasts((prev) =>
                 prev.map((toast) =>
@@ -44,13 +43,11 @@ export const ToastProvider = ({ children }) => {
             );
         }, 100);
 
-        // Start slide out
         setTimeout(() => {
             setToasts((prev) => prev.map((toast) => (toast.id === id ? { ...toast, visible: false } : toast)));
             clearInterval(progressInterval);
         }, duration - 500);
 
-        // Remove toast
         setTimeout(() => {
             setToasts((prev) => prev.filter((toast) => toast.id !== id));
             clearInterval(progressInterval);
@@ -94,7 +91,7 @@ export const ToastProvider = ({ children }) => {
                         <div className={cx('toast-content')}>
                             <span className={cx('toast-message')}>{toast.message}</span>
                         </div>
-                        {/* Progress Bar */}
+
                         <div className={cx('toast-progress')} style={{ width: `${toast.progress}%` }} />
                     </div>
                 ))}

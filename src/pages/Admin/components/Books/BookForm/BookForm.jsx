@@ -1,4 +1,3 @@
-// src/components/Admin/Books/BookForm.jsx
 import React, { useState, useEffect } from 'react';
 import Checkbox from '../../../../../Layouts/components/Checkbox';
 import QuantityInput from '../../../../../Layouts/components/QuantityInput';
@@ -125,7 +124,6 @@ export default function BookForm({
         }
     }, [initialData]);
 
-    // basic handlers
     const handleInputChange = (field, value) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
         if (fieldErrors[field]) setFieldErrors((prev) => ({ ...prev, [field]: '' }));
@@ -149,7 +147,6 @@ export default function BookForm({
         });
     };
 
-    // file handlers
     const handleFileChange = (e) => {
         const selectedFile = e.target.files?.[0] ?? null;
         setFile(selectedFile);
@@ -167,7 +164,6 @@ export default function BookForm({
         setFormData((prev) => ({ ...prev, url: '', fileName: '', mimeType: '', sizeBytes: 0 }));
     };
 
-    // validation helpers
     const isValidUrl = (string) => {
         try {
             new URL(string);
@@ -177,7 +173,6 @@ export default function BookForm({
         }
     };
 
-    // Full validation — used for create
     const validateFullForm = () => {
         const errors = {};
         if (!formData.sku?.trim()) errors.sku = 'Vui lòng điền vào trường này.';
@@ -196,54 +191,43 @@ export default function BookForm({
         return Object.keys(errors).length === 0;
     };
 
-    // Partial validation — used for edit: validate only fields with values (or changed)
     const validatePartialForm = () => {
         const errors = {};
 
-        // slug: nếu user nhập slug thì check format
         if (formData.slug && formData.slug.toString().trim() !== '') {
             if (!/^[a-z0-9-]+$/.test(String(formData.slug))) {
                 errors.slug = 'Slug chỉ chứa chữ thường, số và dấu "-".';
             }
         }
 
-        // productName: nếu có nhập thì non-empty
         if (formData.productName && formData.productName.toString().trim() === '') {
             errors.productName = 'Vui lòng nhập tên sản phẩm nếu muốn cập nhật.';
         }
 
-        // price: chỉ validate khi người dùng nhập giá (không rỗng)
         if (formData.price !== '' && formData.price !== null && formData.price !== undefined) {
             if (isNaN(formData.price) || Number(formData.price) < 0) {
                 errors.price = 'Price phải là số >= 0.';
             }
         }
 
-        // stockQuantity: nếu người dùng thay đổi
         if (formData.stockQuantity !== '' && formData.stockQuantity !== null && formData.stockQuantity !== undefined) {
             if (isNaN(formData.stockQuantity) || Number(formData.stockQuantity) < 0) {
                 errors.stockQuantity = 'Stock quantity phải là số nguyên >= 0.';
             }
         }
 
-        // url: nếu có nhập -> check
         if (formData.url && formData.url.toString().trim() !== '') {
             if (!isValidUrl(formData.url)) errors.url = 'Cover URL không hợp lệ.';
         }
 
-        // categoryIds: nếu user thay đổi categories (dữ liệu rỗng hoặc chiều dài === 0) -> báo lỗi
-        // BUT: trong edit, nếu user muốn clear categories intentionally, backend sẽ xử lý.
-        // Ở đây ta chỉ báo lỗi khi admin gửi mảng rỗng (tùy em muốn buộc hay cho phép).
         if (Array.isArray(formData.categoryIds) && formData.categoryIds.length === 0) {
-            // optional: comment out this line if you want to allow clearing categories
-            // errors.categoryIds = 'Vui lòng chọn ít nhất một thể loại.';
+            /* empty */
         }
 
         setFieldErrors(errors);
         return Object.keys(errors).length === 0;
     };
 
-    // prepare request payload (same as before)
     const prepareFullBookRequest = () => {
         const request = {
             sku: formData.sku,
@@ -269,20 +253,17 @@ export default function BookForm({
         return request;
     };
 
-    // submit
     const handleSubmitLocal = async (e) => {
         e.preventDefault();
         setMessage('');
         setFieldErrors({});
 
-        // create -> full validation
         if (mode === 'create') {
             if (!validateFullForm()) {
                 setMessage('Vui lòng sửa các lỗi validation bên dưới.');
                 return;
             }
         } else {
-            // edit -> partial validation only
             if (!validatePartialForm()) {
                 setMessage('Vui lòng sửa các trường hợp hợp lệ trước khi gửi.');
                 return;
@@ -295,14 +276,12 @@ export default function BookForm({
         }
     };
 
-    // Render
     return (
         <form className={cx('form')} onSubmit={handleSubmitLocal}>
             <div className={cx('headerContainer')}>
                 <h3 className={cx('header')}>{mode === 'edit' ? 'Edit Book' : 'Create Book'}</h3>
             </div>
 
-            {/* Product fields */}
             <div className={cx('fieldGroup')}>
                 <FormField
                     name="sku"
@@ -389,7 +368,6 @@ export default function BookForm({
                 </div>
             </div>
 
-            {/* Categories */}
             <div className={cx('categorySection')}>
                 <div className={cx('form-group', { invalid: !!fieldErrors.categoryIds })}>
                     <label>Categories {mode === 'create' && <span className={cx('required')}>*</span>}</label>
@@ -411,7 +389,6 @@ export default function BookForm({
                 </div>
             </div>
 
-            {/* Cover */}
             <h4 className={cx('sectionTitle')}>Cover (Optional)</h4>
             <div className={cx('coverSection')}>
                 <div className={cx('fileRow')}>
@@ -446,7 +423,6 @@ export default function BookForm({
                 />
             </div>
 
-            {/* Author */}
             <h4 className={cx('sectionTitle')}>Author (Optional)</h4>
             <div className={cx('authorSection')}>
                 <FormField

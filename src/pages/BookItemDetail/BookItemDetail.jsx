@@ -10,7 +10,6 @@ import { useWishlist } from '../../contexts/Wishlist/WishlistContext';
 import { useAuth } from '../../contexts/Auth/AuthContext';
 import reviewApi from '../../api/reviewApi';
 
-// Import components
 import BookImages from './components/BookImages';
 import BookInfo from './components/BookInfo';
 import BookTabs from './components/BookTabs';
@@ -25,14 +24,12 @@ function BookItemDetail() {
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { addToast } = useToast();
 
-    // State management
     const [quantity, setQuantity] = useState(1);
     const [addingToCart, setAddingToCart] = useState(false);
     const [activeTab, setActiveTab] = useState('description');
     const [selectedImage, setSelectedImage] = useState(0);
     const [isWishlisted, setIsWishlisted] = useState(false);
 
-    // Review state
     const [userRating, setUserRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [reviewComment, setReviewComment] = useState('');
@@ -43,7 +40,6 @@ function BookItemDetail() {
     const { user } = useAuth();
     const isAdmin = user?.role === 'ADMIN';
 
-    // Định nghĩa các hàm trước useEffect
     const loadReviews = useCallback(async () => {
         if (!book?.productId) return;
 
@@ -138,14 +134,12 @@ function BookItemDetail() {
             const halfStar = displayRating >= i - 0.5 && displayRating < i;
 
             if (interactive) {
-                // Interactive stars - cho phép chọn nửa sao
                 stars.push(
                     <div
                         key={i}
                         className={cx('star-container')}
                         style={{ position: 'relative', display: 'inline-block' }}
                     >
-                        {/* Nửa TRÁI - chọn NỬA SAO (0.5, 1.5, 2.5, ...) */}
                         <div
                             style={{
                                 position: 'absolute',
@@ -159,7 +153,7 @@ function BookItemDetail() {
                             onClick={() => onStarClick && onStarClick(i - 0.5)}
                             onMouseEnter={() => onStarHover && onStarHover(i - 0.5)}
                         />
-                        {/* Nửa PHẢI - chọn SAO ĐẦY (1, 2, 3, ...) */}
+
                         <div
                             style={{
                                 position: 'absolute',
@@ -173,7 +167,7 @@ function BookItemDetail() {
                             onClick={() => onStarClick && onStarClick(i)}
                             onMouseEnter={() => onStarHover && onStarHover(i)}
                         />
-                        {/* Ngôi sao hiển thị */}
+
                         {fullStar ? (
                             <FaStar
                                 className={cx('star', 'filled', 'interactive')}
@@ -208,7 +202,6 @@ function BookItemDetail() {
                     </div>,
                 );
             } else {
-                // Non-interactive stars - chỉ hiển thị
                 if (fullStar) {
                     stars.push(
                         <FaStar
@@ -249,7 +242,7 @@ function BookItemDetail() {
 
     const handleStarClick = (rating) => {
         setUserRating(rating);
-        console.log('Selected rating:', rating); // Debug
+        console.log('Selected rating:', rating);
     };
 
     const handleStarHover = (rating) => {
@@ -321,7 +314,6 @@ function BookItemDetail() {
         }
     };
 
-    // Navigation and action handlers
     const handleBack = () => {
         navigate(-1);
     };
@@ -423,7 +415,6 @@ function BookItemDetail() {
         );
     }
 
-    // Destructure book data
     const {
         productId,
         productName,
@@ -445,13 +436,11 @@ function BookItemDetail() {
         isbn,
     } = book;
 
-    // Calculated values
     const displayPrice = salePrice ?? price;
     const discountPercent = salePrice && price ? Math.round((1 - salePrice / price) * 100) : 0;
     const isInCart = isItemInCart(productId);
     const cartQuantity = getItemQuantity(productId);
 
-    // Tính averageRating từ reviews thực tế
     const averageRating =
         reviews.length > 0 ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length : rating;
 
@@ -459,7 +448,6 @@ function BookItemDetail() {
 
     return (
         <div className={cx('container')}>
-            {/* Header */}
             <div className={cx('header')}>
                 <Button shine outline back onClick={handleBack}>
                     ←
@@ -482,7 +470,6 @@ function BookItemDetail() {
                 )}
             </div>
 
-            {/* Breadcrumb */}
             <div className={cx('breadcrumb')}>
                 <span onClick={() => navigate('/')}>Trang chủ</span>
                 <span>/</span>
@@ -491,7 +478,6 @@ function BookItemDetail() {
                 <span className={cx('current')}>{productName}</span>
             </div>
 
-            {/* Main Content */}
             <div className={cx('content')}>
                 <BookImages
                     productName={productName}
@@ -538,7 +524,6 @@ function BookItemDetail() {
                 />
             </div>
 
-            {/* Additional Info Tabs */}
             <BookTabs
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}

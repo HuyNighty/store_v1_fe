@@ -77,12 +77,10 @@ function Admin() {
 
     return (
         <div className={cx('wrapper')}>
-            {/* Header */}
             <div className={cx('header')}>
                 <h1 className={cx('title')}>Dashboard</h1>
             </div>
 
-            {/* Stats Grid */}
             <div className={cx('stats-grid')}>
                 {statsData.map((stat, index) => (
                     <div key={index} className={cx('stat-card')} style={{ backgroundColor: stat.color }}>
@@ -107,7 +105,6 @@ function Admin() {
                 ))}
             </div>
 
-            {/* Quick Actions */}
             <div className={cx('quick-actions')}>
                 <h2 className={cx('section-title')}>Quick Actions</h2>
                 <div className={cx('actions-grid')}>

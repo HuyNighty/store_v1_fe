@@ -1,4 +1,3 @@
-// src/.../BookInfo.jsx
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
@@ -106,7 +105,6 @@ function BookInfo({
         <div className={cx('info-section')}>
             <h1 className={cx('product-title')}>{productName || 'Tên sách chưa có'}</h1>
 
-            {/* SKU & Categories */}
             <div className={cx('meta-info')}>
                 <div className={cx('meta-item')}>
                     <FontAwesomeIcon icon={faTags} />
@@ -127,7 +125,6 @@ function BookInfo({
                 )}
             </div>
 
-            {/* Authors */}
             <div className={cx('authors-section')}>
                 <h3>
                     <FontAwesomeIcon icon={faBook} />
@@ -162,7 +159,6 @@ function BookInfo({
                 )}
             </div>
 
-            {/* Rating */}
             <div className={cx('rating-section')}>
                 <div className={cx('rating-stars')}>
                     {typeof renderStars === 'function' ? (
@@ -185,7 +181,6 @@ function BookInfo({
                 </Button>
             </div>
 
-            {/* Price */}
             <div className={cx('price-section')}>
                 <div className={cx('price')}>
                     <span className={cx('current-price')}>{formatVND(priceToShow)}</span>
@@ -199,7 +194,6 @@ function BookInfo({
                 </div>
             </div>
 
-            {/* Book Details */}
             <div className={cx('book-details')}>
                 <h3>Thông tin sách</h3>
                 <div className={cx('details-grid')}>
@@ -246,7 +240,6 @@ function BookInfo({
             </div>
 
             <div className={cx('wishlist-wrapper')}>
-                {/* Quantity */}
                 <div className={cx('quantity-section')}>
                     <label htmlFor="qty-input">Số lượng: </label>
                     <QuantityInput
@@ -260,7 +253,6 @@ function BookInfo({
                     {isInCart && <p className={cx('cart-notice')}>Đã có {cartQuantity} sản phẩm trong giỏ hàng</p>}
                 </div>
 
-                {/* Wishlist toggle */}
                 <Button
                     shine
                     outline
@@ -276,7 +268,6 @@ function BookInfo({
                 </Button>
             </div>
 
-            {/* Stock */}
             <div className={cx('stock-section')}>
                 <div
                     className={cx('stock-status', {
@@ -291,9 +282,7 @@ function BookInfo({
                 </div>
             </div>
 
-            {/* Actions (Add to cart + Wishlist + Buy now) */}
             <div className={cx('action-buttons')}>
-                {/* Add / Update Cart */}
                 {isInCart ? (
                     <Button
                         height={5}
@@ -325,7 +314,6 @@ function BookInfo({
                     </Button>
                 )}
 
-                {/* Buy now */}
                 <Button
                     height={5}
                     shine

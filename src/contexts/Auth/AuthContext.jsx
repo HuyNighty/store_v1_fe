@@ -1,10 +1,8 @@
-// src/contexts/Auth/AuthContext.jsx
 import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import authApi from '../../api/authApi';
 import customerApi from '../../api/customerApi';
 import * as jwtDecodeLib from 'jwt-decode';
 
-// Context mặc định
 export const AuthContext = createContext({
     isAuthenticated: false,
     user: null,
@@ -13,7 +11,6 @@ export const AuthContext = createContext({
     loading: false,
 });
 
-// --- Utility: safe JWT decode (thích ứng với nhiều dạng export của package) ---
 const safeJwtDecode = (token) => {
     if (!token) return null;
 
@@ -29,7 +26,6 @@ const safeJwtDecode = (token) => {
         }
     }
 
-    // Fallback: decode payload bằng base64url (chỉ giải mã payload, KHÔNG verify signature)
     try {
         const parts = token.split('.');
         if (parts.length < 2) return null;
@@ -51,7 +47,6 @@ const safeJwtDecode = (token) => {
     }
 };
 
-// --- Utility: normalize/parse roles từ nhiều cấu trúc token/API khác nhau ---
 function parseRolesFromDecoded(decoded) {
     if (!decoded) return [];
 
@@ -91,13 +86,11 @@ function parseRolesFromDecoded(decoded) {
     return Array.from(rolesSet);
 }
 
-// --- Provider ---
 export function AuthProvider({ children }) {
     const [isAuthenticated, setIsAuthenticated] = useState(Boolean(localStorage.getItem('access_token')));
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // decode từ token -> user minimal (chỉ dùng làm fallback & initial)
     const decodeUserFromToken = (token) => {
         try {
             const decoded = safeJwtDecode(token);
@@ -119,18 +112,12 @@ export function AuthProvider({ children }) {
         }
     };
 
-    /**
-     * fetchUser(decodedFromToken)
-     * - decodedFromToken: optional object returned from decodeUserFromToken(token)
-     * - nếu API profile trả về roles rỗng -> fallback dùng roles từ decodedFromToken
-     */
     const fetchUser = useCallback(async (decodedFromToken = null) => {
         try {
             const customerRes = await customerApi.getMyProfile();
             const customerData = customerRes.data?.result;
 
             if (customerData) {
-                // normalize roles từ customerData
                 let roles =
                     Array.isArray(customerData.roles) && customerData.roles.length
                         ? customerData.roles
@@ -145,7 +132,6 @@ export function AuthProvider({ children }) {
                         ? customerData.scope.split(/\s+/).map((r) => r.toUpperCase())
                         : [];
 
-                // fallback: nếu API trả rỗng thì dùng token decode (nếu có)
                 if ((!roles || roles.length === 0) && decodedFromToken?.roles?.length) {
                     roles = decodedFromToken.roles;
                 }
@@ -172,7 +158,6 @@ export function AuthProvider({ children }) {
                 return;
             }
 
-            // fallback to authApi.me()
             const authRes = await authApi.me();
             const authData = authRes.data?.result;
             if (authData) {
@@ -216,7 +201,6 @@ export function AuthProvider({ children }) {
                 return;
             }
 
-            // nếu cả 2 API đều không trả user, dùng decoded token (nếu có) như fallback cuối cùng
             if (decodedFromToken) {
                 console.log('[Auth] fetchUser -> using decoded token as fallback user:', decodedFromToken);
                 setUser(decodedFromToken);
@@ -224,7 +208,6 @@ export function AuthProvider({ children }) {
         } catch (e) {
             console.warn('[AuthContext] fetchUser failed:', e?.response?.status || e.message);
 
-            // Nếu customer API 404/400 thử fallback authApi.me một lần nữa
             if (e?.response?.status === 404 || e?.response?.status === 400) {
                 try {
                     const authRes = await authApi.me();
@@ -288,11 +271,9 @@ export function AuthProvider({ children }) {
             if (token) {
                 const decodedUser = decodeUserFromToken(token);
                 if (decodedUser) {
-                    // set tạm user từ token để UI phản hồi nhanh
                     setUser(decodedUser);
                     setIsAuthenticated(true);
 
-                    // fetch profile từ server, truyền decoded token để fallback roles nếu cần
                     await fetchUser(decodedUser);
                 } else {
                     localStorage.removeItem('access_token');
@@ -323,10 +304,9 @@ export function AuthProvider({ children }) {
 
             const decodedUser = decodeUserFromToken(token);
             if (decodedUser) {
-                setUser(decodedUser); // set tạm user
+                setUser(decodedUser);
             }
 
-            // fetch server-side profile and merge roles using decodedUser as fallback
             await fetchUser(decodedUser);
             return true;
         } catch (error) {
@@ -353,7 +333,6 @@ export function AuthProvider({ children }) {
 
     const refreshUserData = async () => {
         if (isAuthenticated) {
-            // nếu có token, decode để cung cấp fallback roles
             const token = localStorage.getItem('access_token');
             const decoded = token ? decodeUserFromToken(token) : null;
             await fetchUser(decoded);
@@ -372,7 +351,6 @@ export function AuthProvider({ children }) {
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-// Hook tiện lợi
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {

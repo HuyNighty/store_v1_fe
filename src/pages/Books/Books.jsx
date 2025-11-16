@@ -1,4 +1,3 @@
-// src/pages/Books/Books.jsx
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Books.module.scss';
@@ -14,7 +13,6 @@ import Button from '../../Layouts/components/Button';
 
 const cx = classNames.bind(styles);
 
-// Hook debounce nhỏ gọn
 function useDebounced(value, delay = 250) {
     const [v, setV] = useState(value);
     useEffect(() => {
@@ -25,7 +23,6 @@ function useDebounced(value, delay = 250) {
 }
 
 function Books() {
-    // --- states
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('Most Popular');
     const [selectedCategory, setSelectedCategory] = useState('All');
@@ -34,7 +31,6 @@ function Books() {
     const [openSort, setOpenSort] = useState(false);
     const [openRating, setOpenRating] = useState(false);
 
-    // advanced filters (client)
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
     const [minRating, setMinRating] = useState('0');
@@ -49,10 +45,8 @@ function Books() {
 
     const debouncedSearch = useDebounced(searchQuery, 300);
 
-    // quantity map: key -> quantity (for each book)
     const [quantities, setQuantities] = useState({});
 
-    // helper to extract array from various backend shapes
     const extractArray = (payload) => {
         if (!payload) return [];
         if (Array.isArray(payload)) return payload;
@@ -63,7 +57,6 @@ function Books() {
         return [];
     };
 
-    // Fetch categories
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -105,7 +98,6 @@ function Books() {
         fetchCategories();
     }, []);
 
-    // Fetch books (unchanged logic)
     useEffect(() => {
         const isActiveTrue = (v) => {
             if (v === true) return true;
@@ -181,7 +173,6 @@ function Books() {
         fetchBooks();
     }, [debouncedSearch, selectedCategoryId, minPrice, maxPrice]);
 
-    // --- helpers (normalize ids)
     const normalizeId = (v) => {
         if (v === null || v === undefined) return null;
         if (typeof v === 'number') {
@@ -193,7 +184,6 @@ function Books() {
         return s;
     };
 
-    // Build category tree (unchanged)
     const buildCategoryTree = (categoriesList) => {
         if (!Array.isArray(categoriesList) || categoriesList.length === 0) return [];
 
@@ -266,7 +256,6 @@ function Books() {
 
     const sorts = ['Most Popular', 'Highest Rated', 'Price: Low to High', 'Price: High to Low'];
 
-    // Filtered books (apply search + category + new client filters)
     const filteredBooks = useMemo(() => {
         const search = (debouncedSearch || '').trim().toLowerCase();
         const selCatId = normalizeId(selectedCategoryId);
@@ -328,7 +317,6 @@ function Books() {
         });
     }, [books, debouncedSearch, selectedCategoryId, minPrice, maxPrice, minRating, onlyFeatured, inStockOnly]);
 
-    // Sorted books (memoized)
     const sortedBooks = useMemo(() => {
         const arr = [...filteredBooks];
         arr.sort((a, b) => {
@@ -377,18 +365,16 @@ function Books() {
         setInStockOnly(false);
     };
 
-    // quantity handlers for per-book selector
     const handleQuantityChange = (key, newValue) => {
         setQuantities((prev) => ({ ...prev, [key]: newValue }));
     };
 
     const addToCart = (book, qty) => {
         const q = Number(qty) || 0;
-        // TODO: replace with real cart action
+
         console.log('Add to cart:', { bookId: book.productId ?? book.id ?? book.sku, qty: q });
     };
 
-    // Debug: Log categories để kiểm tra
     useEffect(() => {
         console.log('Categories state:', categories);
         console.log('Category tree:', categoryTree);
@@ -397,16 +383,13 @@ function Books() {
     return (
         <div className={cx('wrapper')}>
             <div className={cx('container')}>
-                {/* Header */}
                 <div className={cx('header')}>
                     <h1>All Books</h1>
                     <p>Discover from our collection of {books.length} books</p>
                 </div>
 
-                {/* Filters */}
                 <div className={cx('filters')}>
                     <div className={cx('filter-group')}>
-                        {/* Search */}
                         <div className={cx('search')}>
                             <Search className={cx('icon')} />
                             <input
@@ -418,7 +401,6 @@ function Books() {
                             />
                         </div>
 
-                        {/* Category Dropdown */}
                         <Tippy
                             offset={[-90, 10]}
                             interactive
@@ -480,7 +462,6 @@ function Books() {
                             </button>
                         </Tippy>
 
-                        {/* Sort Dropdown */}
                         <Tippy
                             offset={[-90, 10]}
                             placement="bottom"
@@ -554,7 +535,6 @@ function Books() {
                         </div>
 
                         <div className={cx('filter-item')}>
-                            {/* Min Rating (Popper) */}
                             <Tippy
                                 offset={[-90, 10]}
                                 placement="bottom"
@@ -650,7 +630,6 @@ function Books() {
                     </div>
                 </div>
 
-                {/* Result Info */}
                 <div className={cx('result-info')}>
                     <p>
                         Showing {sortedBooks.length} {sortedBooks.length === 1 ? 'book' : 'books'}
@@ -663,7 +642,6 @@ function Books() {
                     </p>
                 </div>
 
-                {/* Books Grid */}
                 {loading ? (
                     <div className={cx('loading')}>Đang tải sách...</div>
                 ) : error ? (

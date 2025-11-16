@@ -1,10 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import cartApi from '../../api/cartApi';
 
-// Tạo context
 const CartContext = createContext();
 
-// Custom hook để sử dụng context
 export const useCart = () => {
     const context = useContext(CartContext);
     if (!context) {
@@ -13,19 +11,16 @@ export const useCart = () => {
     return context;
 };
 
-// Provider component
 export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Fetch cart items
     const fetchCartItems = async () => {
         setLoading(true);
         setError(null);
         try {
             const response = await cartApi.getCartItems();
-            console.log('Cart API Response:', response); // Debug log
 
             if (response.data && response.data.result) {
                 setCartItems(response.data.result);
@@ -41,14 +36,12 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // Add to cart
     const addToCart = async (productId, quantity) => {
         try {
-            console.log('Adding to cart:', { productId, quantity }); // Debug log
             const response = await cartApi.addToCart({ productId, quantity });
 
             if (response.data) {
-                await fetchCartItems(); // Refresh cart
+                await fetchCartItems();
                 return {
                     success: true,
                     message: response.data.message || 'Đã thêm vào giỏ hàng!',
@@ -61,14 +54,12 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // Update cart item
     const updateCartItem = async (productId, quantity) => {
         try {
-            console.log('Updating cart item:', { productId, quantity }); // Debug log
             const response = await cartApi.updateCartItem(productId, { quantity });
 
             if (response.data) {
-                await fetchCartItems(); // Refresh cart
+                await fetchCartItems();
                 return {
                     success: true,
                     message: response.data.message || 'Đã cập nhật giỏ hàng!',
@@ -81,14 +72,12 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // Remove from cart
     const removeFromCart = async (productId) => {
         try {
-            console.log('Removing from cart:', productId); // Debug log
             const response = await cartApi.removeFromCart(productId);
 
             if (response.data) {
-                await fetchCartItems(); // Refresh cart
+                await fetchCartItems();
                 return {
                     success: true,
                     message: response.data.message || 'Đã xóa khỏi giỏ hàng!',
@@ -101,13 +90,11 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // Clear cart
     const clearCart = async () => {
         try {
-            console.log('Clearing cart via API'); // Debug log
             const response = await cartApi.clearCart();
             if (response.data) {
-                await fetchCartItems(); // Refresh cart
+                await fetchCartItems();
                 return { success: true, message: 'Đã xóa toàn bộ giỏ hàng!' };
             }
         } catch (err) {
@@ -119,7 +106,6 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // Helper functions
     const getTotalPrice = () => {
         if (!cartItems || !Array.isArray(cartItems)) return 0;
 
@@ -149,7 +135,6 @@ export const CartProvider = ({ children }) => {
         return item ? item.quantity : 0;
     };
 
-    // Fetch cart on mount
     useEffect(() => {
         fetchCartItems();
     }, []);

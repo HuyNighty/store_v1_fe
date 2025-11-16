@@ -25,7 +25,6 @@ function App() {
 
         const layoutProps = {};
         if (Layout !== React.Fragment) {
-            // fallback default to 'auto' nếu không truyền
             layoutProps.headerMode = route.headerMode ?? 'auto';
         }
 

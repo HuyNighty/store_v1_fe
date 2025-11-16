@@ -1,4 +1,3 @@
-// src/pages/Admin/AdminOrders.jsx
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import styles from './AdminOrders.module.scss';
@@ -15,7 +14,7 @@ function AdminOrders() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('ALL');
-    const [showCancelled, setShowCancelled] = useState(false); // State để toggle hiển thị đơn hủy
+    const [showCancelled, setShowCancelled] = useState(false);
     const { addToast } = useToast();
 
     useEffect(() => {
@@ -98,11 +97,9 @@ function AdminOrders() {
         return labels[status] || status;
     };
 
-    // Phân loại orders
     const activeOrders = orders.filter((order) => order.statusOrder !== 'CANCELLED');
     const cancelledOrders = orders.filter((order) => order.statusOrder === 'CANCELLED');
 
-    // Filter cho active orders
     const filteredActiveOrders = activeOrders.filter((order) => {
         if (filter === 'ALL') return true;
         return order.statusOrder === filter;
@@ -141,7 +138,6 @@ function AdminOrders() {
                 <p>Theo dõi và quản lý tất cả đơn hàng trong hệ thống</p>
             </div>
 
-            {/* Statistics */}
             <div className={cx('stats')}>
                 <div className={cx('stat-card')}>
                     <h3>Tổng đơn hàng</h3>
@@ -165,14 +161,12 @@ function AdminOrders() {
                 </div>
             </div>
 
-            {/* Main Orders Section */}
             <div className={cx('main-section')}>
                 <div className={cx('section-header')}>
                     <h2>Đơn hàng đang hoạt động</h2>
                     <p>Quản lý các đơn hàng đang trong quá trình xử lý</p>
                 </div>
 
-                {/* Filter Tabs cho active orders */}
                 <div className={cx('filter-tabs')}>
                     {Object.keys(statusCounts).map(
                         (status) =>
@@ -188,7 +182,6 @@ function AdminOrders() {
                     )}
                 </div>
 
-                {/* Active Orders Table */}
                 <div className={cx('orders-table')}>
                     {filteredActiveOrders.length === 0 ? (
                         <div className={cx('empty-state')}>
@@ -232,7 +225,6 @@ function AdminOrders() {
                                                         Chi tiết
                                                     </Button>
 
-                                                    {/* Status Update Buttons */}
                                                     {getStatusActions(order.statusOrder).map((action) => (
                                                         <Button
                                                             key={action}
@@ -244,7 +236,6 @@ function AdminOrders() {
                                                         </Button>
                                                     ))}
 
-                                                    {/* Delete Button */}
                                                     <Button
                                                         small
                                                         shine
@@ -267,7 +258,6 @@ function AdminOrders() {
                 </div>
             </div>
 
-            {/* Cancelled Orders Section */}
             {cancelledOrders.length > 0 && (
                 <div className={cx('cancelled-section')}>
                     <div className={cx('section-header')}>

@@ -1,4 +1,3 @@
-// src/services/adminService.js
 import adminApi from '../api/adminApi';
 
 /**
@@ -8,7 +7,7 @@ function extractId(resp) {
     if (!resp) return null;
     const d = resp.data ?? resp;
     const candidate = d.result ?? d;
-    // try common fields
+
     return (
         candidate?.id ??
         candidate?.assetId ??
@@ -36,9 +35,9 @@ function extractId(resp) {
 export async function createFullBookItem({
     product,
     assets = [],
-    productAssetLinks = [], // optional mapping for each asset: { type: 'COVER'|'GALLERY', ordinal: 0 }
+    productAssetLinks = [],
     authors = [],
-    bookAuthors = [], // optional mapping for each author: { authorRole: 'PRIMARY'|'COAUTHOR', position: 1 }
+    bookAuthors = [],
 }) {
     const created = {
         productId: null,
@@ -49,13 +48,11 @@ export async function createFullBookItem({
     };
 
     try {
-        // 1) create product
         const rProd = await adminApi.createProduct(product);
         const productId = extractId(rProd);
         if (!productId) throw new Error('Create product did not return id');
         created.productId = productId;
 
-        // 2) create assets (sequential or parallel)
         for (let i = 0; i < assets.length; i++) {
             const aReq = assets[i];
             const rAsset = await adminApi.createAsset(aReq);
@@ -63,33 +60,28 @@ export async function createFullBookItem({
             if (!assetId) throw new Error('Create asset did not return id');
             created.assetIds.push(assetId);
 
-            // 3) link product <-> asset if mapping provided or auto link as COVER/GALLERY
             const linkPayload = {
                 productId,
                 assetId,
-                type: (productAssetLinks[i] && productAssetLinks[i].type) || 'COVER', // fallback
+                type: (productAssetLinks[i] && productAssetLinks[i].type) || 'COVER',
                 ordinal: (productAssetLinks[i] && productAssetLinks[i].ordinal) ?? i,
             };
 
-            // if backend expects same endpoint, adjust createProductAssetLink accordingly
             const rLink = await adminApi.createProductAssetLink(linkPayload);
             const linkId = extractId(rLink);
             created.productAssetLinkIds.push(linkId ?? null);
         }
 
-        // 4) create authors
         for (let i = 0; i < authors.length; i++) {
             const authorReq = authors[i];
-            // ensure authorReq.assetId exists if required (avatar)
+
             const rAuthor = await adminApi.createAuthor(authorReq);
             const authorId = extractId(rAuthor);
             if (!authorId) throw new Error('Create author did not return id');
             created.authorIds.push(authorId);
         }
 
-        // 5) create book-author associations
         for (let i = 0; i < (bookAuthors.length || authors.length); i++) {
-            // allow bookAuthors entries or default mapping: authorIds[i]
             const authorId = (bookAuthors[i] && bookAuthors[i].authorId) ?? created.authorIds[i];
             if (!authorId) continue;
             const payload = {
@@ -102,13 +94,10 @@ export async function createFullBookItem({
             created.bookAuthorIds.push(baId ?? null);
         }
 
-        // success
         return { success: true, created };
     } catch (err) {
-        // rollback best-effort
         console.error('createFullBookItem failed:', err);
 
-        // delete book-author links
         for (const baId of created.bookAuthorIds.filter(Boolean)) {
             try {
                 await adminApi.deleteBookAuthor(baId);
@@ -117,7 +106,6 @@ export async function createFullBookItem({
             }
         }
 
-        // delete authors
         for (const aId of created.authorIds.filter(Boolean)) {
             try {
                 await adminApi.deleteAuthor(aId);
@@ -126,7 +114,6 @@ export async function createFullBookItem({
             }
         }
 
-        // delete product-asset links
         for (const linkId of created.productAssetLinkIds.filter(Boolean)) {
             try {
                 await adminApi.deleteProductAssetLink(linkId);
@@ -135,7 +122,6 @@ export async function createFullBookItem({
             }
         }
 
-        // delete assets
         for (const assetId of created.assetIds.filter(Boolean)) {
             try {
                 await adminApi.deleteAsset(assetId);
@@ -144,7 +130,6 @@ export async function createFullBookItem({
             }
         }
 
-        // delete product
         if (created.productId) {
             try {
                 await adminApi.deleteProduct(created.productId);

@@ -45,7 +45,6 @@ const TextType = forwardRef(
         const cursorRef = useRef(null);
         const containerRef = internalRef;
 
-        // forward ref to parent if provided
         useEffect(() => {
             if (!forwardedRef) return;
             if (typeof forwardedRef === 'function') forwardedRef(internalRef.current);
@@ -65,7 +64,6 @@ const TextType = forwardRef(
             return textColors[currentTextIndex % textColors.length];
         };
 
-        // Visibility observer
         useEffect(() => {
             if (!startOnVisible || !containerRef.current) return;
 
@@ -85,7 +83,6 @@ const TextType = forwardRef(
             return () => observer.disconnect();
         }, [startOnVisible, containerRef]);
 
-        // Cursor blink animation
         useEffect(() => {
             if (showCursor && cursorRef.current) {
                 gsap.set(cursorRef.current, { opacity: 1 });
@@ -100,7 +97,6 @@ const TextType = forwardRef(
             }
         }, [showCursor, cursorBlinkDuration]);
 
-        // Main typing effect
         useEffect(() => {
             if (!isVisible) return;
 
@@ -110,11 +106,9 @@ const TextType = forwardRef(
 
             const fullTyped = displayedText === processedText;
 
-            // If we've typed the full sentence and loop is false and it's the last sentence -> stop
             if (!loop && currentTextIndex === textArray.length - 1 && fullTyped && !isDeleting) {
-                // Notify completion for the last sentence
                 if (onSentenceComplete) onSentenceComplete(currentText, currentTextIndex);
-                return; // stop further typing/deleting
+                return;
             }
 
             const executeTypingAnimation = () => {
@@ -123,13 +117,10 @@ const TextType = forwardRef(
                         setIsDeleting(false);
                         setCurrentCharIndex(0);
 
-                        // advance to next text
                         const nextIndex = currentTextIndex + 1;
                         if (nextIndex >= textArray.length) {
-                            // finished one loop
                             setCompletedLoops((c) => c + 1);
                             if (completedLoops + 1 >= loopCount) {
-                                // reached loop count -> stop
                                 return;
                             }
                         }
@@ -150,20 +141,16 @@ const TextType = forwardRef(
                             variableSpeed ? getRandomSpeed() : typingSpeed,
                         );
                     } else {
-                        // Sentence fully typed
                         if (onSentenceComplete) onSentenceComplete(currentText, currentTextIndex);
 
-                        // if only one sentence and not looping — stop here
                         if (!loop && textArray.length === 1) {
                             return;
                         }
 
-                        // If it's the last sentence and loop is false -> don't delete, just stop
                         if (!loop && currentTextIndex === textArray.length - 1) {
                             return;
                         }
 
-                        // schedule deleting (if more than 1 text or loop is true)
                         timeout = setTimeout(() => {
                             setIsDeleting(true);
                         }, pauseDuration);
@@ -171,7 +158,6 @@ const TextType = forwardRef(
                 }
             };
 
-            // Kick off: if nothing typed yet and at start, respect initialDelay
             if (currentCharIndex === 0 && displayedText === '' && !isDeleting && initialDelay > 0) {
                 timeout = setTimeout(executeTypingAnimation, initialDelay);
             } else {
@@ -179,7 +165,6 @@ const TextType = forwardRef(
             }
 
             return () => clearTimeout(timeout);
-            // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [
             currentCharIndex,
             displayedText,

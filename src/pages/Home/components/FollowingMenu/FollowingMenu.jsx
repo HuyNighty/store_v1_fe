@@ -38,7 +38,7 @@ function MenuItem({ link = '#', text = '', image }) {
 
     const startAnim = (edge) => {
         if (!marqueeRef.current || !marqueeInnerRef.current) return;
-        // tránh tween chồng chéo
+
         gsap.killTweensOf([marqueeRef.current, marqueeInnerRef.current]);
         tlRef.current = gsap
             .timeline({ defaults: animationDefaults })
@@ -67,7 +67,7 @@ function MenuItem({ link = '#', text = '', image }) {
     const handleMouseLeave = (ev) => {
         if (!itemRef.current) return;
         const rect = itemRef.current.getBoundingClientRect();
-        // clientX khi leave có thể nằm ngoài, vẫn OK
+
         const x = ev.clientX - rect.left;
         const y = ev.clientY - rect.top;
         hideAnim(findClosestEdge(x, y, rect.width, rect.height));

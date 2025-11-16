@@ -3,7 +3,6 @@ import { useToast } from '../Toast/ToastContext';
 
 const WishlistContext = createContext();
 
-// Action types
 const WISHLIST_ACTIONS = {
     ADD_ITEM: 'ADD_ITEM',
     REMOVE_ITEM: 'REMOVE_ITEM',
@@ -12,7 +11,6 @@ const WISHLIST_ACTIONS = {
     SET_LOADING: 'SET_LOADING',
 };
 
-// Reducer function
 const wishlistReducer = (state, action) => {
     switch (action.type) {
         case WISHLIST_ACTIONS.SET_LOADING:
@@ -28,11 +26,10 @@ const wishlistReducer = (state, action) => {
                 loading: false,
             };
 
-        case WISHLIST_ACTIONS.ADD_ITEM:
-            // Kiểm tra xem sản phẩm đã có trong wishlist chưa
+        case WISHLIST_ACTIONS.ADD_ITEM: {
             const existingItem = state.items.find((item) => item.productId === action.payload.productId);
             if (existingItem) {
-                return state; // Đã tồn tại, không thêm lại
+                return state;
             }
 
             const newItem = {
@@ -44,6 +41,7 @@ const wishlistReducer = (state, action) => {
                 ...state,
                 items: [newItem, ...state.items],
             };
+        }
 
         case WISHLIST_ACTIONS.REMOVE_ITEM:
             return {
@@ -62,7 +60,6 @@ const wishlistReducer = (state, action) => {
     }
 };
 
-// Initial state
 const initialState = {
     items: [],
     loading: false,
@@ -70,14 +67,11 @@ const initialState = {
 
 export const WishlistProvider = ({ children }) => {
     const [state, dispatch] = useReducer(wishlistReducer, initialState);
-    const { addToast } = useToast();
 
-    // Load wishlist từ localStorage khi component mount
     useEffect(() => {
         loadWishlistFromStorage();
     }, []);
 
-    // Lưu wishlist vào localStorage mỗi khi items thay đổi
     useEffect(() => {
         saveWishlistToStorage();
     }, [state.items]);
@@ -104,7 +98,6 @@ export const WishlistProvider = ({ children }) => {
         }
     };
 
-    // Thêm sản phẩm vào wishlist
     const addToWishlist = (product) => {
         try {
             dispatch({
@@ -118,7 +111,6 @@ export const WishlistProvider = ({ children }) => {
         }
     };
 
-    // Xóa sản phẩm khỏi wishlist
     const removeFromWishlist = (productId) => {
         try {
             dispatch({
@@ -132,7 +124,6 @@ export const WishlistProvider = ({ children }) => {
         }
     };
 
-    // Xóa toàn bộ wishlist
     const clearWishlist = () => {
         try {
             dispatch({ type: WISHLIST_ACTIONS.CLEAR_WISHLIST });
@@ -143,27 +134,23 @@ export const WishlistProvider = ({ children }) => {
         }
     };
 
-    // Kiểm tra xem sản phẩm có trong wishlist không
     const isInWishlist = (productId) => {
         return state.items.some((item) => item.productId === productId);
     };
 
-    // Lấy số lượng sản phẩm trong wishlist
     const getWishlistCount = () => {
         return state.items.length;
     };
 
-    // Lấy tất cả sản phẩm trong wishlist
     const getWishlistItems = () => {
         return state.items;
     };
 
-    // Di chuyển sản phẩm từ wishlist sang cart (nếu cần)
     const moveToCart = (productId, quantity = 1) => {
         const item = state.items.find((item) => item.productId === productId);
         if (item) {
             removeFromWishlist(productId);
-            return item; // Trả về sản phẩm để thêm vào cart
+            return item;
         }
         return null;
     };
@@ -183,7 +170,6 @@ export const WishlistProvider = ({ children }) => {
     return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;
 };
 
-// Custom hook để sử dụng wishlist context
 export const useWishlist = () => {
     const context = useContext(WishlistContext);
     if (!context) {

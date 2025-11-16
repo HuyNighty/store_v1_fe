@@ -1,4 +1,3 @@
-// src/api/adminApi.js
 import axiosClient from './axiosClient';
 
 const adminApi = {

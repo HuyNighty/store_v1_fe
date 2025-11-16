@@ -1,4 +1,3 @@
-// src/pages/UserOrderDetail.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
@@ -73,7 +72,7 @@ function UserOrderDetail() {
         try {
             await orderApi.cancelOrder(order.orderId);
             addToast('Đã hủy đơn hàng thành công', 'success');
-            fetchOrderDetail(); // Refresh để cập nhật trạng thái
+            fetchOrderDetail();
         } catch (error) {
             console.error('Error cancelling order:', error);
             const errorMessage = error.response?.data?.message || 'Lỗi khi hủy đơn hàng';
@@ -102,7 +101,6 @@ function UserOrderDetail() {
     };
 
     const handleContactSupport = () => {
-        // TODO: Liên hệ hỗ trợ
         addToast('Đã gửi yêu cầu hỗ trợ', 'info');
     };
 
@@ -146,7 +144,6 @@ function UserOrderDetail() {
 
     return (
         <div className={cx('container')}>
-            {/* Header */}
             <div className={cx('header')}>
                 <div className={cx('header-main')}>
                     <Button back onClick={() => navigate('/orders')}>
@@ -160,7 +157,6 @@ function UserOrderDetail() {
                     </div>
                 </div>
 
-                {/* Action Buttons - Chỉ hiển thị các action user có thể làm */}
                 <div className={cx('header-actions')}>
                     {canCancel && (
                         <Button danger onClick={handleCancelOrder} disabled={cancelling}>
@@ -184,7 +180,6 @@ function UserOrderDetail() {
 
             <div className={cx('content')}>
                 <div className={cx('grid')}>
-                    {/* Order Information */}
                     <div className={cx('card')}>
                         <div className={cx('card-header')}>
                             <FontAwesomeIcon icon={faBox} />
@@ -242,7 +237,6 @@ function UserOrderDetail() {
                         </div>
                     </div>
 
-                    {/* Shipping Information */}
                     <div className={cx('card')}>
                         <div className={cx('card-header')}>
                             <FontAwesomeIcon icon={faMapMarkerAlt} />
@@ -262,7 +256,6 @@ function UserOrderDetail() {
                         </div>
                     </div>
 
-                    {/* Order Items */}
                     <div className={cx('card', 'full-width')}>
                         <div className={cx('card-header')}>
                             <FontAwesomeIcon icon={faCreditCard} />
@@ -326,7 +319,6 @@ function UserOrderDetail() {
                         </div>
                     </div>
 
-                    {/* Help Section */}
                     <div className={cx('card', 'help-card')}>
                         <div className={cx('card-header')}>
                             <FontAwesomeIcon icon={faPhone} />

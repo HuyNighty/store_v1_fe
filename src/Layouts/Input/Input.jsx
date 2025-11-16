@@ -9,12 +9,12 @@ export default function Input({
     name,
     value,
     defaultValue,
-    checked, // support controlled checkbox
+    checked,
     onChange,
     type = 'text',
     placeholder = '',
     label = '',
-    labelPosition = 'right', // 'right' (default) or 'left' for checkboxes
+    labelPosition = 'right',
     error = '',
     disabled = false,
     required = false,
@@ -33,7 +33,7 @@ export default function Input({
     autoFocus = false,
     pattern,
     maxLength,
-    // Variant props (same idea as Button)
+
     primary,
     outline,
     secondary,
@@ -43,7 +43,7 @@ export default function Input({
     info,
     small,
     large,
-    // Animation props
+
     pulse,
     bounce,
     shine,
@@ -74,12 +74,10 @@ export default function Input({
         if (autoFocus && inputRef.current) inputRef.current.focus();
     }, [autoFocus]);
 
-    // Generic emit — for consistency with existing handlers: emit { target: { name, value } }
     const emitChange = (val, ev) => {
         if (typeof onChange === 'function') onChange({ target: { name, value: val } }, ev);
     };
 
-    // Text-like change (debounce)
     const handleChange = (ev) => {
         const val = ev?.target?.value;
         if (!isControlled) setInternal(val);
@@ -103,12 +101,10 @@ export default function Input({
         if (inputRef.current) inputRef.current.focus();
     };
 
-    // --- Checkbox handling ---
     const isCheckbox = type === 'checkbox';
     const isRadio = type === 'radio';
 
     const checkboxChecked = (() => {
-        // priority: explicit checked prop (controlled checkbox) -> value if boolean -> fallback false
         if (typeof checked === 'boolean') return checked;
         if (typeof value === 'boolean') return value;
         return false;
@@ -117,19 +113,17 @@ export default function Input({
     const handleCheckboxToggle = (ev) => {
         if (disabled) return;
         const newChecked = ev?.target?.checked ?? !checkboxChecked;
-        // emit boolean
+
         emitChange(newChecked, ev);
-        // if uncontrolled and using checked prop not provided, allow internal state change via value
+
         if (!isControlled && typeof value !== 'boolean') {
             setInternal(newChecked);
         }
     };
 
-    // finalize type for text/password
     const finalType = type === 'password' && showPassword ? 'text' : type;
     const displayedValue = isControlled ? value : internal;
 
-    // class composition including variants and animations
     const classes = cx(
         'root',
         {
@@ -139,7 +133,7 @@ export default function Input({
             'with-left': !!iconLeft,
             'with-right': !!(iconRight || clearable || (type === 'password' && showPasswordToggle)),
             textarea,
-            // variants
+
             primary,
             outline,
             secondary,
@@ -149,7 +143,7 @@ export default function Input({
             info,
             small,
             large,
-            // animations
+
             pulse,
             bounce,
             float,
@@ -160,7 +154,7 @@ export default function Input({
             borderDraw,
             lift3d,
             magnetic,
-            // checkbox/radio state classes
+
             checkbox: isCheckbox,
             radio: isRadio,
         },
@@ -230,7 +224,6 @@ export default function Input({
         );
     }
 
-    // regular text/textarea render
     return (
         <div className={classes} style={inlineStyle}>
             {label && (

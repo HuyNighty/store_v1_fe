@@ -14,7 +14,6 @@ function BookImages({
     selectedImage = 0,
     onImageSelect = () => {},
 }) {
-    // chuẩn hóa danh sách ảnh
     const allImages = useMemo(() => {
         if (Array.isArray(productAssets) && productAssets.length > 0) return productAssets;
         return [{ url: DEFAULT_SRC }];

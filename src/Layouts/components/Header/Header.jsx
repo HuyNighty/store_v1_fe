@@ -1,4 +1,3 @@
-// src/components/Header/Header.jsx
 import { useContext, useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import classNames from 'classnames/bind';
@@ -17,29 +16,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const cx = classNames.bind(styles);
 
-function Header({
-    mode = 'auto',
-    scrollThreshold = 50,
-    routeModeMap = null, // optional: if provided, takes precedence over mode when mapping exists
-}) {
+function Header({ mode = 'auto', scrollThreshold = 50, routeModeMap = null }) {
     const { isAuthenticated, user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
 
-    // internal scrolled state only used when effectiveMode === 'auto'
     const [scrolled, setScrolled] = useState(false);
 
-    // Determine effective mode: if routeModeMap has entry for pathname, use it.
     const effectiveMode = (() => {
         if (routeModeMap && routeModeMap[location.pathname]) return routeModeMap[location.pathname];
         return mode;
     })();
 
-    // boolean: whether header should be considered "scrolled/solid"
     const isSolid = (() => {
         if (effectiveMode === 'solid') return true;
         if (effectiveMode === 'transparent') return false;
-        // 'auto' -> depends on scrolled state
         return scrolled;
     })();
 
@@ -49,17 +40,14 @@ function Header({
         const el = headerRef.current;
         if (!el) return;
 
-        // updateHeight có thể được gọi bởi ResizeObserver (entries) hoặc chúng ta gọi thủ công
         const updateHeight = (entries) => {
-            // Nếu được gọi bởi RO thì entries là mảng; nếu gọi thủ công có thể truyền dạng [{ target: el }]
             const target = entries && entries.length ? entries[0].target : headerRef.current || el;
-            if (!target) return; // bảo vệ khi element đã unmount
+            if (!target) return;
 
             const h = target.offsetHeight || 0;
             document.documentElement.style.setProperty('--header-height', `${h}px`);
         };
 
-        // gọi ngay 1 lần với el hiện tại
         updateHeight([{ target: el }]);
 
         let ro;
@@ -88,9 +76,7 @@ function Header({
         };
     }, [isSolid]);
 
-    // Thay thế useEffect(...) hiện tại bằng đoạn này
     useEffect(() => {
-        // nếu mode khác 'auto' thì không cần lắng nghe sự kiện
         if (effectiveMode !== 'auto') {
             setScrolled(
                 window?.scrollY > scrollThreshold || (document.scrollingElement?.scrollTop ?? 0) > scrollThreshold,
@@ -98,24 +84,19 @@ function Header({
             return;
         }
 
-        // Helper: lấy giá trị scroll top từ nhiều nguồn
         const getScrollTop = () => {
-            // document.scrollingElement is the <html> element in modern browsers
             const docEl = document.scrollingElement || document.documentElement || document.body;
-            // prefer docEl.scrollTop, fallback to window.scrollY
+
             return docEl?.scrollTop ?? window.scrollY ?? 0;
         };
 
-        // Primary handler
         const handleScroll = () => {
             const top = getScrollTop();
             setScrolled(top > scrollThreshold);
         };
 
-        // Call once to set initial state
         handleScroll();
 
-        // Add listeners to both window and document.scrollingElement (if present and different)
         window.addEventListener('scroll', handleScroll, { passive: true });
 
         const docEl = document.scrollingElement;
@@ -125,11 +106,9 @@ function Header({
         return () => {
             window.removeEventListener('scroll', handleScroll);
             if (docEl && docEl !== window) docEl.removeEventListener('scroll', handleScroll);
-            // if (possible) possible.removeEventListener('scroll', handleScroll);
         };
     }, [effectiveMode, scrollThreshold, location.pathname]);
 
-    // Search state
     const [searchState, setSearchState] = useState({
         showSearch: false,
         isExpanded: false,
@@ -160,7 +139,6 @@ function Header({
         >
             <div className={cx('content')}>
                 <motion.div className={cx('logo-wrapper')} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    {/* isTransparent = !isSolid */}
                     <Logo className={cx('logo')} isTransparent={!isSolid} />
                 </motion.div>
 

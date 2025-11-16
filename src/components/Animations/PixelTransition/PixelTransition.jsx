@@ -1,4 +1,3 @@
-// PixelTransition.jsx (fixed: always queue leave so quick hover-out works)
 import React, { useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import classNames from 'classnames/bind';
@@ -11,7 +10,7 @@ function PixelTransition({
     secondContent,
     gridSize = 7,
     pixelColor = 'currentColor',
-    animationStepDuration = 0.3, // total duration for one full swap (cover+reveal)
+    animationStepDuration = 0.3,
     once = false,
     aspectRatio = '100%',
     className = '',
@@ -77,7 +76,6 @@ function PixelTransition({
                 tlRef.current.kill();
                 tlRef.current = null;
             }
-            // clear pending to avoid stray callbacks
             pendingActionRef.current = null;
             currentActionRef.current = null;
         };
@@ -95,7 +93,6 @@ function PixelTransition({
         if (pendingActionRef.current === action) return;
 
         if (tlRef.current && tlRef.current.isActive()) {
-            // queue opposite/next action, wait until current finishes
             pendingActionRef.current = action;
             return;
         }
@@ -111,7 +108,6 @@ function PixelTransition({
         const pixels = Array.from(pixelGridEl.children);
         const total = pixels.length || 1;
 
-        // NEW TIMING LOGIC:
         const totalDuration = Math.max(0.03, animationStepDuration);
         const phaseDuration = totalDuration / 2;
 
@@ -200,15 +196,12 @@ function PixelTransition({
     };
 
     const handleEnter = () => {
-        // still safe to ignore if already active
         if (currentActionRef.current === 'enter' || pendingActionRef.current === 'enter') return;
         animatePixels(true);
     };
 
-    // <-- FIXED: always request leave (don't rely on isActive)
     const handleLeave = () => {
         if (once) return;
-        // always attempt to perform/queue leave; animatePixels will handle duplicates/queueing
         animatePixels(false);
     };
 

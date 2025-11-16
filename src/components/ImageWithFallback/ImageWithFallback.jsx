@@ -22,8 +22,6 @@ function ImageWithFallback({
             setErrored(true);
             setImgSrc(fallback);
         }
-        // optional: nếu cần log
-        // console.warn('Image load error:', src);
         if (rest.onError) rest.onError(e);
     };
 

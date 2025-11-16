@@ -1,20 +1,17 @@
-// src/api/customerApi.js
 import axiosClient from './axiosClient';
 
+//ADMIN role
 const customerApi = {
-    // Lấy tất cả customers (Admin)
     getAllCustomers: () => {
         const url = '/customers';
         return axiosClient.get(url);
     },
 
-    // Lấy chi tiết customer theo ID
     getCustomerById: (customerId) => {
         const url = `/customers/${customerId}`;
         return axiosClient.get(url);
     },
 
-    // Cập nhật customer
     updateCustomer: (customerId, data) => {
         const url = `/customers/${customerId}`;
         return axiosClient.patch(url, data);
@@ -25,13 +22,11 @@ const customerApi = {
         return axiosClient.get(url);
     },
 
-    // Lấy thông tin customer của user hiện tại
     getMyProfile: () => {
         const url = '/customers/me';
         return axiosClient.get(url);
     },
 
-    // Upload ảnh đại diện
     uploadProfileImage: (file) => {
         const url = '/customers/profile-image';
         const formData = new FormData();
@@ -43,7 +38,6 @@ const customerApi = {
         });
     },
 
-    // Xóa ảnh đại diện
     removeProfileImage: () => {
         const url = '/customers/profile-image';
         return axiosClient.delete(url);

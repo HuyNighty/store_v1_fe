@@ -40,9 +40,9 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     console.log('ProtectedRoute user:', user);
 
     if (requiredRole) {
-        const roles = normalizeRoles(user); // e.g. ["ROLE_USER", "ROLE_ADMIN", "USER"]
+        const roles = normalizeRoles(user);
         const expected = requiredRole.toString().toUpperCase();
-        const expectedVariants = [expected, `ROLE_${expected}`]; // e.g. 'USER' & 'ROLE_USER'
+        const expectedVariants = [expected, `ROLE_${expected}`];
         const has = roles.some((r) => expectedVariants.includes(r));
         if (!has) return <Navigate to="/" replace />;
     }

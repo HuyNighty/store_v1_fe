@@ -197,7 +197,6 @@
         transform: translateX(3px);
     }
 
-    // Button variants
     &.primary {
         background: linear-gradient(135deg, #4f46e5, #7c3aed);
         color: white;
@@ -239,7 +238,6 @@
     }
 }
 
-// Responsive design
 @media (max-width: 768px) {
     .wrapper {
         padding: 20px 15px;
@@ -304,7 +302,6 @@
     }
 }
 
-// Animation for cards
 @keyframes fadeInUp {
     from {
         opacity: 0;

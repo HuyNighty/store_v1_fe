@@ -1,4 +1,3 @@
-// src/components/BookCarousel/BookCarousel.jsx
 import React, { useState, useMemo, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import styles from './BookCarousel.module.scss';
@@ -54,7 +53,6 @@ function BookCarousel() {
                     booksData = data.items;
                 }
 
-                // FILTER: chỉ giữ product active
                 booksData = booksData.filter((b) => {
                     const val = b.isActive ?? b.active ?? b.is_active ?? b.activeFlag;
                     return isActiveTrue(val);
@@ -103,7 +101,6 @@ function BookCarousel() {
 
     return (
         <div className={cx('carousel-wrapper')}>
-            {/* Header với navigation buttons */}
             <div className={cx('header')}>
                 <div className={cx('nav-buttons')}>
                     <button
@@ -129,7 +126,7 @@ function BookCarousel() {
                     </button>
                 </div>
             </div>
-            {/* Status messages */}
+
             <div className={cx('text')}>
                 <AnimatePresence mode="wait">
                     {loading && (
@@ -164,7 +161,6 @@ function BookCarousel() {
                     )}
                 </AnimatePresence>
             </div>
-            {/* Book list với smooth animation */}
             <div className={cx('book-list-container')}>
                 <motion.div
                     className={cx('book-list-track')}
@@ -187,7 +183,7 @@ function BookCarousel() {
                     )}
                 </motion.div>
             </div>
-            {/* Progress indicators */}
+
             {/* {pages.length > 1 && (
                 <div className={cx('carousel-progress')}>
                     {pages.map((_, index) => (

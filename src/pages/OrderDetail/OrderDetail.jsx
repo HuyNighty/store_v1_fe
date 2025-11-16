@@ -1,4 +1,3 @@
-// src/pages/Admin/OrderDetail.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
@@ -90,7 +89,6 @@ function OrderDetail() {
         }
     };
 
-    // Hàm mở modal xem chi tiết customer
     const handleViewCustomer = (customerId) => {
         setSelectedCustomerId(customerId);
         setShowCustomerModal(true);
@@ -155,7 +153,6 @@ function OrderDetail() {
 
     return (
         <div className={cx('container')}>
-            {/* Header */}
             <div className={cx('header')}>
                 <div className={cx('header-main')}>
                     <Button back onClick={() => navigate('/admin-orders')}>
@@ -170,7 +167,6 @@ function OrderDetail() {
                     </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className={cx('header-actions')}>
                     {getStatusActions(order.statusOrder).map((action) => (
                         <Button
@@ -190,7 +186,6 @@ function OrderDetail() {
 
             <div className={cx('content')}>
                 <div className={cx('grid')}>
-                    {/* Order Information */}
                     <div className={cx('card')}>
                         <div className={cx('card-header')}>
                             <FontAwesomeIcon icon={faBox} />
@@ -248,7 +243,6 @@ function OrderDetail() {
                         </div>
                     </div>
 
-                    {/* Customer Information */}
                     <div className={cx('card')}>
                         <div className={cx('card-header')}>
                             <FontAwesomeIcon icon={faUser} />
@@ -279,7 +273,6 @@ function OrderDetail() {
                         </div>
                     </div>
 
-                    {/* Shipping Information */}
                     <div className={cx('card')}>
                         <div className={cx('card-header')}>
                             <FontAwesomeIcon icon={faMapMarkerAlt} />
@@ -299,7 +292,6 @@ function OrderDetail() {
                         </div>
                     </div>
 
-                    {/* Order Items */}
                     <div className={cx('card', 'full-width')}>
                         <div className={cx('card-header')}>
                             <FontAwesomeIcon icon={faCreditCard} />
@@ -366,7 +358,6 @@ function OrderDetail() {
                 </div>
             </div>
 
-            {/* Customer Detail Modal */}
             <CustomerDetailModal
                 customerId={selectedCustomerId}
                 isOpen={showCustomerModal}

@@ -2,7 +2,6 @@ import adminApi from '../api/adminApi';
 
 export const createFullBook = async (payload, file) => {
     try {
-        // Handle file upload logic here if needed
         const response = await adminApi.createFullBook(payload);
         return {
             success: true,
@@ -21,7 +20,6 @@ export const createFullBook = async (payload, file) => {
 
 export const updateFullBook = async (productId, payload, file) => {
     try {
-        // Handle file upload logic here if needed
         const response = await adminApi.updateFullBook(productId, payload);
         return {
             success: true,

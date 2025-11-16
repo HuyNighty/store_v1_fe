@@ -5,12 +5,10 @@
     z-index: 100;
     transition: all 0.5s ease;
 
-    // Mặc định trong suốt (cho Hero section)
     background: transparent;
     backdrop-filter: blur(0px);
 
     &.scrolled {
-        // Khi scroll xuống thì có background
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
         box-shadow: 0 2px 20px rgba(101, 85, 72, 0.1);
@@ -47,7 +45,6 @@
     gap: 16px;
 }
 
-// Wishlist button - ĐIỀU CHỈNH QUAN TRỌNG
 .wishlist-wrapper {
     position: relative;
     width: var(--icon-size, 24px);
@@ -60,7 +57,6 @@
     border-radius: 8px;
     padding: 8px;
 
-    // Màu khi header trong suốt (trên Hero)
     .wrapper:not(.scrolled) & {
         color: var(--white);
 
@@ -71,7 +67,6 @@
         }
     }
 
-    // Màu khi header có background (sau khi scroll)
     .wrapper.scrolled & {
         color: var(--primary-color-bold);
 
@@ -106,9 +101,7 @@
     }
 }
 
-// Logo wrapper styles - THÊM VÀO HEADER.MODULE.SCSS
 .logo-wrapper {
-    // Khi header trong suốt
     .wrapper:not(.scrolled) & {
         :global(.logo) {
             :global(.logo-text) {
@@ -139,7 +132,6 @@
         }
     }
 
-    // Khi header có background
     .wrapper.scrolled & {
         :global(.logo) {
             :global(.logo-text) {
@@ -173,7 +165,6 @@
 
 .nav-links-container {
     .wrapper:not(.scrolled) & {
-        // Các link màu trắng khi header trong suốt
         a,
         .nav-link {
             color: var(--white) !important;
@@ -185,7 +176,6 @@
     }
 
     .wrapper.scrolled & {
-        // Các link màu bình thường khi header có background
         a,
         .nav-link {
             color: var(--primary-color-bold) !important;
@@ -197,11 +187,9 @@
     }
 }
 
-// Cart Button cần điều chỉnh (nếu có custom styles)
 .cart-button-wrapper {
     transition: all var(--transition-base);
 
-    // Khi header trong suốt
     .wrapper:not(.scrolled) & {
         .cart-icon {
             color: var(--white);
@@ -212,7 +200,6 @@
         }
     }
 
-    // Khi header có background
     .wrapper.scrolled & {
         .cart-icon {
             color: var(--primary-color-bold);
@@ -232,7 +219,6 @@
     }
 }
 
-// Search Bar cần điều chỉnh
 .search-bar-wrapper {
     transition: all var(--transition-base);
 
@@ -247,11 +233,9 @@
     }
 }
 
-// Login Button cần điều chỉnh
 .login-button-wrapper {
     transition: all var(--transition-base);
 
-    // Button outline khi header trong suốt
     .wrapper:not(.scrolled) & {
         .btn-outline {
             border-color: var(--white);
@@ -264,7 +248,6 @@
         }
     }
 
-    // Button outline khi header có background
     .wrapper.scrolled & {
         .btn-outline {
             border-color: var(--primary-color-bold);
@@ -286,11 +269,9 @@
     }
 }
 
-// Profile Menu cần điều chỉnh
 .profile-menu-wrapper {
     transition: all var(--transition-base);
 
-    // Khi header trong suốt
     .wrapper:not(.scrolled) & {
         .profile-trigger {
             color: var(--white);
@@ -301,7 +282,6 @@
         }
     }
 
-    // Khi header có background
     .wrapper.scrolled & {
         .profile-trigger {
             color: var(--primary-color-bold);
@@ -317,7 +297,6 @@
     }
 }
 
-// Staggered animation cho các action items
 .action-item {
     opacity: 0;
     transform: translateX(20px);
@@ -340,7 +319,6 @@
     }
 }
 
-// Animation Keyframes
 @keyframes slideInRight {
     from {
         opacity: 0;
@@ -367,7 +345,6 @@
     }
 }
 
-// Responsive design
 @media (max-width: 768px) {
     .content {
         padding: 12px 15px;

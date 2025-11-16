@@ -5,7 +5,6 @@
     font-family: var(--font-family-primary);
 }
 
-// Background styles
 .background-overlay {
     position: absolute;
     inset: 0;
@@ -40,7 +39,6 @@
     display: flex;
 }
 
-// Floating particles
 .floating-particle {
     position: absolute;
     display: none;
@@ -105,7 +103,6 @@
     }
 }
 
-// Main container - SỬA QUAN TRỌNG
 .login-container {
     position: relative;
     z-index: 10;
@@ -138,7 +135,6 @@
     }
 }
 
-// Branding section - SỬA LAYOUT
 .branding-section {
     color: var(--white);
     display: none;
@@ -196,7 +192,6 @@
     font-family: var(--font-family-primary);
 }
 
-// Features section - SỬA CĂN CHỈNH
 .features-section {
     display: flex;
     flex-direction: column;
@@ -266,7 +261,6 @@
     }
 }
 
-// Stats section
 .stats-section {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -295,7 +289,6 @@
     }
 }
 
-// Form section - SỬA QUAN TRỌNG
 .form-section {
     width: 100%;
     display: flex;
@@ -350,7 +343,6 @@
     }
 }
 
-// Form Header - SỬA CĂN CHỈNH
 .form-header {
     display: flex;
     justify-content: space-between;
@@ -724,7 +716,6 @@
     }
 }
 
-// Animations
 @keyframes scaleIn {
     from {
         opacity: 0;
@@ -745,7 +736,6 @@
     }
 }
 
-// Responsive design - SỬA QUAN TRỌNG
 @media (max-width: 1023px) {
     .content-grid {
         grid-template-columns: 1fr;
@@ -823,7 +813,6 @@
     }
 }
 
-// Mobile-specific fixes
 @media (max-width: 375px) {
     .form-card .card-content {
         padding: 16px;

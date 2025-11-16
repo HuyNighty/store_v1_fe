@@ -1,4 +1,3 @@
-// src/pages/Admin/Products/Products.jsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Products.module.scss';
@@ -53,7 +52,6 @@ const normalizeProduct = (p) => ({
     ...p,
 });
 
-// simple slugify — giữ đơn giản, an toàn cho URL
 const slugify = (text = '') =>
     text
         .toString()
@@ -66,17 +64,14 @@ const slugify = (text = '') =>
         .toLowerCase();
 
 function Products() {
-    // data
     const [products, setProducts] = useState([]);
     const [loadingList, setLoadingList] = useState(false);
     const [listError, setListError] = useState('');
 
-    // UI / filters / search
-    const [filter, setFilter] = useState('all'); // 'all' | 'active' | 'inactive'
+    const [filter, setFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchDebounce, setSearchDebounce] = useState(''); // actual debounced query
+    const [searchDebounce, setSearchDebounce] = useState('');
 
-    // modal/form
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [formModel, setFormModel] = useState({
@@ -94,9 +89,7 @@ function Products() {
     const [formLoading, setFormLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
 
-    // fetch all products / search
     const fetchProducts = useCallback(async (opts = {}) => {
-        // opts: { search: string } -> if present, do server search
         try {
             setLoadingList(true);
             setListError('');
@@ -121,25 +114,21 @@ function Products() {
         fetchProducts();
     }, [fetchProducts]);
 
-    // debounce searchQuery -> searchDebounce
     useEffect(() => {
         const t = setTimeout(() => {
             const q = searchQuery.trim();
             setSearchDebounce(q);
-            // trigger server search if >= 3 chars, otherwise load all
+
             if (q.length >= 3) {
                 fetchProducts({ search: q });
             } else if (q.length === 0) {
-                // restore all when cleared
                 fetchProducts();
             } else {
-                // keep client-side filtering for short queries
             }
         }, 350);
         return () => clearTimeout(t);
     }, [searchQuery, fetchProducts]);
 
-    // filteredProducts: apply filter + local-search (case-insensitive)
     const filteredProducts = useMemo(() => {
         const q = (searchDebounce || '').toLowerCase();
         let list = products;
@@ -159,7 +148,6 @@ function Products() {
         });
     }, [products, filter, searchDebounce]);
 
-    // show success toast shorter
     useEffect(() => {
         if (!successMessage) return;
         const id = setTimeout(() => setSuccessMessage(''), 3000);
@@ -219,7 +207,7 @@ function Products() {
 
     const mapServerErrors = (err) => {
         const resp = err?.response?.data ?? err?.response ?? err;
-        // try multiple shapes
+
         if (resp == null) return { _server: 'Unknown server error' };
         if (resp?.result && typeof resp.result === 'object') return resp.result;
         if (resp?.errors && typeof resp.errors === 'object') return resp.errors;
@@ -241,13 +229,12 @@ function Products() {
             return;
         }
 
-        // prepare payload: normalize types
         const payload = {
             ...formModel,
             sku: formModel.sku?.toString().trim(),
             slug: formModel.slug?.toString().trim() || slugify(formModel.productName || ''),
             productName: formModel.productName?.toString().trim(),
-            // price must be number (server expects BigDecimal-equivalent)
+
             price: formModel.price === '' || formModel.price === null ? null : parseFloat(formModel.price),
             salePrice:
                 formModel.salePrice === '' || formModel.salePrice === null ? null : parseFloat(formModel.salePrice),
@@ -283,25 +270,23 @@ function Products() {
         const conf = window.confirm('Bạn có chắc muốn xóa (soft-delete) sản phẩm này?');
         if (!conf) return;
 
-        // optimistic remove
         const prev = products;
         setProducts((p) => p.filter((x) => x.id !== id));
         setSuccessMessage('');
         try {
-            // Prefer backend soft-delete via DELETE if implemented
             await adminApi.deleteProduct(id);
             setSuccessMessage('Xóa thành công.');
             await fetchProducts();
         } catch (err) {
             console.warn('delete fallback/update', err);
-            // fallback: try update isActive=false
+
             try {
                 await adminApi.updateProduct(id, { isActive: false });
                 setSuccessMessage('Xóa (soft-delete) thành công.');
                 await fetchProducts();
             } catch (err2) {
                 console.error('Delete failed - rollback', err2);
-                setProducts(prev); // rollback
+                setProducts(prev);
                 alert('Xóa thất bại. Thử lại.');
             }
         }
@@ -317,7 +302,6 @@ function Products() {
                     <h2 className={cx('title')}>Admin — Products</h2>
                 </div>
 
-                {/* Toolbar */}
                 <div
                     className={cx('toolbar')}
                     style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}
@@ -350,7 +334,6 @@ function Products() {
                         </div>
                     </div>
 
-                    {/* Search input */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, justifyContent: 'center' }}>
                         <input
                             className={cx('input')}
@@ -375,7 +358,6 @@ function Products() {
 
                 {listError && <div className={cx('server-error', 'message')}>{listError}</div>}
 
-                {/* Table */}
                 <div style={{ overflowX: 'auto', marginTop: 12 }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
@@ -431,7 +413,6 @@ function Products() {
                 )}
             </div>
 
-            {/* Modal form */}
             {showForm && (
                 <div
                     role="dialog"

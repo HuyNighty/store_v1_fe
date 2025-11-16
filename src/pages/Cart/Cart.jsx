@@ -26,7 +26,6 @@ function Cart() {
     } = useCart();
     const { addToast } = useToast();
 
-    // Thêm state để chặn multiple actions
     const [isProcessing, setIsProcessing] = useState(false);
     const processingRef = useRef(false);
 
@@ -42,13 +41,11 @@ function Cart() {
         navigate('/checkout');
     };
 
-    // Hàm xem chi tiết sản phẩm
     const handleViewProductDetails = (item) => {
         if (processingRef.current) return;
 
         console.log('Viewing product details:', item.productName);
 
-        // Chuyển hướng đến trang chi tiết sản phẩm
         navigate('/book-item', {
             state: {
                 book: {
@@ -184,7 +181,6 @@ function Cart() {
         fetchCartItems();
     };
 
-    // Format price function
     const formatPrice = (price) => {
         if (typeof price !== 'number' || isNaN(price)) {
             return '0';
@@ -192,7 +188,6 @@ function Cart() {
         return (price / 1000).toLocaleString();
     };
 
-    // Loading state
     if (loading) {
         return (
             <div className={cx('container')}>
@@ -210,7 +205,6 @@ function Cart() {
         );
     }
 
-    // Error state
     if (error) {
         return (
             <div className={cx('container')}>
@@ -232,7 +226,6 @@ function Cart() {
         );
     }
 
-    // Empty cart state
     if (cartItems.length === 0) {
         return (
             <div className={cx('container')}>
@@ -257,7 +250,6 @@ function Cart() {
 
     return (
         <div className={cx('container')}>
-            {/* Header */}
             <div className={cx('header')}>
                 <Button back onClick={handleBack}>
                     <FontAwesomeIcon icon={faArrowLeft} />
@@ -275,16 +267,13 @@ function Cart() {
             </div>
 
             <div className={cx('content')}>
-                {/* Cart Items */}
                 <div className={cx('cart-items')}>
                     {cartItems.map((item) => {
-                        // Validation - bỏ qua items không hợp lệ
                         if (!item || !item.productId) {
                             console.warn('Invalid cart item:', item);
                             return null;
                         }
 
-                        // Sử dụng data structure mới từ API
                         const displayPrice = item.unitPrice || item.price || 0;
                         const mainImage = item.url || '/images/default-book.jpg';
                         const authorName = item.authorName || 'Đang cập nhật';
@@ -296,7 +285,6 @@ function Cart() {
                                 key={item.cartItemId || item.productId}
                                 className={cx('cart-item')}
                                 onClick={(e) => {
-                                    // Chỉ xem chi tiết khi click vào phần chính, không phải các nút điều khiển
                                     if (
                                         !e.target.closest(`.${cx('item-controls')}`) &&
                                         !e.target.closest(`.${cx('remove-btn')}`) &&
@@ -315,7 +303,6 @@ function Cart() {
                                         }}
                                     />
                                     {item.featured && <span className={cx('featured-badge')}>Nổi bật</span>}
-                                    {/* View details overlay */}
                                 </div>
 
                                 <div className={cx('item-details')}>
@@ -374,7 +361,6 @@ function Cart() {
                     })}
                 </div>
 
-                {/* Order Summary */}
                 <div className={cx('order-summary')}>
                     <h3>Tóm tắt đơn hàng</h3>
 

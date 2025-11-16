@@ -90,12 +90,11 @@
     font-size: 14px;
     border: 2px solid var(--border-color);
 
-    // Fallback style khi ảnh lỗi
     &.fallback {
         position: absolute;
         top: 0;
         left: 0;
-        display: none; // Mặc định ẩn, chỉ hiện khi ảnh lỗi
+        display: none;
     }
 
     svg {

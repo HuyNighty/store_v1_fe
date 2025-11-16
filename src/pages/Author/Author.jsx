@@ -25,13 +25,11 @@ function Author() {
                 setLoading(true);
                 setError(null);
 
-                // Sử dụng API public endpoints
                 const [authorResponse, booksResponse] = await Promise.all([
                     authorApi.getAuthorDetail(authorId),
                     authorApi.getAuthorBooks(authorId),
                 ]);
 
-                // Lấy data từ response
                 const authorData = authorResponse.data?.result || authorResponse.data;
                 const booksData =
                     booksResponse.data?.result?.books || booksResponse.data?.books || booksResponse.data || [];
@@ -112,7 +110,6 @@ function Author() {
 
     return (
         <div className={cx('container')}>
-            {/* Header */}
             <div className={cx('header')}>
                 <Button shine outline back onClick={handleBack}>
                     <FontAwesomeIcon icon={faArrowLeft} />
@@ -120,7 +117,6 @@ function Author() {
                 <h1>Thông tin tác giả</h1>
             </div>
 
-            {/* Breadcrumb */}
             <div className={cx('breadcrumb')}>
                 <span onClick={() => navigate('/')}>Trang chủ</span>
                 <span>/</span>
@@ -129,7 +125,6 @@ function Author() {
                 <span className={cx('current')}>{authorName}</span>
             </div>
 
-            {/* Author Profile */}
             <div className={cx('author-profile')}>
                 <div className={cx('author-portrait')}>
                     {imageLoading && <div className={cx('image-placeholder')}>Đang tải ảnh...</div>}
@@ -205,7 +200,6 @@ function Author() {
                 </div>
             </div>
 
-            {/* Author's Books */}
             <div className={cx('books-section')}>
                 <h2 className={cx('section-title')}>
                     <FontAwesomeIcon icon={faBook} />

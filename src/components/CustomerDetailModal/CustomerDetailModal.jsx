@@ -1,4 +1,3 @@
-// src/components/CustomerDetailModal.jsx
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import styles from './CustomerDetailModal.module.scss';

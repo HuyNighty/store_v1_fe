@@ -33,7 +33,6 @@ function ReviewSection({
         return `${baseUrl}/Store${imagePath}`;
     };
 
-    // Hàm hiển thị avatar - ĐÃ SỬA
     const renderAvatar = (review) => {
         const hasProfileImage = review.profileImage || review.user?.profileImage;
         const profileImageUrl = review.profileImage || review.user?.profileImage;
@@ -41,7 +40,6 @@ function ReviewSection({
         const lastName = review.lastName || review.user?.lastName || '';
         const userName = review.userName || 'Độc giả';
 
-        // Nếu có ảnh, hiển thị ảnh với fallback
         if (hasProfileImage && profileImageUrl) {
             return (
                 <div className={cx('avatar-container')}>
@@ -50,11 +48,10 @@ function ReviewSection({
                         alt="Avatar"
                         className={cx('review-avatar')}
                         onError={(e) => {
-                            // Khi ảnh lỗi, hiển thị placeholder với chữ cái đầu
                             e.target.style.display = 'none';
                         }}
                     />
-                    {/* Fallback hiển thị khi ảnh lỗi */}
+
                     <div className={cx('avatar-placeholder', 'fallback')} style={{ display: 'none' }}>
                         {firstName ? firstName.charAt(0) + (lastName?.charAt(0) || '') : userName.charAt(0)}
                     </div>
@@ -62,7 +59,6 @@ function ReviewSection({
             );
         }
 
-        // Nếu không có ảnh, hiển thị placeholder với chữ cái đầu
         return (
             <div className={cx('avatar-placeholder')}>
                 {firstName ? firstName.charAt(0) + (lastName?.charAt(0) || '') : userName.charAt(0)}
@@ -72,7 +68,6 @@ function ReviewSection({
 
     return (
         <div className={cx('reviews-container')}>
-            {/* Review Summary */}
             <div className={cx('review-summary')}>
                 <div className={cx('average-rating')}>
                     <div className={cx('rating-number')}>{averageRating.toFixed(1)}</div>
@@ -81,7 +76,6 @@ function ReviewSection({
                 </div>
             </div>
 
-            {/* Write Review Form */}
             <ReviewForm
                 userReview={userReview}
                 userRating={userRating}
@@ -96,7 +90,6 @@ function ReviewSection({
                 handleDeleteReview={handleDeleteReview}
             />
 
-            {/* Reviews List */}
             <div className={cx('reviews-list')}>
                 <h4>Đánh giá từ độc giả</h4>
                 {reviews.length > 0 ? (

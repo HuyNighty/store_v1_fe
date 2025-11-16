@@ -28,14 +28,11 @@ function HomeContent() {
         };
     }, []);
 
-    // Floating books positions
     const floatingBooks = [...Array(6)].map((_, i) => i);
 
     return (
         <>
-            {/* Hero Section */}
             <section className={cx('hero', { 'no-bg': !bgLoaded })}>
-                {/* Floating books animation */}
                 {floatingBooks.map((i) => (
                     <motion.div
                         key={i}
@@ -61,7 +58,6 @@ function HomeContent() {
                 ))}
 
                 <div className={cx('hero-inner')}>
-                    {/* Animated badge */}
                     <motion.div
                         className={cx('hero-badge')}
                         animate={{ y: [0, -10, 0] }}
@@ -71,7 +67,6 @@ function HomeContent() {
                         Khám phá kiến thức vô tận
                     </motion.div>
 
-                    {/* Title (TextType) - đã chuyển sang tiếng Việt và tối ưu nội dung tiêu đề) */}
                     <TextType
                         className={cx('title')}
                         text={[
@@ -89,9 +84,6 @@ function HomeContent() {
                         textColors={['white', '#f0f0e5ff', '#f7eac5ff']}
                         variableSpeed={{ min: 30, max: 120 }}
                         startOnVisible={true}
-                        // onSentenceComplete={(sentence, index) => {
-                        //     console.log('Câu hoàn tất:', index, sentence);
-                        // }}
                         loop={true}
                     />
 
@@ -114,7 +106,6 @@ function HomeContent() {
                     </div>
                 </div>
 
-                {/* Scroll indicator */}
                 <motion.div
                     className={cx('scroll-indicator')}
                     animate={{ y: [0, 10, 0] }}
@@ -130,7 +121,6 @@ function HomeContent() {
                 </motion.div>
             </section>
 
-            {/* Stats Section (đang để comment, khi cần mình sẽ dịch/hiện lại) */}
             {/* <section className={cx('stats-section')}>
                 <div className={cx('stats-container')}>
                     <div className={cx('stats-grid')}>

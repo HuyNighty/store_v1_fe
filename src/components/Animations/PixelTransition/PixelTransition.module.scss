@@ -20,7 +20,6 @@
     &__pixel {
         position: absolute;
         box-sizing: border-box;
-        /* background is set inline from JS; you can add border or shadow if want */
         will-change: transform, opacity;
     }
 }

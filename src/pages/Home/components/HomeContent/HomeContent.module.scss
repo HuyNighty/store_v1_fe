@@ -8,6 +8,7 @@
     text-align: center;
     background: linear-gradient(rgba(101, 85, 72, 0.4), rgba(149, 125, 107, 0.3)),
         url('https://i.pinimg.com/736x/3b/30/b6/3b30b6bc5b1a89ce7857999dd0672ef0.jpg');
+
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -20,7 +21,6 @@
     animation: fadeSlideDown 1s cubic-bezier(0.16, 1, 0.3, 1) both;
     padding-top: var(--header-height, 72px);
 
-    // Shine effect
     &::before {
         content: '';
         position: absolute;
@@ -34,7 +34,6 @@
         z-index: 1;
     }
 
-    // Overlay để text dễ đọc hơn
     &::after {
         content: '';
         position: absolute;
@@ -147,7 +146,6 @@
     }
 }
 
-// Fallback nếu ảnh không load
 .hero.no-bg {
     background: linear-gradient(135deg, var(--primary-color-bold), var(--primary-color));
 
@@ -156,7 +154,6 @@
     }
 }
 
-// Floating books particles (Từ mẫu)
 .floating-book {
     position: absolute;
     color: rgba(184, 165, 134, 0.4);
@@ -169,7 +166,6 @@
     }
 }
 
-// Hero Badge (Từ mẫu)
 .hero-badge {
     display: inline-flex;
     align-items: center;
@@ -192,7 +188,6 @@
     }
 }
 
-// Scroll Indicator (Từ mẫu)
 .scroll-indicator {
     position: absolute;
     bottom: 2rem;
@@ -218,7 +213,6 @@
     border-radius: 50%;
 }
 
-// Stats Section (Từ mẫu)
 .stats-section {
     padding: 5rem 0;
     background: white;
@@ -287,7 +281,6 @@
     font-weight: 500;
 }
 
-// Responsive Design
 @media (max-width: 1200px) {
     .hero {
         height: 55vh;
@@ -301,14 +294,14 @@
 @media (max-width: 768px) {
     .hero {
         height: 50vh;
-        background-attachment: scroll; // Bỏ parallax trên mobile
+        background-attachment: scroll;
         padding: 0 15px;
 
         .title {
             font-size: 4rem;
 
             span {
-                display: inline; // Hiển thị trên cùng 1 dòng
+                display: inline;
             }
         }
 
@@ -383,7 +376,6 @@
     }
 }
 
-// Animations
 @keyframes fadeSlideDown {
     from {
         opacity: 0;
@@ -418,7 +410,6 @@
     }
 }
 
-// Additional effects từ mẫu
 @keyframes float {
     0%,
     100% {
@@ -449,7 +440,6 @@
     }
 }
 
-// Áp dụng animations
 .hero .title {
     animation: fadeUp 0.8s ease-out forwards 0.2s, float 6s ease-in-out infinite 1s;
 }
@@ -462,7 +452,6 @@
     animation: fadeUp 0.8s ease-out forwards 0.1s, float 4s ease-in-out infinite 0.5s;
 }
 
-// Utility classes cho animations
 .animate-float {
     animation: float 3s ease-in-out infinite;
 }

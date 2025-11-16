@@ -55,7 +55,6 @@ function Login() {
         try {
             await login(form);
 
-            // Redirect về trang trước đó hoặc trang chủ
             const redirectPath = localStorage.getItem('redirectPath') || '/';
             localStorage.removeItem('redirectPath');
             navigate(redirectPath);
@@ -69,10 +68,8 @@ function Login() {
 
     const shouldShowPasswordIcon = form.password.length > 0;
 
-    // Floating particles data
     const floatingParticles = Array.from({ length: 6 }, (_, i) => i);
 
-    // Features data
     const features = [
         {
             icon: faBook,
@@ -91,7 +88,6 @@ function Login() {
         },
     ];
 
-    // Stats data
     const stats = [
         { value: '10K+', label: 'Sách' },
         { value: '50K+', label: 'Độc giả' },
@@ -100,24 +96,20 @@ function Login() {
 
     return (
         <div className={cx('login-wrapper')}>
-            {/* Background Image with Overlay */}
             <div className={cx('background-overlay')}>
                 <div className={cx('background-image')}></div>
                 <div className={cx('gradient-overlay')}></div>
                 <div className={cx('radial-overlay')}></div>
             </div>
 
-            {/* Animated floating books */}
             {floatingParticles.map((i) => (
                 <div key={i} className={cx('floating-particle', `particle-${i}`)}>
                     <FontAwesomeIcon icon={faBook} />
                 </div>
             ))}
 
-            {/* Content */}
             <div className={cx('login-container')}>
                 <div className={cx('content-grid')}>
-                    {/* Left side - Branding and features */}
                     <div className={cx('branding-section')}>
                         <div className={cx('branding-content')}>
                             <div className={cx('logo-section')}>
@@ -135,7 +127,6 @@ function Login() {
                             </p>
                         </div>
 
-                        {/* Features */}
                         <div className={cx('features-section')}>
                             {features.map((feature, index) => (
                                 <div key={index} className={cx('feature-item')}>
@@ -150,7 +141,6 @@ function Login() {
                             ))}
                         </div>
 
-                        {/* Stats */}
                         <div className={cx('stats-section')}>
                             {stats.map((stat, i) => (
                                 <div key={i} className={cx('stat-item')}>
@@ -161,15 +151,11 @@ function Login() {
                         </div>
                     </div>
 
-                    {/* Right side - Login Form */}
                     <div className={cx('form-section')}>
-                        {/* Glass morphism card */}
                         <div className={cx('form-card')}>
-                            {/* Glow effect */}
                             <div className={cx('card-glow')} />
 
                             <div className={cx('card-content')}>
-                                {/* Mobile logo */}
                                 <div className={cx('mobile-logo')}>
                                     <FontAwesomeIcon icon={faBook} />
                                 </div>
@@ -194,7 +180,6 @@ function Login() {
                                 )}
 
                                 <form onSubmit={handleSubmit} className={cx('login-form')}>
-                                    {/* Email Input */}
                                     <div className={cx('input-group')}>
                                         <label className={cx('input-label')}>Email hoặc tên đăng nhập</label>
                                         <div
@@ -218,7 +203,6 @@ function Login() {
                                         </div>
                                     </div>
 
-                                    {/* Password Input */}
                                     <div className={cx('input-group')}>
                                         <label htmlFor="password" className={cx('input-label')}>
                                             Mật khẩu
@@ -252,7 +236,6 @@ function Login() {
                                         </div>
                                     </div>
 
-                                    {/* Remember & Forgot */}
                                     <div className={cx('form-options')}>
                                         <label className={cx('remember-me')}>
                                             <input type="checkbox" />
@@ -264,7 +247,6 @@ function Login() {
                                         </a>
                                     </div>
 
-                                    {/* Submit Button */}
                                     <div className={cx('submit-section')}>
                                         <Button
                                             type="submit"
@@ -290,12 +272,10 @@ function Login() {
                                     </div>
                                 </form>
 
-                                {/* Divider */}
                                 <div className={cx('divider')}>
                                     <span>HOẶC</span>
                                 </div>
 
-                                {/* Social Login */}
                                 <div className={cx('social-login')}>
                                     <Button type="button" outline className={cx('social-button')}>
                                         <svg className={cx('social-icon')} viewBox="0 0 24 24">
@@ -326,7 +306,6 @@ function Login() {
                                     </Button>
                                 </div>
 
-                                {/* Register Link */}
                                 <div className={cx('register-link-section')}>
                                     <span className={cx('register-prompt')}>Chưa có tài khoản? </span>
                                     <Button type="button" shine outline to="/register" className={cx('register-link')}>

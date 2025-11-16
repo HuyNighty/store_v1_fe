@@ -81,7 +81,6 @@ function Wishlist() {
 
     return (
         <div className={cx('container')}>
-            {/* Header */}
             <div className={cx('header')}>
                 <Button shine outline back onClick={handleBack}>
                     <FontAwesomeIcon icon={faArrowLeft} />
@@ -96,7 +95,6 @@ function Wishlist() {
                 </div>
             </div>
 
-            {/* Wishlist Items */}
             <div className={cx('wishlist-items')}>
                 {wishlistItems.map((item) => (
                     <div key={item.productId} className={cx('wishlist-item')}>
@@ -161,7 +159,6 @@ function Wishlist() {
                 ))}
             </div>
 
-            {/* Footer Actions */}
             <div className={cx('footer-actions')}>
                 <Button primary onClick={() => navigate('/books')}>
                     Tiếp tục mua sắm
