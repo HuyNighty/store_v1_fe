@@ -390,6 +390,8 @@ function Cart() {
                         </div>
 
                         <Button
+                            scale
+                            shine
                             primary
                             large
                             onClick={handleCheckout}
@@ -400,6 +402,8 @@ function Cart() {
                         </Button>
 
                         <Button
+                            scale
+                            shine
                             outline
                             onClick={handleContinueShopping}
                             className={cx('continue-btn')}
