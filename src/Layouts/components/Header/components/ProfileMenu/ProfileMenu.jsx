@@ -1,3 +1,4 @@
+import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faGear, faBox, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
@@ -5,28 +6,25 @@ import styles from './ProfileMenu.module.scss';
 import classNames from 'classnames/bind';
 import { Wrapper as PopperWrapper } from '../../../../Popper';
 import Tippy from '@tippyjs/react';
+import { useAuth } from '../../../../../contexts/Auth/AuthContext';
 
 const cx = classNames.bind(styles);
 
-function ProfileMenu({ onProfileInteract, onLogout, user }) {
+function ProfileMenu({ onProfileInteract, onLogout }) {
+    const { user } = useAuth();
+
     const profileMenuItems = [
         { key: 1, label: 'Thông tin cá nhân', icon: faUser, to: '/profile' },
         { key: 2, label: 'Đơn hàng', icon: faBox, to: '/orders' },
-        // { label: 'Cài đặt', icon: faGear, to: '/settings' },
         { key: 3, label: 'Đăng xuất', icon: faRightFromBracket, onClick: onLogout },
     ];
 
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
-
-        if (imagePath.startsWith('http')) {
-            return imagePath;
-        }
-
+        if (imagePath.startsWith('http')) return imagePath;
         const baseUrl = 'http://localhost:8080';
-        const fullUrl = `${baseUrl}/Store${imagePath}`;
-
-        return fullUrl;
+        const ts = user?.updatedAt ? new Date(user.updatedAt).getTime() : undefined;
+        return ts ? `${baseUrl}/Store${imagePath}?t=${ts}` : `${baseUrl}/Store${imagePath}`;
     };
 
     const menuContent = (
@@ -50,7 +48,7 @@ function ProfileMenu({ onProfileInteract, onLogout, user }) {
             hideOnClick={true}
             interactive
             delay={[100, 300]}
-            onTrigger={() => onProfileInteract()}
+            onTrigger={() => onProfileInteract?.()}
         >
             <div className={cx('profile-trigger')}>
                 {user?.profileImage ? (
@@ -58,9 +56,7 @@ function ProfileMenu({ onProfileInteract, onLogout, user }) {
                         src={getImageUrl(user.profileImage)}
                         alt="Profile"
                         className={cx('profile-image')}
-                        onError={(e) => {
-                            e.target.style.display = 'none';
-                        }}
+                        onError={(e) => (e.target.style.display = 'none')}
                     />
                 ) : (
                     <FontAwesomeIcon icon={faUser} className={cx('icon-btn')} />

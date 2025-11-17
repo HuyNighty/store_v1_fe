@@ -27,10 +27,13 @@ const customerApi = {
         return axiosClient.get(url);
     },
 
-    uploadProfileImage: (file) => {
+    uploadProfileImage: (formData) => {
         const url = '/customers/profile-image';
-        const formData = new FormData();
-        formData.append('file', file);
+        console.log('API Call - Upload Profile Image');
+        console.log('FormData contents:');
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ', pair[1]);
+        }
         return axiosClient.post(url, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',

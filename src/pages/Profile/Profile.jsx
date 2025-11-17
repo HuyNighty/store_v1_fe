@@ -1,4 +1,3 @@
-// Profile.js - Sửa phần hiển thị ảnh
 import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Profile.module.scss';
@@ -10,7 +9,7 @@ import Button from '../../Layouts/components/Button';
 const cx = classNames.bind(styles);
 
 function Profile() {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user, refreshUserData, setUser } = useAuth();
     const [userInfo, setUserInfo] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -22,9 +21,11 @@ function Profile() {
         if (!isAuthenticated) {
             setLoading(false);
             setError('Please login to view your profile');
+            setUserInfo(null);
             return;
         }
         fetchUserInfo();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated]);
 
     const fetchUserInfo = async () => {
@@ -34,11 +35,11 @@ function Profile() {
             setImageError(false);
 
             const response = await customerApi.getMyProfile();
-
-            if (response.data?.result) {
-                setUserInfo(response.data.result);
-            } else {
-                throw new Error('No user data found in response');
+            const payload = response.data?.result ?? response.data ?? null;
+            if (!payload) throw new Error('No user data found in response');
+            setUserInfo(payload);
+            if (setUser) {
+                setUser((prev) => ({ ...(prev || {}), ...payload }));
             }
         } catch (err) {
             console.error('Error fetching user info:', err);
@@ -49,7 +50,7 @@ function Profile() {
     };
 
     const handleImageUpload = async (event) => {
-        const file = event.target.files[0];
+        const file = event?.target?.files?.[0];
         if (!file) return;
 
         if (!file.type.startsWith('image/')) {
@@ -66,15 +67,29 @@ function Profile() {
             setUploading(true);
             setImageError(false);
 
-            const response = await customerApi.uploadProfileImage(file);
+            const formData = new FormData();
+            formData.append('file', file);
 
-            setUserInfo((prev) => ({
-                ...prev,
-                profileImage: response.data.result,
-            }));
+            // Debug: Check what's being sent
+            console.log('Sending file:', file.name, file.size, file.type);
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ', ' + pair[1]);
+            }
+
+            const response = await customerApi.uploadProfileImage(formData);
+            const newImagePath = response.data?.result ?? response.data ?? null;
+
+            if (setUser) {
+                setUser((prev) =>
+                    prev ? { ...prev, profileImage: newImagePath, updatedAt: new Date().toISOString() } : prev,
+                );
+            }
+            setUserInfo((prev) => ({ ...(prev || {}), profileImage: newImagePath }));
+
+            if (refreshUserData) {
+                await refreshUserData();
+            }
         } catch (err) {
-            console.error('Error uploading image:', err);
-            alert(err.response?.data?.message || 'Failed to upload image. Please try again.');
         } finally {
             setUploading(false);
             if (fileInputRef.current) {
@@ -82,22 +97,24 @@ function Profile() {
             }
         }
     };
-
     const handleRemoveImage = async () => {
-        if (!window.confirm('Are you sure you want to remove your profile image?')) {
-            return;
-        }
-
+        if (!window.confirm('Are you sure you want to remove your profile image?')) return;
         try {
+            setUploading(true);
             await customerApi.removeProfileImage();
-            setUserInfo((prev) => ({
-                ...prev,
-                profileImage: null,
-            }));
+            if (setUser) {
+                setUser((prev) => (prev ? { ...prev, profileImage: null, updatedAt: new Date().toISOString() } : prev));
+            }
+            setUserInfo((prev) => ({ ...(prev || {}), profileImage: null }));
             setImageError(false);
+            if (refreshUserData) {
+                await refreshUserData();
+            }
         } catch (err) {
             console.error('Error removing image:', err);
             alert(err.response?.data?.message || 'Failed to remove image. Please try again.');
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -113,28 +130,23 @@ function Profile() {
     const handleLogout = async () => {
         try {
             await authApi.logout();
-            localStorage.removeItem('access_token');
-            window.location.href = '/';
         } catch (err) {
             console.error('Logout error:', err);
+        } finally {
             localStorage.removeItem('access_token');
             window.location.href = '/';
         }
     };
 
-    // Construct full image URL
-    const getImageUrl = (imagePath) => {
+    const buildImageUrl = (imagePath) => {
         if (!imagePath) return null;
-
-        // Nếu đã là full URL, return luôn
-        if (imagePath.startsWith('http')) {
-            return imagePath;
-        }
-
-        // eslint-disable-next-line no-undef
+        if (imagePath.startsWith('http')) return imagePath;
         const baseUrl = 'http://localhost:8080';
-        const fullUrl = `${baseUrl}/Store${imagePath}`;
-        return fullUrl;
+        const ts =
+            userInfo?.updatedAt || user?.updatedAt
+                ? new Date(userInfo?.updatedAt || user?.updatedAt).getTime()
+                : undefined;
+        return ts ? `${baseUrl}/Store${imagePath}?t=${ts}` : `${baseUrl}/Store${imagePath}`;
     };
 
     if (loading) {
@@ -189,13 +201,12 @@ function Profile() {
             </div>
 
             <div className={cx('profile-content')}>
-                {/* Welcome Section */}
                 <div className={cx('welcome-section')}>
                     <div className={cx('avatar-section')}>
                         <div className={cx('avatar-container')} onClick={handleImageClick}>
                             {userInfo.profileImage && !imageError ? (
                                 <img
-                                    src={getImageUrl(userInfo.profileImage)}
+                                    src={buildImageUrl(userInfo.profileImage)}
                                     alt="Profile"
                                     className={cx('avatar-image')}
                                     onError={handleImageError}
@@ -204,8 +215,7 @@ function Profile() {
 
                             {shouldShowPlaceholder && (
                                 <div className={cx('avatar-placeholder')}>
-                                    {userInfo.firstName?.charAt(0) || 'U'}
-                                    {userInfo.lastName?.charAt(0) || 'S'}
+                                    {(userInfo.firstName?.charAt(0) || 'U') + (userInfo.lastName?.charAt(0) || '')}
                                 </div>
                             )}
 
@@ -253,13 +263,12 @@ function Profile() {
 
                     <div className={cx('welcome-text')}>
                         <h2>
-                            Welcome back, {userInfo.firstName || 'User'} {userInfo.lastName || ''}!
+                            Welcome back, {userInfo.firstName || 'User'} {userInfo.lastName || ''}
                         </h2>
                         <p>Here's your profile information</p>
                     </div>
                 </div>
 
-                {/* Personal Information Section */}
                 <div className={cx('profile-section')}>
                     <h2 className={cx('section-title')}>Personal Information</h2>
                     <div className={cx('info-grid')}>
@@ -277,35 +286,11 @@ function Profile() {
     );
 }
 
-// Helper Component for Info Items
 const InfoItem = ({ label, value, isPoints = false }) => (
     <div className={cx('info-item')}>
         <span className={cx('info-label')}>{label}</span>
         <span className={cx('info-value', { points: isPoints })}>{value || value === 0 ? value : 'N/A'}</span>
     </div>
 );
-
-// Helper Component for Summary Cards
-const SummaryCard = ({ title, value, className = '' }) => (
-    <div className={cx('summary-card', className)}>
-        <h3 className={cx('summary-title')}>{title}</h3>
-        <p className={cx('summary-value')}>{value}</p>
-    </div>
-);
-
-// Helper functions
-const getLoyaltyStatus = (points) => {
-    if (points >= 1000) return 'Gold Member 🥇';
-    if (points >= 500) return 'Silver Member 🥈';
-    if (points >= 100) return 'Bronze Member 🥉';
-    return 'New Member 🌟';
-};
-
-const getLoyaltyClass = (points) => {
-    if (points >= 1000) return 'gold';
-    if (points >= 500) return 'silver';
-    if (points >= 100) return 'bronze';
-    return 'new-member';
-};
 
 export default Profile;

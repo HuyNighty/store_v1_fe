@@ -9,15 +9,15 @@ export const AuthContext = createContext({
     login: async () => {},
     logout: async () => {},
     loading: false,
+    refreshUserData: async () => {},
+    setUser: () => {},
 });
 
 const safeJwtDecode = (token) => {
     if (!token) return null;
-
     const possibleFn =
         (jwtDecodeLib && (jwtDecodeLib.default || jwtDecodeLib.jwtDecode || jwtDecodeLib.jwt_decode)) ||
         (typeof jwtDecodeLib === 'function' ? jwtDecodeLib : null);
-
     if (typeof possibleFn === 'function') {
         try {
             return possibleFn(token);
@@ -25,12 +25,10 @@ const safeJwtDecode = (token) => {
             console.warn('[Auth] jwt-decode lib failed, falling back to manual decode', err);
         }
     }
-
     try {
         const parts = token.split('.');
         if (parts.length < 2) return null;
-        let payload = parts[1];
-        payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+        let payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
         const pad = payload.length % 4;
         if (pad) payload += '='.repeat(4 - pad);
         const decodedStr = atob(payload);
@@ -49,9 +47,7 @@ const safeJwtDecode = (token) => {
 
 function parseRolesFromDecoded(decoded) {
     if (!decoded) return [];
-
     const rolesSet = new Set();
-
     if (Array.isArray(decoded.roles)) {
         decoded.roles.forEach((r) => {
             if (typeof r === 'string') rolesSet.add(r.toUpperCase());
@@ -61,7 +57,6 @@ function parseRolesFromDecoded(decoded) {
             }
         });
     }
-
     if (Array.isArray(decoded.authorities)) {
         decoded.authorities.forEach((a) => {
             if (typeof a === 'string') rolesSet.add(a.toUpperCase());
@@ -71,18 +66,14 @@ function parseRolesFromDecoded(decoded) {
             }
         });
     }
-
     if (decoded.realm_access && Array.isArray(decoded.realm_access.roles)) {
         decoded.realm_access.roles.forEach((r) => rolesSet.add(String(r).toUpperCase()));
     }
-
     if (typeof decoded.scope === 'string' && decoded.scope.trim()) {
         decoded.scope.split(/\s+/).forEach((s) => rolesSet.add(s.toUpperCase()));
     }
-
     if (typeof decoded.role === 'string' && decoded.role.trim()) rolesSet.add(decoded.role.toUpperCase());
     if (typeof decoded.authority === 'string') rolesSet.add(decoded.authority.toUpperCase());
-
     return Array.from(rolesSet);
 }
 
@@ -95,10 +86,8 @@ export function AuthProvider({ children }) {
         try {
             const decoded = safeJwtDecode(token);
             if (!decoded) return null;
-
             const roles = parseRolesFromDecoded(decoded);
             const primaryRole = roles.length ? roles[0] : null;
-
             return {
                 id: decoded.id || decoded.sub || null,
                 username: decoded.username || decoded.preferred_username || decoded.sub || null,
@@ -116,7 +105,6 @@ export function AuthProvider({ children }) {
         try {
             const customerRes = await customerApi.getMyProfile();
             const customerData = customerRes.data?.result;
-
             if (customerData) {
                 let roles =
                     Array.isArray(customerData.roles) && customerData.roles.length
@@ -131,18 +119,15 @@ export function AuthProvider({ children }) {
                         : typeof customerData.scope === 'string'
                         ? customerData.scope.split(/\s+/).map((r) => r.toUpperCase())
                         : [];
-
                 if ((!roles || roles.length === 0) && decodedFromToken?.roles?.length) {
                     roles = decodedFromToken.roles;
                 }
-
                 const primaryRole =
                     roles && roles.length
                         ? roles[0]
                         : customerData.role
                         ? String(customerData.role).toUpperCase()
                         : decodedFromToken?.role || null;
-
                 const mergedUser = {
                     ...customerData,
                     roles,
@@ -152,8 +137,6 @@ export function AuthProvider({ children }) {
                     lastName: customerData.lastName,
                     email: customerData.email,
                 };
-
-                console.log('[Auth] fetchUser -> customer profile (merged):', mergedUser);
                 setUser(mergedUser);
                 return;
             }
@@ -174,18 +157,15 @@ export function AuthProvider({ children }) {
                         : typeof authData.scope === 'string'
                         ? authData.scope.split(/\s+/).map((r) => r.toUpperCase())
                         : [];
-
                 if ((!roles || roles.length === 0) && decodedFromToken?.roles?.length) {
                     roles = decodedFromToken.roles;
                 }
-
                 const primaryRole =
                     roles && roles.length
                         ? roles[0]
                         : authData.role
                         ? String(authData.role).toUpperCase()
                         : decodedFromToken?.role || null;
-
                 const mergedUser = {
                     ...authData,
                     roles,
@@ -195,19 +175,15 @@ export function AuthProvider({ children }) {
                     lastName: authData.lastName,
                     email: authData.email,
                 };
-
-                console.log('[Auth] fetchUser -> auth profile (merged):', mergedUser);
                 setUser(mergedUser);
                 return;
             }
 
             if (decodedFromToken) {
-                console.log('[Auth] fetchUser -> using decoded token as fallback user:', decodedFromToken);
                 setUser(decodedFromToken);
             }
         } catch (e) {
             console.warn('[AuthContext] fetchUser failed:', e?.response?.status || e.message);
-
             if (e?.response?.status === 404 || e?.response?.status === 400) {
                 try {
                     const authRes = await authApi.me();
@@ -226,18 +202,15 @@ export function AuthProvider({ children }) {
                                 : typeof authData.scope === 'string'
                                 ? authData.scope.split(/\s+/).map((r) => r.toUpperCase())
                                 : [];
-
                         if ((!roles || roles.length === 0) && decodedFromToken?.roles?.length) {
                             roles = decodedFromToken.roles;
                         }
-
                         const primaryRole =
                             roles && roles.length
                                 ? roles[0]
                                 : authData.role
                                 ? String(authData.role).toUpperCase()
                                 : decodedFromToken?.role || null;
-
                         const mergedUser = {
                             ...authData,
                             roles,
@@ -247,8 +220,6 @@ export function AuthProvider({ children }) {
                             lastName: authData.lastName,
                             email: authData.email,
                         };
-
-                        console.log('[Auth] fetchUser (fallback auth) merged:', mergedUser);
                         setUser(mergedUser);
                         return;
                     }
@@ -273,7 +244,6 @@ export function AuthProvider({ children }) {
                 if (decodedUser) {
                     setUser(decodedUser);
                     setIsAuthenticated(true);
-
                     await fetchUser(decodedUser);
                 } else {
                     localStorage.removeItem('access_token');
@@ -286,7 +256,6 @@ export function AuthProvider({ children }) {
             }
             setLoading(false);
         };
-
         initializeAuth();
     }, [fetchUser]);
 
@@ -296,17 +265,11 @@ export function AuthProvider({ children }) {
             const res = await authApi.login({ identifier, password });
             const token =
                 res.data?.result?.token || res.data?.result?.accessToken || res.data?.token || res.data?.accessToken;
-
             if (!token) throw new Error('No token returned from login');
-
             localStorage.setItem('access_token', token);
             setIsAuthenticated(true);
-
             const decodedUser = decodeUserFromToken(token);
-            if (decodedUser) {
-                setUser(decodedUser);
-            }
-
+            if (decodedUser) setUser(decodedUser);
             await fetchUser(decodedUser);
             return true;
         } catch (error) {
@@ -342,6 +305,7 @@ export function AuthProvider({ children }) {
     const value = {
         isAuthenticated,
         user,
+        setUser,
         login,
         logout,
         loading,
@@ -353,9 +317,7 @@ export function AuthProvider({ children }) {
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
+    if (!context) throw new Error('useAuth must be used within an AuthProvider');
     return context;
 };
 

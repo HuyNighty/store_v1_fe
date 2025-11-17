@@ -6,7 +6,6 @@ export async function uploadAsset(file) {
     const formData = new FormData();
     formData.append('file', file);
     // eslint-disable-next-line no-useless-catch
-
     try {
         const res = await axiosClient.post('/api/assets/upload', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
