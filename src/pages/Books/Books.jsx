@@ -22,6 +22,20 @@ function useDebounced(value, delay = 250) {
     return v;
 }
 
+const normalizeRatingValue = (raw) => {
+    if (raw === null || raw === undefined) return 0;
+    let s = String(raw).trim();
+    s = s.replace(/\s/g, '').replace(',', '.').replace('%', '');
+    const n = parseFloat(s);
+    if (!Number.isFinite(n)) return 0;
+    if (n > 5) {
+        if (n <= 10) return Math.max(0, Math.min(5, n / 2));
+        if (n <= 100) return Math.max(0, Math.min(5, (n / 100) * 5));
+        return Math.max(0, Math.min(5, n));
+    }
+    return Math.max(0, Math.min(5, n));
+};
+
 function Books() {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('Most Popular');
@@ -33,7 +47,7 @@ function Books() {
 
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
-    const [minRating, setMinRating] = useState('0');
+    const [minRating, setMinRating] = useState(0);
     const [onlyFeatured, setOnlyFeatured] = useState(false);
     const [inStockOnly, setInStockOnly] = useState(false);
 
@@ -44,7 +58,6 @@ function Books() {
     const [error, setError] = useState(null);
 
     const debouncedSearch = useDebounced(searchQuery, 300);
-
     const [quantities, setQuantities] = useState({});
 
     const extractArray = (payload) => {
@@ -118,6 +131,15 @@ function Books() {
                 setLoading(true);
                 setError(null);
 
+                const catIdNum = toNumberOrUndefined(selectedCategoryId);
+                const minP = toNumberOrUndefined(minPrice);
+                const maxP = toNumberOrUndefined(maxPrice);
+                const minR = (() => {
+                    const n = parseFloat(minRating || '0');
+                    if (!Number.isFinite(n)) return 0;
+                    return Math.max(0, Math.min(5, n));
+                })();
+
                 if (debouncedSearch && debouncedSearch.trim().length >= 3) {
                     const res = await productApi.searchByName(debouncedSearch.trim());
                     const booksData = extractArray(res);
@@ -130,26 +152,39 @@ function Books() {
                     return;
                 }
 
-                const catIdNum = toNumberOrUndefined(selectedCategoryId);
-                const minP = toNumberOrUndefined(minPrice);
-                const maxP = toNumberOrUndefined(maxPrice);
-
-                const hasServerFilter = catIdNum !== undefined || minP !== undefined || maxP !== undefined;
+                const hasServerFilter =
+                    catIdNum !== undefined || minP !== undefined || maxP !== undefined || (minR && minR > 0);
 
                 if (hasServerFilter) {
                     const filters = {};
                     if (catIdNum !== undefined) filters.categoryId = catIdNum;
                     if (minP !== undefined) filters.minPrice = minP;
                     if (maxP !== undefined) filters.maxPrice = maxP;
+                    if (minR && minR > 0) filters.minRating = minR;
 
                     const res = await productApi.filterProducts(filters);
                     const booksData = extractArray(res);
-                    setBooks(
-                        (booksData || []).filter((b) => {
-                            const val = b.isActive ?? b.active ?? b.is_active ?? b.activeFlag;
-                            return isActiveTrue(val);
-                        }),
-                    );
+
+                    let list = (booksData || []).filter((b) => {
+                        const val = b.isActive ?? b.active ?? b.is_active ?? b.activeFlag;
+                        return isActiveTrue(val);
+                    });
+
+                    if (filters.minRating !== undefined) {
+                        list = list.filter((b) => {
+                            const ratingRaw =
+                                b.rating ??
+                                b.averageRating ??
+                                b.avgRating ??
+                                b.reviewsAvg ??
+                                (b.review && (b.review.average || b.review.avg)) ??
+                                0;
+                            const rating = normalizeRatingValue(ratingRaw);
+                            return rating >= filters.minRating;
+                        });
+                    }
+
+                    setBooks(list);
                     return;
                 }
 
@@ -171,7 +206,7 @@ function Books() {
         };
 
         fetchBooks();
-    }, [debouncedSearch, selectedCategoryId, minPrice, maxPrice]);
+    }, [debouncedSearch, selectedCategoryId, minPrice, maxPrice, minRating]);
 
     const normalizeId = (v) => {
         if (v === null || v === undefined) return null;
@@ -278,7 +313,6 @@ function Books() {
                 });
 
             const matchesSearch = !search || productName.includes(search) || topAuthor.includes(search) || authorMatch;
-
             if (!matchesSearch) return false;
 
             if (selCatId) {
@@ -303,7 +337,16 @@ function Books() {
             if (!isNaN(minP) && price < minP) return false;
             if (!isNaN(maxP) && price > maxP) return false;
 
-            const rating = Number(book.rating ?? book.averageRating ?? book.avgRating ?? 0);
+            const ratingRaw =
+                book.rating ??
+                book.averageRating ??
+                book.avgRating ??
+                book.reviewsAvg ??
+                (book.reviews?.length
+                    ? book.reviews.reduce((sum, r) => sum + (r.rating ?? 0), 0) / book.reviews.length
+                    : 0) ??
+                0;
+            const rating = normalizeRatingValue(ratingRaw);
             if (!isNaN(minR) && rating < minR) return false;
 
             if (onlyFeatured && !(book.featured ?? book.isFeatured ?? book.is_featured)) return false;
@@ -322,8 +365,8 @@ function Books() {
         arr.sort((a, b) => {
             const aPrice = Number(a.salePrice ?? a.price) || 0;
             const bPrice = Number(b.salePrice ?? b.price) || 0;
-            const aRating = Number(a.rating ?? a.averageRating) || 0;
-            const bRating = Number(b.rating ?? b.averageRating) || 0;
+            const aRating = normalizeRatingValue(a.rating ?? a.averageRating ?? a.avgRating ?? a.reviewsAvg ?? 0);
+            const bRating = normalizeRatingValue(b.rating ?? b.averageRating ?? b.avgRating ?? b.reviewsAvg ?? 0);
             const aPop = Number(a.popularity ?? a.soldCount) || 0;
             const bPop = Number(b.popularity ?? b.soldCount) || 0;
 
@@ -371,7 +414,6 @@ function Books() {
 
     const addToCart = (book, qty) => {
         const q = Number(qty) || 0;
-
         console.log('Add to cart:', { bookId: book.productId ?? book.id ?? book.sku, qty: q });
     };
 
