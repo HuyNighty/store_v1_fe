@@ -1,36 +1,30 @@
 import axiosClient from './axiosClient';
 
+const base = '/categories';
+
+const unwrap = (res) => {
+    const payload = res?.data ?? res;
+    return payload?.result ?? payload;
+};
+
 const categoryApi = {
-    getAllCategories: () => {
-        const url = '/categories/public';
-        return axiosClient.get(url);
-    },
+    getAllPublic: () => axiosClient.get(`${base}/public`).then(unwrap),
 
-    getCategoryById: (categoryId) => {
-        const url = `/categories/${categoryId}`;
-        return axiosClient.get(url);
-    },
+    getAllAdmin: () => axiosClient.get(base).then(unwrap),
 
-    createCategory: (data) => {
-        const url = '/categories';
-        return axiosClient.post(url, data);
-    },
+    getById: (categoryId) => axiosClient.get(`${base}/${categoryId}`).then(unwrap),
 
-    updateCategory: (categoryId, data) => {
-        const url = `/categories/${categoryId}`;
-        return axiosClient.patch(url, data);
-    },
+    create: (data) => axiosClient.post(base, data).then(unwrap),
 
-    // Xóa mềm category
-    deleteCategory: (categoryId) => {
-        const url = `/categories/${categoryId}`;
-        return axiosClient.delete(url);
-    },
+    update: (categoryId, data) => axiosClient.patch(`${base}/${categoryId}`, data).then(unwrap),
 
-    getActiveCategories: () => {
-        const url = '/categories/active';
-        return axiosClient.get(url);
-    },
+    delete: (categoryId) =>
+        axiosClient.delete(`${base}/${categoryId}`).then((res) => {
+            const payload = res?.data ?? res;
+            return payload;
+        }),
+
+    getActive: () => axiosClient.get(`${base}/active`).then(unwrap),
 };
 
 export default categoryApi;

@@ -70,7 +70,6 @@ function Profile() {
             const formData = new FormData();
             formData.append('file', file);
 
-            // Debug: Check what's being sent
             console.log('Sending file:', file.name, file.size, file.type);
             for (let pair of formData.entries()) {
                 console.log(pair[0] + ', ' + pair[1]);

@@ -19,6 +19,7 @@ import Author from '../pages/Author';
 import FAQ from '../pages/FAQ';
 import CreateBook from '../pages/Admin/components/Books/CreateBook';
 import EditBook from '../pages/Admin/components/Books/EditBook';
+import CategoryForm from '../pages/Admin/components/CategoryForm';
 
 const publicRoutes = [
     { path: '/', component: Home, headerMode: 'auto' },
@@ -50,6 +51,7 @@ const adminRoutes = [
     { path: '/admin/books/edit/:productId', component: EditBook, layout: null },
     { path: '/admin-orders', component: AdminOrders, layout: null },
     { path: '/admin/orders/:orderId', component: OrderDetail, layout: null },
+    { path: '/admin-category', component: CategoryForm, layout: null },
 ];
 
 export { publicRoutes, privateRoutes, guestRoutes, userRoutes, adminRoutes };

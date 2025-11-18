@@ -128,6 +128,11 @@ function Admin() {
                         Analytics
                         <FontAwesomeIcon icon={faArrowRight} className={cx('arrow')} />
                     </Button>
+                    <Button to="/admin-category" info className={cx('action-btn')}>
+                        <FontAwesomeIcon icon={faChartBar} />
+                        Category
+                        <FontAwesomeIcon icon={faArrowRight} className={cx('arrow')} />
+                    </Button>
                 </div>
             </div>
         </div>

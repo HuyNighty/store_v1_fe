@@ -38,8 +38,8 @@ const normalizeRatingValue = (raw) => {
 
 function Books() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [sortBy, setSortBy] = useState('Most Popular');
-    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [sortBy, setSortBy] = useState('most_popular');
+    const [selectedCategory, setSelectedCategory] = useState('Tất cả');
     const [selectedCategoryId, setSelectedCategoryId] = useState(null);
     const [openCategory, setOpenCategory] = useState(false);
     const [openSort, setOpenSort] = useState(false);
@@ -68,6 +68,18 @@ function Books() {
         if (Array.isArray(payload.data?.result)) return payload.data.result;
         if (Array.isArray(payload.items)) return payload.items;
         return [];
+    };
+
+    const sorts = [
+        { key: 'most_popular', label: 'Phổ biến nhất' },
+        { key: 'highest_rated', label: 'Đánh giá cao nhất' },
+        { key: 'price_low_high', label: 'Giá: Thấp → Cao' },
+        { key: 'price_high_low', label: 'Giá: Cao → Thấp' },
+    ];
+
+    const getSortLabel = (key) => {
+        const found = sorts.find((s) => s.key === key);
+        return found ? found.label : key;
     };
 
     useEffect(() => {
@@ -289,8 +301,6 @@ function Books() {
 
     const categoryTree = useMemo(() => buildCategoryTree(categories), [categories]);
 
-    const sorts = ['Most Popular', 'Highest Rated', 'Price: Low to High', 'Price: High to Low'];
-
     const filteredBooks = useMemo(() => {
         const search = (debouncedSearch || '').trim().toLowerCase();
         const selCatId = normalizeId(selectedCategoryId);
@@ -371,12 +381,13 @@ function Books() {
             const bPop = Number(b.popularity ?? b.soldCount) || 0;
 
             switch (sortBy) {
-                case 'Price: Low to High':
+                case 'price_low_high':
                     return aPrice - bPrice;
-                case 'Price: High to Low':
+                case 'price_high_low':
                     return bPrice - aPrice;
-                case 'Highest Rated':
+                case 'highest_rated':
                     return bRating - aRating;
+                case 'most_popular':
                 default:
                     return bPop - aPop;
             }
@@ -385,12 +396,12 @@ function Books() {
     }, [filteredBooks, sortBy]);
 
     const handleCategorySelect = (category) => {
-        if (!category || category === 'All') {
-            setSelectedCategory('All');
+        if (!category || category === 'All' || category === 'Tất cả') {
+            setSelectedCategory('Tất cả');
             setSelectedCategoryId(null);
         } else {
             const id = normalizeId(category.categoryId ?? category.id ?? category._id ?? category.code);
-            const name = category.categoryName ?? category.name ?? category.title ?? category.displayName ?? 'Category';
+            const name = category.categoryName ?? category.name ?? category.title ?? category.displayName ?? 'Danh mục';
             setSelectedCategory(name);
             setSelectedCategoryId(id === '0' ? null : id);
         }
@@ -399,7 +410,7 @@ function Books() {
 
     const resetFilters = () => {
         setSearchQuery('');
-        setSelectedCategory('All');
+        setSelectedCategory('Tất cả');
         setSelectedCategoryId(null);
         setMinPrice('');
         setMaxPrice('');
@@ -426,8 +437,8 @@ function Books() {
         <div className={cx('wrapper')}>
             <div className={cx('container')}>
                 <div className={cx('header')}>
-                    <h1>All Books</h1>
-                    <p>Discover from our collection of {books.length} books</p>
+                    <h1>Tất cả sách</h1>
+                    <p>Khám phá bộ sưu tập gồm {books.length} cuốn sách</p>
                 </div>
 
                 <div className={cx('filters')}>
@@ -436,10 +447,10 @@ function Books() {
                             <Search className={cx('icon')} />
                             <input
                                 type="text"
-                                placeholder="Search books or authors..."
+                                placeholder="Tìm sách hoặc tác giả..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                aria-label="Search books or authors"
+                                aria-label="Tìm sách hoặc tác giả"
                             />
                         </div>
 
@@ -456,13 +467,13 @@ function Books() {
                                             role="button"
                                             tabIndex={0}
                                             className={cx('dropdown-item')}
-                                            onClick={() => handleCategorySelect('All')}
-                                            onKeyDown={(e) => e.key === 'Enter' && handleCategorySelect('All')}
+                                            onClick={() => handleCategorySelect('Tất cả')}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleCategorySelect('Tất cả')}
                                         >
-                                            All
+                                            Tất cả
                                         </div>
                                         {categoriesLoading ? (
-                                            <div className={cx('dropdown-loading')}>Loading categories...</div>
+                                            <div className={cx('dropdown-loading')}>Đang tải danh mục...</div>
                                         ) : categoryTree.length > 0 ? (
                                             categoryTree.map((cat) => (
                                                 <div
@@ -482,7 +493,7 @@ function Books() {
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className={cx('dropdown-loading')}>No categories available</div>
+                                            <div className={cx('dropdown-loading')}>Không có danh mục</div>
                                         )}
                                     </PopperWrapper>
                                 </div>
@@ -515,19 +526,20 @@ function Books() {
                                     <PopperWrapper>
                                         {sorts.map((sort) => (
                                             <div
-                                                key={sort}
+                                                key={sort.key}
                                                 className={cx('dropdown-item')}
                                                 role="button"
                                                 tabIndex={0}
                                                 onClick={() => {
-                                                    setSortBy(sort);
+                                                    setSortBy(sort.key);
                                                     setOpenSort(false);
                                                 }}
                                                 onKeyDown={(e) =>
-                                                    e.key === 'Enter' && (setSortBy(sort), setOpenSort(false))
+                                                    e.key === 'Enter' && (setSortBy(sort.key), setOpenSort(false))
                                                 }
+                                                aria-label={`Sắp xếp theo: ${sort.label}`}
                                             >
-                                                {sort}
+                                                {sort.label}
                                             </div>
                                         ))}
                                     </PopperWrapper>
@@ -544,7 +556,7 @@ function Books() {
                                 aria-haspopup="listbox"
                                 aria-expanded={openSort}
                             >
-                                <span>{sortBy}</span>
+                                <span>{getSortLabel(sortBy)}</span>
                                 <ChevronDown className={cx('chevron')} />
                             </button>
                         </Tippy>
@@ -552,7 +564,7 @@ function Books() {
 
                     <div className={cx('filter-group', 'advanced-filters')}>
                         <div className={cx('filter-item')}>
-                            <label>Price</label>
+                            <label>Giá</label>
                             <div className={cx('price-inputs')}>
                                 <QuantityInput
                                     value={minPrice === '' ? '' : Number(minPrice)}
@@ -560,7 +572,7 @@ function Books() {
                                     min={0}
                                     step={1000}
                                     size="small"
-                                    placeholder="Min"
+                                    placeholder="Tối thiểu"
                                     enforceMinOnBlur={false}
                                 />
                                 <span>-</span>
@@ -570,7 +582,7 @@ function Books() {
                                     min={0}
                                     step={1000}
                                     size="small"
-                                    placeholder="Max"
+                                    placeholder="Tối đa"
                                     enforceMinOnBlur={false}
                                 />
                             </div>
@@ -588,7 +600,7 @@ function Books() {
                                         <PopperWrapper>
                                             <div
                                                 role="listbox"
-                                                aria-label="Minimum rating"
+                                                aria-label="Đánh giá tối thiểu"
                                                 className={cx('rating-list')}
                                             >
                                                 {['0', '1', '2', '3', '4', '4.5'].map((r) => (
@@ -612,7 +624,7 @@ function Books() {
                                                             }
                                                         }}
                                                     >
-                                                        {r === '0' ? 'Any' : `≥ ${r}`}
+                                                        {r === '0' ? 'Bất kỳ' : `≥ ${r}`}
                                                     </div>
                                                 ))}
                                             </div>
@@ -621,7 +633,7 @@ function Books() {
                                 )}
                             >
                                 <div className={cx('filter-item')}>
-                                    <label id="min-rating-label">Min Rating</label>
+                                    <label id="min-rating-label">Đánh giá tối thiểu</label>
                                     <button
                                         type="button"
                                         className={cx('select')}
@@ -634,7 +646,7 @@ function Books() {
                                             setOpenSort(false);
                                         }}
                                     >
-                                        <span>{minRating === '0' ? 'Any' : `≥ ${minRating}`}</span>
+                                        <span>{minRating === '0' ? 'Bất kỳ' : `≥ ${minRating}`}</span>
                                         <ChevronDown className={cx('chevron')} />
                                     </button>
                                 </div>
@@ -647,7 +659,7 @@ function Books() {
                                 type="checkbox"
                                 id="filter-featured"
                                 name="onlyFeatured"
-                                label="Featured"
+                                label="Nổi bật"
                                 checked={onlyFeatured}
                                 onChange={() => setOnlyFeatured((s) => !s)}
                                 small
@@ -657,7 +669,7 @@ function Books() {
                                 type="checkbox"
                                 id="filter-instock"
                                 name="inStockOnly"
-                                label="In stock"
+                                label="Còn hàng"
                                 checked={inStockOnly}
                                 onChange={() => setInStockOnly((s) => !s)}
                                 small
@@ -666,7 +678,7 @@ function Books() {
 
                         <div className={cx('filter-actions')}>
                             <Button shine scale className={cx('btn-reset')} onClick={resetFilters}>
-                                Reset
+                                Đặt lại
                             </Button>
                         </div>
                     </div>
@@ -674,13 +686,13 @@ function Books() {
 
                 <div className={cx('result-info')}>
                     <p>
-                        Showing {sortedBooks.length} {sortedBooks.length === 1 ? 'book' : 'books'}
-                        {selectedCategoryId && ` in "${selectedCategory}"`}
-                        {onlyFeatured && ' · Featured'}
-                        {inStockOnly && ' · In stock'}
+                        Hiển thị {sortedBooks.length} {sortedBooks.length === 1 ? 'sách' : 'cuốn sách'}
+                        {selectedCategoryId && ` trong "${selectedCategory}"`}
+                        {onlyFeatured && ' · Nổi bật'}
+                        {inStockOnly && ' · Còn hàng'}
                         {(!isNaN(parseFloat(minPrice)) || !isNaN(parseFloat(maxPrice))) &&
-                            ` · Price ${minPrice || 0} - ${maxPrice || '∞'}`}
-                        {minRating && minRating !== '0' && ` · Rating ≥ ${minRating}`}
+                            ` · Giá ${minPrice || 0} - ${maxPrice || '∞'}`}
+                        {minRating && minRating !== '0' && ` · Đánh giá ≥ ${minRating}`}
                     </p>
                 </div>
 
@@ -703,8 +715,8 @@ function Books() {
                 ) : (
                     <div className={cx('no-results')}>
                         <Search />
-                        <h3>No books found</h3>
-                        <p>Try adjusting your search or filters</p>
+                        <h3>Không tìm thấy sách</h3>
+                        <p>Thử điều chỉnh tìm kiếm hoặc bộ lọc</p>
                     </div>
                 )}
             </div>
