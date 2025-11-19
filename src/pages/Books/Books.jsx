@@ -86,7 +86,7 @@ function Books() {
         const fetchCategories = async () => {
             try {
                 setCategoriesLoading(true);
-                const res = await categoryApi.getAllCategories();
+                const res = await categoryApi.getAllPublic();
 
                 let categoriesData = [];
                 if (res && res.data && Array.isArray(res.data.result)) {
@@ -692,7 +692,7 @@ function Books() {
                         {inStockOnly && ' · Còn hàng'}
                         {(!isNaN(parseFloat(minPrice)) || !isNaN(parseFloat(maxPrice))) &&
                             ` · Giá ${minPrice || 0} - ${maxPrice || '∞'}`}
-                        {minRating && minRating !== '0' && ` · Đánh giá ≥ ${minRating}`}
+                        {/* {minRating && minRating !== '0' && ` · Đánh giá ≥ ${minRating}`} */}
                     </p>
                 </div>
 

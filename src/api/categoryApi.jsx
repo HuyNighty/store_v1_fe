@@ -12,6 +12,8 @@ const categoryApi = {
 
     getAllAdmin: () => axiosClient.get(base).then(unwrap),
 
+    getByCategoryName: (categoryName) => axiosClient.get(`${base}/public/${categoryName}`).then(unwrap),
+
     getById: (categoryId) => axiosClient.get(`${base}/${categoryId}`).then(unwrap),
 
     create: (data) => axiosClient.post(base, data).then(unwrap),

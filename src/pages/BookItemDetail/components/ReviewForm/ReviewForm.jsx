@@ -24,13 +24,11 @@ function ReviewForm({
     const navigate = useNavigate();
 
     const handleLoginRedirect = () => {
-        // Lưu trang hiện tại để quay lại sau khi đăng nhập
         const currentPath = window.location.pathname + window.location.search;
         localStorage.setItem('redirectPath', currentPath);
         navigate('/login');
     };
 
-    // Nếu người dùng chưa đăng nhập, hiển thị nút đăng nhập
     if (!user) {
         return (
             <div className={cx('write-review')}>

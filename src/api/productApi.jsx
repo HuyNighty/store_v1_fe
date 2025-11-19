@@ -15,6 +15,18 @@ const productApi = {
         return normalize(res);
     },
 
+    getByCategoryName: async (categoryName) => {
+        if (!categoryName) return [];
+        const safe = encodeURIComponent(String(categoryName).trim());
+        try {
+            const res = await axiosClient.get(`/products/public/${safe}`);
+            return normalize(res);
+        } catch (err) {
+            console.warn('getByCategoryName failed', err);
+            return [];
+        }
+    },
+
     getByCategory: async (categoryId) => {
         const res = await axiosClient.get(`/products/by-category/${categoryId}`);
         return normalize(res);
