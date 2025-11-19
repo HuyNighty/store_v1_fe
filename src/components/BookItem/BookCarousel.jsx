@@ -1,4 +1,3 @@
-// src/components/BookItem/BookCarousel.jsx
 import React, { useEffect, useState, useMemo, forwardRef, useImperativeHandle } from 'react';
 import classNames from 'classnames/bind';
 import styles from './BookCarousel.module.scss';
@@ -8,6 +7,7 @@ import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons
 import { motion } from 'framer-motion';
 import productApi from '../../api/productApi';
 import AnimatedContent from '../Animations/AnimatedContent';
+import FlowingMenu from '../../pages/Home/components/FollowingMenu';
 
 const cx = classNames.bind(styles);
 
@@ -33,21 +33,11 @@ const normalizeText = (s) =>
         .replace(/\s+/g, ' ')
         .trim();
 
-const BESTSELLER_KEYWORDS = [
-    'ban chay',
-    'banchay',
-    'ban-chay',
-    'bestseller',
-    'best-seller',
-    'best',
-    'best seller',
-    'banchạy',
-    'bán chạy',
-];
+const BESTSELLER_KEYWORDS = ['ban chay'];
 
 const BookCarousel = forwardRef(function BookCarousel(
     {
-        id = undefined, // id prop để ImageGrid / anchor scroll tới
+        id = undefined,
         categoryId = null,
         categorySlug = '',
         categoryName = '',
@@ -63,7 +53,6 @@ const BookCarousel = forwardRef(function BookCarousel(
     const [error, setError] = useState(null);
     const [isTransitioning, setIsTransitioning] = useState(false);
 
-    // Expose imperative API: scrollToProduct(productId)
     useImperativeHandle(
         ref,
         () => ({
@@ -78,7 +67,6 @@ const BookCarousel = forwardRef(function BookCarousel(
                 }
             },
         }),
-        // pages is defined below; keep ESLint quiet by listing booksPerPage (pages derived from books)
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [],
     );
@@ -93,7 +81,6 @@ const BookCarousel = forwardRef(function BookCarousel(
                 setError(null);
                 let resp = null;
 
-                // 1) Thử getByCategoryName (nếu backend có)
                 if (categoryName && productApi.getByCategoryName) {
                     try {
                         resp = await productApi.getByCategoryName(categoryName);
@@ -104,7 +91,6 @@ const BookCarousel = forwardRef(function BookCarousel(
                     }
                 }
 
-                // 2) Thử getByCategory (id)
                 if ((!resp || (Array.isArray(resp) && resp.length === 0)) && categoryId && productApi.getByCategory) {
                     try {
                         resp = await productApi.getByCategory(categoryId);
@@ -115,7 +101,6 @@ const BookCarousel = forwardRef(function BookCarousel(
                     }
                 }
 
-                // 3) Thử filterProducts
                 if (
                     (!resp || (Array.isArray(resp) && resp.length === 0)) &&
                     productApi.filterProducts &&
@@ -134,7 +119,6 @@ const BookCarousel = forwardRef(function BookCarousel(
                     }
                 }
 
-                // 4) Fallback getAll
                 if (!resp || resp == null) {
                     resp = await productApi.getAll();
                     console.debug(
@@ -143,7 +127,6 @@ const BookCarousel = forwardRef(function BookCarousel(
                     );
                 }
 
-                // normalize to array
                 const data = resp?.data ?? resp;
                 let list = Array.isArray(data)
                     ? data
@@ -157,24 +140,20 @@ const BookCarousel = forwardRef(function BookCarousel(
 
                 if (!Array.isArray(list)) list = [];
 
-                // filter active
                 let filtered = list.filter((b) => {
                     const val = b.isActive ?? b.active ?? b.is_active ?? b.activeFlag;
                     return isTruthyFlag(val);
                 });
 
-                // decide if wants bestseller (feature flag)
                 const normalizedCategory = normalizeText(categoryName);
                 const wantsBestseller = BESTSELLER_KEYWORDS.some((kw) => normalizedCategory.includes(kw));
 
                 if (wantsBestseller) {
-                    // filter by feature flags on product
                     filtered = filtered.filter((b) =>
                         isTruthyFlag(b.feature ?? b.featured ?? b.isFeatured ?? b.bestSeller ?? b.bestseller),
                     );
                     console.debug('[BookCarousel] Applied bestseller filter, remaining:', filtered.length);
                 } else if (categoryName) {
-                    // client-side category name contains
                     const lowerName = normalizeText(categoryName);
                     filtered = filtered.filter((book) => {
                         const names = [
@@ -192,7 +171,6 @@ const BookCarousel = forwardRef(function BookCarousel(
                     );
                 }
 
-                // sort by popularity/soldCount fallback
                 filtered.sort(
                     (a, b) => (Number(b.popularity ?? b.soldCount) || 0) - (Number(a.popularity ?? a.soldCount) || 0),
                 );
@@ -254,10 +232,15 @@ const BookCarousel = forwardRef(function BookCarousel(
     };
 
     return (
-        // gắn id trực tiếp lên wrapper để ImageGrid có thể document.getElementById('best-seller') và scroll
         <div id={id} className={cx('carousel-wrapper')} aria-roledescription="carousel">
             <div className={cx('header')}>
                 <div className={cx('nav-buttons')}>
+                    <AnimatedContent>
+                        <FlowingMenu
+                            title={title}
+                            image="https://i.pinimg.com/1200x/40/07/79/400779b11c63675794518da05b7d7d8e.jpg"
+                        />
+                    </AnimatedContent>
                     <button
                         className={cx('nav-btn')}
                         onClick={handlePrev}
@@ -266,11 +249,6 @@ const BookCarousel = forwardRef(function BookCarousel(
                     >
                         <FontAwesomeIcon icon={faChevronLeft} />
                     </button>
-
-                    <AnimatedContent>
-                        <div className={cx('fea-text')}>{title}</div>
-                    </AnimatedContent>
-
                     <button
                         className={cx('nav-btn')}
                         onClick={handleNext}

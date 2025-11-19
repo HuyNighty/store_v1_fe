@@ -1,24 +1,11 @@
 import React from 'react';
 import { gsap } from 'gsap';
-
 import classNames from 'classnames/bind';
 import styles from './FollowingMenu.module.scss';
 
 const cx = classNames.bind(styles);
 
-function FlowingMenu({ items = [] }) {
-    return (
-        <div className={cx('menu-wrap')}>
-            <nav className={cx('menu')}>
-                {items.map((item, idx) => (
-                    <MenuItem key={idx} {...item} />
-                ))}
-            </nav>
-        </div>
-    );
-}
-
-function MenuItem({ link = '#', text = '', image }) {
+function FlowingMenu({ title = '', image = null, link = '#' }) {
     const itemRef = React.useRef(null);
     const marqueeRef = React.useRef(null);
     const marqueeInnerRef = React.useRef(null);
@@ -30,6 +17,7 @@ function MenuItem({ link = '#', text = '', image }) {
         const yd = y - y2;
         return xd * xd + yd * yd;
     };
+
     const findClosestEdge = (mouseX, mouseY, width, height) => {
         const top = distMetric(mouseX, mouseY, width / 2, 0);
         const bottom = distMetric(mouseX, mouseY, width / 2, height);
@@ -67,7 +55,6 @@ function MenuItem({ link = '#', text = '', image }) {
     const handleMouseLeave = (ev) => {
         if (!itemRef.current) return;
         const rect = itemRef.current.getBoundingClientRect();
-
         const x = ev.clientX - rect.left;
         const y = ev.clientY - rect.top;
         hideAnim(findClosestEdge(x, y, rect.width, rect.height));
@@ -75,29 +62,37 @@ function MenuItem({ link = '#', text = '', image }) {
 
     const repeatedMarqueeContent = Array.from({ length: 4 }).map((_, i) => (
         <React.Fragment key={i}>
-            <span>{text}</span>
-            <div
-                className={cx('marquee__img')}
-                style={{ backgroundImage: image ? `url(${image})` : undefined }}
-                aria-hidden="true"
-            />
+            <span>{title}</span>
+            {image && (
+                <div className={cx('marquee__img')} style={{ backgroundImage: `url(${image})` }} aria-hidden="true" />
+            )}
         </React.Fragment>
     ));
 
     return (
-        <div className={cx('menu__item')} ref={itemRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-            <a className={cx('menu__item-link')} href={link} aria-label={text}>
-                {text}
-            </a>
+        <div className={cx('menu-wrap')}>
+            <nav className={cx('menu')}>
+                <div
+                    className={cx('menu__item')}
+                    ref={itemRef}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                >
+                    <a className={cx('menu__item-link')} aria-label={title}>
+                        {title}
+                    </a>
 
-            <div className={cx('marquee')} ref={marqueeRef} aria-hidden="true">
-                <div className={cx('marquee__inner-wrap')} ref={marqueeInnerRef}>
-                    <div className={cx('marquee__inner')} aria-hidden="true">
-                        {repeatedMarqueeContent}
+                    <div className={cx('marquee')} ref={marqueeRef} aria-hidden="true">
+                        <div className={cx('marquee__inner-wrap')} ref={marqueeInnerRef}>
+                            <div className={cx('marquee__inner')} aria-hidden="true">
+                                {repeatedMarqueeContent}
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </nav>
         </div>
     );
 }
+
 export default FlowingMenu;

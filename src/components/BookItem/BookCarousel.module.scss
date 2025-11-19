@@ -11,47 +11,64 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+    width: 100%;
+    position: relative;
 
-    .title-section {
-        h2 {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #222;
+    .nav-buttons {
+        display: grid !important;
+        grid-template-columns: 1fr;
+        align-items: center;
+        width: 100%;
+        gap: 20px;
+        position: relative;
+    }
+
+    .nav-btn {
+        color: var(--primary-color);
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+        position: absolute;
+        z-index: 10;
+        top: 50%;
+        transform: translateY(-50%);
+
+        &:hover {
+            color: var(--white);
+            background: var(--primary-hover);
         }
 
-        p {
-            color: #777;
-            font-size: 1rem;
+        &.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
     }
 
-    .nav-buttons {
-        display: contents;
-        gap: 10px;
+    .flowing-menu-container {
+        grid-column: 1;
+        grid-row: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
 
-        .nav-btn {
-            color: var(--primary-color);
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
+    .nav-btn:first-child {
+        left: 0;
+        z-index: 20;
+    }
 
-            &:hover {
-                color: var(--white);
-                background: var(--primary-hover);
-            }
-
-            &.disabled {
-                opacity: 0.4;
-                cursor: not-allowed;
-            }
-        }
+    .nav-btn:last-child {
+        right: 0;
+        z-index: 20;
     }
 }
 
@@ -127,6 +144,10 @@
     .book-list-container {
         min-height: 380px;
     }
+
+    .header .nav-buttons {
+        gap: 10px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -139,5 +160,14 @@
     }
     .book-list-container {
         min-height: 360px;
+    }
+
+    .header .nav-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .header .nav-btn {
+        width: 35px;
+        height: 35px;
     }
 }

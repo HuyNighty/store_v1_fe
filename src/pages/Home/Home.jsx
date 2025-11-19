@@ -73,7 +73,7 @@ function Home() {
                     <ImageGrid items={gridItems} />
                 </div>
 
-                <FlowingMenu items={Items} />
+                {/* <FlowingMenu items={Items} /> */}
 
                 <BookCarousel />
 
