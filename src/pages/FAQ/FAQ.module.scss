@@ -1,0 +1,214 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: #718096;
+    margin-bottom: 30px;
+}
+
+.searchContainer {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+
+    &:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    &::placeholder {
+        color: #a0aec0;
+    }
+}
+
+.content {
+    margin-bottom: 60px;
+}
+
+.accordion {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.accordionItem {
+    border-bottom: 1px solid #e2e8f0;
+    background: white;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.accordionButton {
+    width: 100%;
+    padding: 24px;
+    background: white;
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+
+    &:hover {
+        background: #f7fafc;
+    }
+
+    &.active {
+        background: #f7fafc;
+    }
+}
+
+.questionText {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3748;
+    flex: 1;
+    margin-right: 20px;
+}
+
+.accordionIcon {
+    color: #667eea;
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+}
+
+.accordionContent {
+    background: #f7fafc;
+    overflow: hidden;
+}
+
+.answerText {
+    padding: 0 24px 24px;
+    color: #4a5568;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.noResults {
+    text-align: center;
+    padding: 60px 20px;
+    color: #718096;
+
+    p {
+        font-size: 1.1rem;
+    }
+}
+
+.footer {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 40px;
+    color: white;
+    text-align: center;
+}
+
+.contactInfo {
+    h3 {
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+
+    p {
+        margin-bottom: 24px;
+        opacity: 0.9;
+    }
+}
+
+.contactMethods {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.contactItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+
+    .contactIcon {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 20px 16px;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .accordionButton {
+        padding: 20px 16px;
+    }
+
+    .questionText {
+        font-size: 1rem;
+    }
+
+    .answerText {
+        padding: 0 16px 20px;
+    }
+
+    .contactMethods {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .footer {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 1.75rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .searchInput {
+        padding: 14px 16px;
+    }
+}
