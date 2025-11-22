@@ -24,8 +24,11 @@ export default defineConfig({
         alias: {
             // eslint-disable-next-line no-undef
             '~': path.resolve(__dirname, 'src'),
+            // eslint-disable-next-line no-undef
             react: path.resolve(__dirname, 'node_modules/react'),
+            // eslint-disable-next-line no-undef
             'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+            // eslint-disable-next-line no-undef
             'react/jsx-runtime': path.resolve(__dirname, 'node_modules/react/jsx-runtime'),
         },
     },

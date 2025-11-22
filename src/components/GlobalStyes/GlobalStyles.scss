@@ -1,7 +1,8 @@
 @import 'normalize.css';
 @import url('https://fonts.googleapis.com/css2?family=Lobster&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
 :root {
-    --primary: rgba(#ebe5d8);
+    --primary: #ebe5d8;
     background-color: #f6f4ef;
 }
 
@@ -671,8 +672,6 @@ h1 {
         animation-duration: 3s;
     }
 }
-
-/* ===== UTILITY CLASSES FOR COMMON EFFECTS ===== */
 
 /* Hover effects */
 .hover-lift {
