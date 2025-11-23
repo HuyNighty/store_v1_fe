@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './FAQ.module.scss';
+import classNames from 'classnames/bind';
+
+const cx = classNames.bind(styles);
 
 const FAQ = () => {
     const [activeIndex, setActiveIndex] = useState(null);
@@ -52,36 +55,38 @@ const FAQ = () => {
     };
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <h1 className={styles.title}>Câu Hỏi Thường Gặp</h1>
-                <p className={styles.subtitle}>Tìm kiếm câu trả lời cho những thắc mắc của bạn</p>
+        <div className={cx('container')}>
+            <div className={cx('header')}>
+                <h1 className={cx('title', 'animate-fadeSlideDown')}>Câu Hỏi Thường Gặp</h1>
+                <p className={cx('subtitle', 'animate-fadeUp', 'delay-200')}>
+                    Tìm kiếm câu trả lời cho những thắc mắc của bạn
+                </p>
 
-                <div className={styles.searchContainer}>
+                <div className={cx('searchContainer', 'animate-fadeUp', 'delay-300')}>
                     <input
                         type="text"
                         placeholder="Tìm kiếm câu hỏi..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className={styles.searchInput}
+                        className={cx('searchInput', 'focus-ring')}
                     />
                 </div>
             </div>
 
-            <div className={styles.content}>
+            <div className={cx('content')}>
                 {filteredFaqs.length > 0 ? (
-                    <div className={styles.accordion}>
+                    <div className={cx('accordion')}>
                         {filteredFaqs.map((item, index) => (
-                            <div key={index} className={styles.accordionItem}>
+                            <div key={index} className={cx('accordionItem', 'hover-lift')}>
                                 <button
-                                    className={`${styles.accordionButton} ${
-                                        activeIndex === index ? styles.active : ''
-                                    }`}
+                                    className={cx('accordionButton', {
+                                        active: activeIndex === index,
+                                    })}
                                     onClick={() => toggleAccordion(index)}
                                 >
-                                    <span className={styles.questionText}>{item.question}</span>
+                                    <span className={cx('questionText')}>{item.question}</span>
                                     <motion.span
-                                        className={styles.accordionIcon}
+                                        className={cx('accordionIcon')}
                                         animate={{ rotate: activeIndex === index ? 180 : 0 }}
                                         transition={{ duration: 0.3 }}
                                     >
@@ -95,9 +100,9 @@ const FAQ = () => {
                                             animate={{ opacity: 1, height: 'auto' }}
                                             exit={{ opacity: 0, height: 0 }}
                                             transition={{ duration: 0.3 }}
-                                            className={styles.accordionContent}
+                                            className={cx('accordionContent')}
                                         >
-                                            <div className={styles.answerText}>{item.answer}</div>
+                                            <div className={cx('answerText')}>{item.answer}</div>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
@@ -105,27 +110,27 @@ const FAQ = () => {
                         ))}
                     </div>
                 ) : (
-                    <div className={styles.noResults}>
+                    <div className={cx('noResults', 'animate-scaleIn')}>
                         <p>Không tìm thấy câu hỏi phù hợp với từ khóa "{searchTerm}"</p>
                     </div>
                 )}
             </div>
 
-            <div className={styles.footer}>
-                <div className={styles.contactInfo}>
+            <div className={cx('footer', 'animate-fadeUp', 'delay-500')}>
+                <div className={cx('contactInfo')}>
                     <h3>Vẫn còn thắc mắc?</h3>
                     <p>Liên hệ với chúng tôi để được hỗ trợ tốt nhất</p>
-                    <div className={styles.contactMethods}>
-                        <div className={styles.contactItem}>
-                            <span className={styles.contactIcon}>📞</span>
+                    <div className={cx('contactMethods')}>
+                        <div className={cx('contactItem', 'hover-scale')}>
+                            <span className={cx('contactIcon')}>📞</span>
                             <span>Hotline: 1900 1234</span>
                         </div>
-                        <div className={styles.contactItem}>
-                            <span className={styles.contactIcon}>✉️</span>
+                        <div className={cx('contactItem', 'hover-scale')}>
+                            <span className={cx('contactIcon')}>✉️</span>
                             <span>Email: support@bookstore.com</span>
                         </div>
-                        <div className={styles.contactItem}>
-                            <span className={styles.contactIcon}>💬</span>
+                        <div className={cx('contactItem', 'hover-scale')}>
+                            <span className={cx('contactIcon')}>💬</span>
                             <span>Chat trực tuyến: 24/7</span>
                         </div>
                     </div>

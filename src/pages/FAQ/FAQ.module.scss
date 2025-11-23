@@ -2,7 +2,8 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 40px 20px;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--background-color);
+    min-height: 100vh;
 }
 
 .header {
@@ -11,20 +12,18 @@
 }
 
 .title {
-    font-size: 2.5rem;
+    font-size: 3.2rem;
     font-weight: 700;
-    color: #2d3748;
+    color: var(--primary-color-bold);
     margin-bottom: 16px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-family: 'Noto Sans', sans-serif;
 }
 
 .subtitle {
-    font-size: 1.1rem;
-    color: #718096;
+    font-size: 1.6rem;
+    color: var(--primary-color);
     margin-bottom: 30px;
+    font-weight: 400;
 }
 
 .searchContainer {
@@ -35,20 +34,21 @@
 .searchInput {
     width: 100%;
     padding: 16px 20px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--primary);
     border-radius: 12px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: white;
+    font-size: 1.6rem;
+    transition: all var(--transition-base);
+    background: var(--white);
+    font-family: var(--font-family-primary);
 
     &:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(101, 85, 72, 0.1);
     }
 
     &::placeholder {
-        color: #a0aec0;
+        color: var(--gray);
     }
 }
 
@@ -63,8 +63,9 @@
 }
 
 .accordionItem {
-    border-bottom: 1px solid #e2e8f0;
-    background: white;
+    border-bottom: 1px solid var(--primary);
+    background: var(--white);
+    transition: transform var(--transition-base);
 
     &:last-child {
         border-bottom: none;
@@ -74,79 +75,85 @@
 .accordionButton {
     width: 100%;
     padding: 24px;
-    background: white;
+    background: var(--white);
     border: none;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
     text-align: left;
+    font-family: var(--font-family-primary);
 
     &:hover {
-        background: #f7fafc;
+        background: var(--primary);
     }
 
     &.active {
-        background: #f7fafc;
+        background: var(--primary);
     }
 }
 
 .questionText {
-    font-size: 1.1rem;
+    font-size: 1.6rem;
     font-weight: 600;
-    color: #2d3748;
+    color: var(--primary-color-bold);
     flex: 1;
     margin-right: 20px;
 }
 
 .accordionIcon {
-    color: #667eea;
-    font-size: 0.8rem;
-    transition: transform 0.3s ease;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    transition: transform var(--transition-base);
     flex-shrink: 0;
 }
 
 .accordionContent {
-    background: #f7fafc;
+    background: var(--primary);
     overflow: hidden;
 }
 
 .answerText {
     padding: 0 24px 24px;
-    color: #4a5568;
+    color: var(--text-color);
     line-height: 1.6;
-    font-size: 1rem;
+    font-size: 1.5rem;
+    font-family: var(--font-family-primary);
 }
 
 .noResults {
     text-align: center;
     padding: 60px 20px;
-    color: #718096;
+    color: var(--gray);
 
     p {
-        font-size: 1.1rem;
+        font-size: 1.6rem;
+        font-family: var(--font-family-primary);
     }
 }
 
 .footer {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-bold) 100%);
     border-radius: 16px;
     padding: 40px;
-    color: white;
+    color: var(--white);
     text-align: center;
 }
 
 .contactInfo {
     h3 {
-        font-size: 1.5rem;
+        font-size: 2rem;
         margin-bottom: 12px;
         font-weight: 600;
+        font-family: var(--font-family-primary);
     }
 
     p {
         margin-bottom: 24px;
         opacity: 0.9;
+        font-size: 1.5rem;
+        font-family: var(--font-family-primary);
     }
 }
 
@@ -160,21 +167,27 @@
 .contactItem {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 1rem;
+    gap: 12px;
+    font-size: 1.5rem;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: transform var(--transition-base);
+    font-family: var(--font-family-primary);
 
     .contactIcon {
-        font-size: 1.2rem;
+        font-size: 1.8rem;
     }
 }
 
+// Responsive
 @media (max-width: 768px) {
     .container {
         padding: 20px 16px;
     }
 
     .title {
-        font-size: 2rem;
+        font-size: 2.4rem;
     }
 
     .accordionButton {
@@ -182,33 +195,54 @@
     }
 
     .questionText {
-        font-size: 1rem;
+        font-size: 1.5rem;
     }
 
     .answerText {
         padding: 0 16px 20px;
+        font-size: 1.4rem;
     }
 
     .contactMethods {
         flex-direction: column;
-        gap: 20px;
+        gap: 16px;
     }
 
     .footer {
         padding: 30px 20px;
     }
+
+    .contactItem {
+        justify-content: center;
+    }
 }
 
 @media (max-width: 480px) {
     .title {
-        font-size: 1.75rem;
+        font-size: 2rem;
     }
 
     .subtitle {
-        font-size: 1rem;
+        font-size: 1.4rem;
     }
 
     .searchInput {
         padding: 14px 16px;
+        font-size: 1.4rem;
+    }
+
+    .contactInfo {
+        h3 {
+            font-size: 1.8rem;
+        }
+
+        p {
+            font-size: 1.4rem;
+        }
+    }
+
+    .contactItem {
+        font-size: 1.4rem;
+        padding: 10px 16px;
     }
 }
