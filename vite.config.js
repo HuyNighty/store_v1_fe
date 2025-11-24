@@ -37,4 +37,13 @@ export default defineConfig({
             generateScopedName: '[name]_[local]_[hash:base64:5]',
         },
     },
+    server: {
+        proxy: {
+            '/Store/api': {
+                target: 'http://52.62.234.97:8080',
+                changeOrigin: true,
+                secure: false,
+            },
+        },
+    },
 });
