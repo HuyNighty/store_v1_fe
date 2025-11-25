@@ -34,7 +34,7 @@ function Home() {
         },
         {
             id: 'g3',
-            title: 'Khoa học viễn tưởng',
+            title: 'Văn học & tiểu thuyết',
             targetId: 'sci-fi',
             src: 'https://i.pinimg.com/736x/3b/9d/c5/3b9dc5c8f44875fa3331de6e6b82fdc3.jpg',
             ctaText: 'Khám phá',
@@ -75,37 +75,34 @@ function Home() {
 
                 {/* <FlowingMenu items={Items} /> */}
 
-                <BookCarousel />
+                <BookCarousel image="https://i.pinimg.com/736x/22/5e/a9/225ea9ea0b2232b313e13d57aaeeab8e.jpg" />
 
-                <BookCarousel id="best-seller" categoryName="Bán chạy" title="Bán chạy" limit={12} booksPerPage={4} />
+                <BookCarousel
+                    id="best-seller"
+                    categoryName="Bán chạy"
+                    title="Bán chạy"
+                    limit={12}
+                    booksPerPage={4}
+                    image="https://i.pinimg.com/736x/bd/46/8d/bd468dd0fc8520c030bd66416ab17597.jpg"
+                />
 
-                {/* <BookCarousel id="classic" categoryName="Kinh điển" title="Kinh điển" limit={12} booksPerPage={4} /> */}
+                <BookCarousel
+                    id="classic"
+                    categoryName="Khoa học & Thiên nhiên"
+                    title="Khoa học & Thiên nhiên"
+                    limit={12}
+                    booksPerPage={4}
+                    image="https://i.pinimg.com/736x/cf/6a/2a/cf6a2a034ffb96436d07f1922ec5e6f4.jpg"
+                />
 
-                {/* <BookCarousel
+                <BookCarousel
                     id="sci-fi"
-                    categoryName="Khoa học viễn tưởng"
-                    title="Khoa học viễn tưởng"
+                    categoryName="Văn học & tiểu thuyết"
+                    title="Văn học & tiểu thuyết"
                     limit={12}
                     booksPerPage={4}
+                    image="https://i.pinimg.com/736x/30/d3/31/30d331212bde4b8b8b4d41fe7c1fcbf2.jpg"
                 />
-
-                <BookCarousel
-                    id="mystery"
-                    categoryName="Hình sự & Kinh dị"
-                    title="Hình sự & Kinh dị"
-                    limit={12}
-                    booksPerPage={4}
-                />
-
-                <BookCarousel id="romance" categoryName="Lãng mạn" title="Lãng mạn" limit={12} booksPerPage={4} />
-
-                <BookCarousel
-                    id="non-fiction"
-                    categoryName="Phi hư cấu"
-                    title="Phi hư cấu"
-                    limit={12}
-                    booksPerPage={4}
-                /> */}
             </div>
         </>
     );

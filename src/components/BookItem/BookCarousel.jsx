@@ -44,6 +44,7 @@ const BookCarousel = forwardRef(function BookCarousel(
         title = 'Sách nổi bật',
         limit = 12,
         booksPerPage = 4,
+        image = null,
     },
     ref,
 ) {
@@ -236,10 +237,7 @@ const BookCarousel = forwardRef(function BookCarousel(
             <div className={cx('header')}>
                 <div className={cx('nav-buttons')}>
                     <AnimatedContent>
-                        <FlowingMenu
-                            title={title}
-                            image="https://i.pinimg.com/1200x/40/07/79/400779b11c63675794518da05b7d7d8e.jpg"
-                        />
+                        <FlowingMenu title={title} image={image} />
                     </AnimatedContent>
                     <button
                         className={cx('nav-btn')}
