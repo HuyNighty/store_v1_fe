@@ -31,7 +31,12 @@ function BookItem({ book }) {
     } = book;
 
     const imageUrl = productAssets[0]?.url || '/images/default-book.jpg';
-    const displayPrice = salePrice ?? price;
+
+    const discountPercentage = salePrice && price ? Math.round(((price - salePrice) / price) * 100) : 0;
+
+    const formatPrice = (price) => {
+        return (price / 1000).toLocaleString('vi-VN') + '.000 đ';
+    };
 
     useEffect(() => {
         const loadReviews = async () => {
@@ -91,6 +96,7 @@ function BookItem({ book }) {
             <div className={cx('book-item-image')}>
                 <img src={imageUrl} alt={productName} className={cx('book-item-img')} />
                 {featured && <span className={cx('bestseller')}>Bestseller</span>}
+                {discountPercentage > 0 && <span className={cx('discount-badge')}>-{discountPercentage}%</span>}
             </div>
 
             <div className={cx('book-item-details')}>
@@ -120,8 +126,21 @@ function BookItem({ book }) {
                     )}
                 </div>
 
+                <div className={cx('book-item-pricing')}>
+                    {salePrice && salePrice < price ? (
+                        <>
+                            <div className={cx('price-container')}>
+                                <span className={cx('sale-price')}>{formatPrice(salePrice)}</span>
+                                <span className={cx('original-price')}>{formatPrice(price)}</span>
+                            </div>
+                            <span className={cx('discount-percentage')}>-{discountPercentage}%</span>
+                        </>
+                    ) : (
+                        <span className={cx('normal-price')}>{formatPrice(price)}</span>
+                    )}
+                </div>
+
                 <div className={cx('book-item-footer')}>
-                    <p className={cx('book-item-price')}>{displayPrice / 1000}.000 đ</p>
                     <Magnet magnetStrength={10}>
                         <Button
                             small

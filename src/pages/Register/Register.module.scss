@@ -138,7 +138,7 @@
     align-items: center;
 
     @media (min-width: 1024px) {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 2fr 1fr;
         gap: 48px;
     }
 }
@@ -153,7 +153,7 @@
     position: relative;
     animation: scaleIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     width: 100%;
-    max-width: 740px;
+    max-width: 900px;
 
     .card-glow {
         position: absolute;
@@ -501,6 +501,9 @@
 }
 
 .submit-section {
+    width: 100%;
+    grid-column: 1 / -1;
+
     .register-button {
         position: relative;
         overflow: hidden;
@@ -510,6 +513,9 @@
         font-size: 1.6rem;
         font-weight: 100;
         font-family: var(--font-family-primary);
+
+        display: block;
+        min-width: 100%;
 
         .loading-spinner {
             width: 20px;

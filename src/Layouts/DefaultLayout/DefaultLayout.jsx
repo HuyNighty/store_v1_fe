@@ -16,9 +16,9 @@ function DefaultLayout({ children, headerMode = 'auto' }) {
             >
                 {children}
             </div>
-            <AnimatedContent>
-                <Footer />
-            </AnimatedContent>
+            {/* <AnimatedContent> */}
+            <Footer />
+            {/* </AnimatedContent> */}
         </div>
     );
 }
