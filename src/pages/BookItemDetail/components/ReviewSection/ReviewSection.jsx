@@ -29,7 +29,7 @@ function ReviewSection({
             return imagePath;
         }
 
-        const baseUrl = 'http://localhost:8080';
+        const baseUrl = 'https://store-mocha-chi.vercel.app';
         return `${baseUrl}/Store${imagePath}`;
     };
 

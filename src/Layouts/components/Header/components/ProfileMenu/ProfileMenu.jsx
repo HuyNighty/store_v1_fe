@@ -22,7 +22,7 @@ function ProfileMenu({ onProfileInteract, onLogout }) {
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
         if (imagePath.startsWith('http')) return imagePath;
-        const baseUrl = 'http://localhost:8080';
+        const baseUrl = 'https://store-mocha-chi.vercel.app';
         const ts = user?.updatedAt ? new Date(user.updatedAt).getTime() : undefined;
         return ts ? `${baseUrl}/Store${imagePath}?t=${ts}` : `${baseUrl}/Store${imagePath}`;
     };
@@ -56,7 +56,10 @@ function ProfileMenu({ onProfileInteract, onLogout }) {
                         src={getImageUrl(user.profileImage)}
                         alt="Profile"
                         className={cx('profile-image')}
-                        onError={(e) => (e.target.style.display = 'none')}
+                        onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'https://i.pinimg.com/1200x/0c/9e/44/0c9e443b533656c2e541c0dceb571301.jpg';
+                        }}
                     />
                 ) : (
                     <FontAwesomeIcon icon={faUser} className={cx('icon-btn')} />

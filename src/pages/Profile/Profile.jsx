@@ -140,13 +140,23 @@ function Profile() {
     const buildImageUrl = (imagePath) => {
         if (!imagePath) return null;
         if (imagePath.startsWith('http')) return imagePath;
-        const baseUrl = 'http://localhost:8080';
+
+        const cleaned = imagePath.replace(/^\/+/, '');
+
+        const host = 'https://store-mocha-chi.vercel.app';
+        if (cleaned.toLowerCase().startsWith('store/')) {
+            return `${host}/${cleaned}${getTsQuery()}`;
+        }
+        return `${host}/Store/${cleaned}${getTsQuery()}`;
+    };
+
+    function getTsQuery() {
         const ts =
             userInfo?.updatedAt || user?.updatedAt
                 ? new Date(userInfo?.updatedAt || user?.updatedAt).getTime()
                 : undefined;
-        return ts ? `${baseUrl}/Store${imagePath}?t=${ts}` : `${baseUrl}/Store${imagePath}`;
-    };
+        return ts ? `?t=${ts}` : '';
+    }
 
     if (loading) {
         return (

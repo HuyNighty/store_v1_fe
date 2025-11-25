@@ -35,9 +35,8 @@ const customerApi = {
             console.log(pair[0] + ': ', pair[1]);
         }
         return axiosClient.post(url, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+            withCredentials: true,
+            headers: {},
         });
     },
 
