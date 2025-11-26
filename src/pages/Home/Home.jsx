@@ -75,7 +75,10 @@ function Home() {
 
                 {/* <FlowingMenu items={Items} /> */}
 
-                <BookCarousel image="https://i.pinimg.com/736x/22/5e/a9/225ea9ea0b2232b313e13d57aaeeab8e.jpg" />
+                <BookCarousel
+                    id="featured"
+                    image="https://i.pinimg.com/736x/22/5e/a9/225ea9ea0b2232b313e13d57aaeeab8e.jpg"
+                />
 
                 <BookCarousel
                     id="best-seller"

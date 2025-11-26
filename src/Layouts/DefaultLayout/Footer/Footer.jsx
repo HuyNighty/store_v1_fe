@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebook, faTwitter, faInstagram } from '@fortawesome/free-brands-svg-icons';
+import { faFacebook, faTwitter, faInstagram, faGithub } from '@fortawesome/free-brands-svg-icons';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
 import styles from './Footer.module.scss';
@@ -20,17 +20,17 @@ function Footer() {
                         </p>
                     </div>
                     <div className={cx('social')}>
-                        <a href="#">
+                        <a href="https://www.facebook.com/nguyen.huy.908064">
                             <FontAwesomeIcon icon={faFacebook} />
                         </a>
-                        <a href="#">
-                            <FontAwesomeIcon icon={faTwitter} />
-                        </a>
-                        <a href="#">
+                        <a href="https://www.instagram.com/huynguyen3690/">
                             <FontAwesomeIcon icon={faInstagram} />
                         </a>
-                        <a href="#">
+                        <a href="mailto:husyah0000@gmail.com?subject=Contact%20BookStore&body=Hello%20BookStore,">
                             <FontAwesomeIcon icon={faEnvelope} />
+                        </a>
+                        <a href="https://github.com/HuyNighty">
+                            <FontAwesomeIcon icon={faGithub} />
                         </a>
                     </div>
                 </div>
@@ -42,13 +42,13 @@ function Footer() {
                             <a href="/books">All Books</a>
                         </li>
                         <li>
-                            <a href="#">Bestsellers</a>
+                            <a href="#best-seller">Bestsellers</a>
                         </li>
                         <li>
-                            <a href="#">New Releases</a>
+                            <a href="#featured">New Releases</a>
                         </li>
                         <li>
-                            <a href="#">Featured</a>
+                            <a href="#featured">Featured</a>
                         </li>
                     </ul>
                 </div>
@@ -57,35 +57,27 @@ function Footer() {
                     <h4>Support</h4>
                     <ul>
                         <li>
-                            <a href="#">Contact Us</a>
+                            <a href="https://www.facebook.com/nguyen.huy.908064">Contact Us</a>
                         </li>
                         <li>
-                            <a href="#">FAQs</a>
+                            <a href="/FAQ">FAQs</a>
                         </li>
                         <li>
                             <a href="#">Shipping Info</a>
                         </li>
                         <li>
-                            <a href="#">Returns</a>
+                            <a href="/">Returns</a>
                         </li>
                     </ul>
                 </div>
 
                 <div className={cx('footer-section')}>
-                    <h4>Company</h4>
+                    <h4>Project</h4>
                     <ul>
-                        <li>
-                            <a href="#">About Us</a>
-                        </li>
-                        <li>
-                            <a href="#">Careers</a>
-                        </li>
-                        <li>
-                            <a href="#">Privacy Policy</a>
-                        </li>
-                        <li>
-                            <a href="#">Terms of Service</a>
-                        </li>
+                        <li>Full-stack BookStore</li>
+                        <li>Backend: Spring Boot + JWT</li>
+                        <li>Frontend: React + SCSS</li>
+                        <li>Database: MySQL / JPA</li>
                     </ul>
                 </div>
             </div>
