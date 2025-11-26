@@ -13,6 +13,7 @@ import reviewApi from '../../api/reviewApi';
 import BookImages from './components/BookImages';
 import BookInfo from './components/BookInfo';
 import BookTabs from './components/BookTabs';
+import RelatedBooks from './components/RelatedBooks/RelatedBooks';
 
 const cx = classNames.bind(styles);
 
@@ -552,6 +553,7 @@ function BookItemDetail() {
                 handleSubmitReview={handleSubmitReview}
                 handleDeleteReview={handleDeleteReview}
             />
+            <RelatedBooks currentBook={book} navigate={navigate} />
         </div>
     );
 }

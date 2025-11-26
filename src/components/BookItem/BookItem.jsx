@@ -8,7 +8,7 @@ import Magnet from '../Animations/Magnet';
 
 const cx = classNames.bind(styles);
 
-function BookItem({ book }) {
+function BookItem({ book, onClick }) {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -91,6 +91,12 @@ function BookItem({ book }) {
         return stars;
     };
 
+    const handleClick = () => {
+        if (onClick) {
+            onClick(book);
+        }
+    };
+
     return (
         <div key={productId} className={cx('book-item')}>
             <div className={cx('book-item-image')}>
@@ -168,6 +174,7 @@ function BookItem({ book }) {
                                 },
                             }}
                             scrollToTop
+                            onClick={handleClick}
                         >
                             Xem chi tiết
                         </Button>
