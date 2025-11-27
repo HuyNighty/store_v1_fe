@@ -14,7 +14,6 @@
     background: var(--surface);
 }
 
-/* header / tab list */
 .tabs-header {
     display: flex;
     gap: 0;
@@ -34,7 +33,7 @@
         color: #666;
         cursor: pointer;
         transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
-        font-weight: 100;
+        font-weight: 400;
         text-align: center;
 
         &:hover,
@@ -64,13 +63,11 @@
     }
 }
 
-/* content area */
 .tabs-content {
     background: var(--surface);
     min-height: 180px;
 }
 
-/* panel */
 .tab-panel {
     padding: 24px;
 
@@ -78,17 +75,18 @@
         margin: 0 0 14px 0;
         font-size: 2.4rem;
         color: #333;
-        font-weight: 100;
+        font-weight: 400;
     }
 
     h4 {
         margin: 18px 0 10px 0;
         font-size: 1.8rem;
         color: #333;
-        font-weight: 100;
+        font-weight: 400;
     }
 
     p {
+        font-weight: 400;
         margin: 0 0 12px 0;
         font-size: 1.2rem;
         line-height: 1.6;
@@ -107,7 +105,6 @@
     }
 }
 
-/* specs grid */
 .specs-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -128,11 +125,12 @@
 
         strong {
             color: #666;
-            font-weight: 100;
+            font-weight: 400;
             font-size: 0.95rem;
         }
 
         span {
+            font-weight: 400;
             color: #333;
             font-size: 0.95rem;
             text-align: right;
@@ -142,7 +140,6 @@
     }
 }
 
-/* shipping info */
 .shipping-info {
     h4 {
         display: flex;
@@ -151,11 +148,10 @@
         margin: 14px 0 8px 0;
         font-size: 1rem;
         color: #333;
-        font-weight: 100;
+        font-weight: 400;
     }
 }
 
-/* mobile tweaks */
 @media (max-width: 480px) {
     .tab-panel {
         padding: 16px;

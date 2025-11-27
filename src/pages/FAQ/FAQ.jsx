@@ -122,12 +122,11 @@ const FAQ = () => {
                     <p>Liên hệ với chúng tôi để được hỗ trợ tốt nhất</p>
                     <div className={cx('contactMethods')}>
                         <div className={cx('contactItem', 'hover-scale')}>
-                            <span className={cx('contactIcon')}>📞</span>
-                            <span>Hotline: 1900 1234</span>
+                            <span>Có kiến thức về Java Core và Spring (Spring Boot)</span>
                         </div>
                         <div className={cx('contactItem', 'hover-scale')}>
                             <span className={cx('contactIcon')}>✉️</span>
-                            <span>Email: support@bookstore.com</span>
+                            <span>Email: husyah0000@gmail.com</span>
                         </div>
                         <div className={cx('contactItem', 'hover-scale')}>
                             <span className={cx('contactIcon')}>💬</span>

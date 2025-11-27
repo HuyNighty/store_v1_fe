@@ -102,7 +102,9 @@ function HomeContent() {
                                 <ArrowRight className={cx('btn-icon')} />
                             </motion.div>
                         </Button>
-                        <Button className={cx('btn', 'btn-outline')}>Xem sách bán chạy</Button>
+                        <Button href="#best-seller" className={cx('btn', 'btn-outline')}>
+                            Xem sách bán chạy
+                        </Button>
                     </div>
                 </div>
 
