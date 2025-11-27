@@ -77,7 +77,6 @@ const BookCarousel = forwardRef(function BookCarousel(
 
         const fetchBooks = async () => {
             try {
-                console.debug('[BookCarousel] fetchBooks start', { categoryId, categorySlug, categoryName, limit });
                 setLoading(true);
                 setError(null);
                 let resp = null;
@@ -85,9 +84,7 @@ const BookCarousel = forwardRef(function BookCarousel(
                 if (categoryName && productApi.getByCategoryName) {
                     try {
                         resp = await productApi.getByCategoryName(categoryName);
-                        console.debug('[BookCarousel] resp from getByCategoryName', resp?.data ?? resp);
                     } catch (e) {
-                        console.warn('[BookCarousel] getByCategoryName failed', e);
                         resp = resp ?? null;
                     }
                 }
@@ -95,9 +92,7 @@ const BookCarousel = forwardRef(function BookCarousel(
                 if ((!resp || (Array.isArray(resp) && resp.length === 0)) && categoryId && productApi.getByCategory) {
                     try {
                         resp = await productApi.getByCategory(categoryId);
-                        console.debug('[BookCarousel] resp from getByCategory', resp?.data ?? resp);
                     } catch (e) {
-                        console.warn('[BookCarousel] getByCategory failed', e);
                         resp = resp ?? null;
                     }
                 }
@@ -113,19 +108,13 @@ const BookCarousel = forwardRef(function BookCarousel(
                         if (categorySlug) filters.categorySlug = categorySlug;
                         if (categoryName) filters.categoryName = categoryName;
                         resp = await productApi.filterProducts(filters);
-                        console.debug('[BookCarousel] resp from filterProducts', resp?.data ?? resp);
                     } catch (e) {
-                        console.warn('[BookCarousel] filterProducts failed', e);
                         resp = resp ?? null;
                     }
                 }
 
                 if (!resp || resp == null) {
                     resp = await productApi.getAll();
-                    console.debug(
-                        '[BookCarousel] resp from getAll (fallback) length',
-                        (resp?.data ?? resp)?.length ?? null,
-                    );
                 }
 
                 const data = resp?.data ?? resp;
@@ -153,7 +142,6 @@ const BookCarousel = forwardRef(function BookCarousel(
                     filtered = filtered.filter((b) =>
                         isTruthyFlag(b.feature ?? b.featured ?? b.isFeatured ?? b.bestSeller ?? b.bestseller),
                     );
-                    console.debug('[BookCarousel] Applied bestseller filter, remaining:', filtered.length);
                 } else if (categoryName) {
                     const lowerName = normalizeText(categoryName);
                     filtered = filtered.filter((book) => {
@@ -166,10 +154,6 @@ const BookCarousel = forwardRef(function BookCarousel(
                             .map((s) => normalizeText(s));
                         return names.some((n) => n.includes(lowerName));
                     });
-                    console.debug(
-                        '[BookCarousel] Applied categoryName client-side filter, remaining:',
-                        filtered.length,
-                    );
                 }
 
                 filtered.sort(
@@ -183,7 +167,6 @@ const BookCarousel = forwardRef(function BookCarousel(
                     setCurrentIndex(0);
                 }
             } catch (err) {
-                console.error('[BookCarousel] fetchBooks error', err);
                 if (mounted) {
                     setError('Không thể tải sách.');
                     setBooks([]);

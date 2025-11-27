@@ -53,16 +53,6 @@ function Profile() {
         const file = event?.target?.files?.[0];
         if (!file) return;
 
-        if (!file.type.startsWith('image/')) {
-            alert('Please select an image file (JPEG, PNG, GIF, etc.)');
-            return;
-        }
-
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Image size should be less than 5MB');
-            return;
-        }
-
         try {
             setUploading(true);
             setImageError(false);
@@ -70,25 +60,37 @@ function Profile() {
             const formData = new FormData();
             formData.append('file', file);
 
-            console.log('Sending file:', file.name, file.size, file.type);
-            for (let pair of formData.entries()) {
-                console.log(pair[0] + ', ' + pair[1]);
+            const response = await customerApi.uploadProfileImage(formData);
+
+            let newImagePath = response.data?.result ?? response.data ?? null;
+
+            let relativePath = newImagePath;
+
+            if (newImagePath.includes('/Store/uploads/')) {
+                const match = newImagePath.match(/\/Store\/(uploads\/profile-images\/[^?]+)/);
+                if (match) {
+                    relativePath = match[1];
+                }
             }
 
-            const response = await customerApi.uploadProfileImage(formData);
-            const newImagePath = response.data?.result ?? response.data ?? null;
+            const updatedUserData = {
+                profileImage: relativePath,
+                profileImageFull: newImagePath,
+                updatedAt: new Date().toISOString(),
+            };
 
             if (setUser) {
-                setUser((prev) =>
-                    prev ? { ...prev, profileImage: newImagePath, updatedAt: new Date().toISOString() } : prev,
-                );
+                setUser((prev) => (prev ? { ...prev, ...updatedUserData } : prev));
             }
-            setUserInfo((prev) => ({ ...(prev || {}), profileImage: newImagePath }));
 
-            if (refreshUserData) {
-                await refreshUserData();
-            }
+            setUserInfo((prev) => ({
+                ...(prev || {}),
+                ...updatedUserData,
+            }));
+
+            await fetchUserInfo();
         } catch (err) {
+            alert(err.response?.data?.message || err.message || 'Upload failed');
         } finally {
             setUploading(false);
             if (fileInputRef.current) {
@@ -96,6 +98,7 @@ function Profile() {
             }
         }
     };
+
     const handleRemoveImage = async () => {
         if (!window.confirm('Are you sure you want to remove your profile image?')) return;
         try {
@@ -122,7 +125,6 @@ function Profile() {
     };
 
     const handleImageError = () => {
-        console.error('🖼️ Image failed to load');
         setImageError(true);
     };
 
@@ -137,17 +139,21 @@ function Profile() {
         }
     };
 
+    const HOST = 'http://52.62.234.97:8080';
+
     const buildImageUrl = (imagePath) => {
         if (!imagePath) return null;
-        if (imagePath.startsWith('http')) return imagePath;
 
-        const cleaned = imagePath.replace(/^\/+/, '');
+        let cleaned = imagePath.replace(/^\/+/, '');
 
-        const host = 'https://store-mocha-chi.vercel.app';
-        if (cleaned.toLowerCase().startsWith('store/')) {
-            return `${host}/${cleaned}${getTsQuery()}`;
+        if (!cleaned.startsWith('Store/') && !cleaned.startsWith('uploads/')) {
+            cleaned = `Store/${cleaned}`;
+        } else if (cleaned.startsWith('uploads/')) {
+            cleaned = `Store/${cleaned}`;
         }
-        return `${host}/Store/${cleaned}${getTsQuery()}`;
+
+        const finalUrl = `${HOST}/${cleaned}${getTsQuery()}`;
+        return finalUrl;
     };
 
     function getTsQuery() {

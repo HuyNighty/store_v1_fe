@@ -12,8 +12,6 @@ function BookItem({ book, onClick }) {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    console.log(book);
-
     if (!book) return null;
 
     const {
