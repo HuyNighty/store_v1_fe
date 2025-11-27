@@ -21,10 +21,35 @@ function ProfileMenu({ onProfileInteract, onLogout }) {
 
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
-        if (imagePath.startsWith('http')) return imagePath;
-        const baseUrl = 'https://store-mocha-chi.vercel.app';
-        const ts = user?.updatedAt ? new Date(user.updatedAt).getTime() : undefined;
-        return ts ? `${baseUrl}/Store${imagePath}?t=${ts}` : `${baseUrl}/Store${imagePath}`;
+
+        if (imagePath.startsWith('http')) {
+            let fixedPath = imagePath;
+
+            if (fixedPath.startsWith('https://52.62.234.97')) {
+                fixedPath = fixedPath.replace('https://', 'http://');
+            }
+
+            if (fixedPath.includes('52.62.234.97') && !fixedPath.includes(':8080')) {
+                fixedPath = fixedPath.replace('52.62.234.97', '52.62.234.97:8080');
+            }
+
+            return fixedPath + getTsQuery();
+        }
+
+        let cleaned = imagePath.replace(/^\/+/, '');
+
+        if (!cleaned.startsWith('Store/')) {
+            cleaned = `Store/${cleaned}`;
+        }
+
+        const HOST = 'http://52.62.234.97:8080';
+        const finalUrl = `${HOST}/${cleaned}${getTsQuery()}`;
+        return finalUrl;
+    };
+
+    const getTsQuery = () => {
+        const ts = user?.updatedAt ? new Date(user.updatedAt).getTime() : Date.now();
+        return `?t=${ts}`;
     };
 
     const menuContent = (

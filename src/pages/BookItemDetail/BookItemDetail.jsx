@@ -45,7 +45,6 @@ function BookItemDetail() {
         if (!book?.productId) return;
 
         try {
-            console.log('🔄 Loading reviews for product:', book.productId);
             const response = await reviewApi.getReviewsByProduct(book.productId);
 
             let reviewsData = [];

@@ -26,11 +26,29 @@ function ReviewSection({
         if (!imagePath) return null;
 
         if (imagePath.startsWith('http')) {
-            return imagePath;
+            let fixedPath = imagePath;
+
+            if (fixedPath.startsWith('https://52.62.234.97')) {
+                fixedPath = fixedPath.replace('https://', 'http://');
+            }
+
+            if (fixedPath.includes('52.62.234.97') && !fixedPath.includes(':8080')) {
+                fixedPath = fixedPath.replace('52.62.234.97', '52.62.234.97:8080');
+            }
+
+            return fixedPath;
         }
 
-        const baseUrl = 'https://store-mocha-chi.vercel.app';
-        return `${baseUrl}/Store${imagePath}`;
+        let cleaned = imagePath.replace(/^\/+/, '');
+
+        if (!cleaned.startsWith('Store/')) {
+            cleaned = `Store/${cleaned}`;
+        }
+
+        const HOST = 'http://52.62.234.97:8080';
+        const finalUrl = `${HOST}/${cleaned}`;
+        console.log('🔄 ReviewSection - Final URL:', finalUrl);
+        return finalUrl;
     };
 
     const renderAvatar = (review) => {
@@ -49,6 +67,10 @@ function ReviewSection({
                         className={cx('review-avatar')}
                         onError={(e) => {
                             e.target.style.display = 'none';
+                            const placeholder = e.target.nextSibling;
+                            if (placeholder) {
+                                placeholder.style.display = 'flex';
+                            }
                         }}
                     />
 
