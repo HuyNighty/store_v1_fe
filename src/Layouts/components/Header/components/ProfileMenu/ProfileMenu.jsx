@@ -22,18 +22,15 @@ function ProfileMenu({ onProfileInteract, onLogout }) {
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
 
-        try {
-            const url = new URL(imagePath, window.location.origin);
-            if (url.hostname === '52.62.234.97' || imagePath.includes('52.62.234.97')) {
-                const idx = imagePath.indexOf('/uploads/');
-                const path = idx !== -1 ? imagePath.substring(idx + 9) : imagePath;
-                return `/api/uploads/${path}${getTsQuery()}`;
-            }
-        } catch (e) {}
+        const baseUrl = 'http://52.62.234.97';
 
-        let cleaned = imagePath.replace(/^\/+/, '');
-        if (cleaned.startsWith('Store/')) cleaned = cleaned.replace(/^Store\//, '');
-        return `/api/uploads/${cleaned}${getTsQuery()}`;
+        if (imagePath.startsWith('http')) {
+            const filename = imagePath.split('/').pop();
+            return `${baseUrl}/Store/uploads/profile-images/${filename}${getTsQuery()}`;
+        }
+
+        const filename = imagePath.split('/').pop();
+        return `${baseUrl}/Store/uploads/profile-images/${filename}${getTsQuery()}`;
     };
 
     const getTsQuery = () => {
