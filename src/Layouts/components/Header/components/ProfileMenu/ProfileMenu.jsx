@@ -22,29 +22,18 @@ function ProfileMenu({ onProfileInteract, onLogout }) {
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
 
-        if (imagePath.startsWith('http')) {
-            let fixedPath = imagePath;
-
-            if (fixedPath.startsWith('https://52.62.234.97')) {
-                fixedPath = fixedPath.replace('https://', 'http://');
+        try {
+            const url = new URL(imagePath, window.location.origin);
+            if (url.hostname === '52.62.234.97' || imagePath.includes('52.62.234.97')) {
+                const idx = imagePath.indexOf('/uploads/');
+                const path = idx !== -1 ? imagePath.substring(idx + 9) : imagePath;
+                return `/api/uploads/${path}${getTsQuery()}`;
             }
-
-            if (fixedPath.includes('52.62.234.97') && !fixedPath.includes(':8080')) {
-                fixedPath = fixedPath.replace('52.62.234.97', '52.62.234.97:8080');
-            }
-
-            return fixedPath + getTsQuery();
-        }
+        } catch (e) {}
 
         let cleaned = imagePath.replace(/^\/+/, '');
-
-        if (!cleaned.startsWith('Store/')) {
-            cleaned = `Store/${cleaned}`;
-        }
-
-        const HOST = 'http://52.62.234.97:8080';
-        const finalUrl = `${HOST}/${cleaned}${getTsQuery()}`;
-        return finalUrl;
+        if (cleaned.startsWith('Store/')) cleaned = cleaned.replace(/^Store\//, '');
+        return `/api/uploads/${cleaned}${getTsQuery()}`;
     };
 
     const getTsQuery = () => {
