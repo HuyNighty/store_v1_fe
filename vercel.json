@@ -13,44 +13,14 @@
             "destination": "http://52.62.234.97:8080/Store/api/:path*"
         },
         {
-            "source": "/Store/uploads/:path*",
-            "destination": "http://52.62.234.97/Store/uploads/:path*"
-        },
-        {
-            "source": "/api/uploads/:path*",
-            "destination": "http://52.62.234.97/Store/uploads/:path*"
-        },
-        {
-            "source": "/:path*",
-            "destination": "/index.html"
+            "source": "/uploads/:path*",
+            "destination": "http://52.62.234.97:8080/Store/uploads/:path*"
         }
     ],
     "headers": [
         {
-            "source": "/Store/uploads/:path*",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "public, max-age=31536000, immutable"
-                },
-                {
-                    "key": "Access-Control-Allow-Origin",
-                    "value": "*"
-                }
-            ]
-        },
-        {
-            "source": "/api/uploads/:path*",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "public, max-age=31536000, immutable"
-                },
-                {
-                    "key": "Access-Control-Allow-Origin",
-                    "value": "*"
-                }
-            ]
+            "source": "/uploads/:path*",
+            "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
         }
     ]
 }

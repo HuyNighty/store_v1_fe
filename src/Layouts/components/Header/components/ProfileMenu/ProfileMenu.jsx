@@ -18,19 +18,18 @@ function ProfileMenu({ onProfileInteract, onLogout }) {
         { key: 2, label: 'Đơn hàng', icon: faBox, to: '/orders' },
         { key: 3, label: 'Đăng xuất', icon: faRightFromBracket, onClick: onLogout },
     ];
-
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
 
-        const baseUrl = 'http://52.62.234.97';
+        const baseUrl = 'https://store-mocha-chi.vercel.app';
 
         if (imagePath.startsWith('http')) {
             const filename = imagePath.split('/').pop();
-            return `${baseUrl}/Store/uploads/profile-images/${filename}${getTsQuery()}`;
+            return `${baseUrl}/uploads/profile-images/${filename}${getTsQuery()}`;
         }
 
         const filename = imagePath.split('/').pop();
-        return `${baseUrl}/Store/uploads/profile-images/${filename}${getTsQuery()}`;
+        return `${baseUrl}/uploads/profile-images/${filename}${getTsQuery()}`;
     };
 
     const getTsQuery = () => {

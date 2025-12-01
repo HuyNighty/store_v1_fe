@@ -139,8 +139,6 @@ function Profile() {
         }
     };
 
-    const HOST = 'http://52.62.234.97:8080';
-
     const buildImageUrl = (imagePath) => {
         if (!imagePath) return null;
 
@@ -152,8 +150,8 @@ function Profile() {
             cleaned = `Store/${cleaned}`;
         }
 
-        const finalUrl = `${HOST}/${cleaned}${getTsQuery()}`;
-        return finalUrl;
+        const relative = `/${cleaned}${getTsQuery()}`;
+        return relative;
     };
 
     function getTsQuery() {
