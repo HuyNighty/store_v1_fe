@@ -25,12 +25,12 @@ function ReviewSection({
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
 
-        if (imagePath.startsWith('http')) {
+        if (/^https?:\/\//i.test(imagePath)) {
             try {
                 const url = new URL(imagePath);
-                imagePath = url.pathname;
-            } catch (e) {
-                console.error('Invalid URL:', imagePath);
+                imagePath = url.pathname || imagePath;
+            } catch (err) {
+                console.warn('getImageUrl: invalid absolute url', imagePath);
             }
         }
 
@@ -58,15 +58,20 @@ function ReviewSection({
                         alt="Avatar"
                         className={cx('review-avatar')}
                         onError={(e) => {
-                            e.target.style.display = 'none';
-                            const placeholder = e.target.nextSibling;
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.style.display = 'none';
+                            const placeholder = e.currentTarget.nextElementSibling;
                             if (placeholder) {
                                 placeholder.style.display = 'flex';
                             }
                         }}
                     />
 
-                    <div className={cx('avatar-placeholder', 'fallback')} style={{ display: 'none' }}>
+                    <div
+                        className={cx('avatar-placeholder', 'fallback')}
+                        style={{ display: 'none', alignItems: 'center', justifyContent: 'center' }}
+                        aria-hidden="true"
+                    >
                         {firstName ? firstName.charAt(0) + (lastName?.charAt(0) || '') : userName.charAt(0)}
                     </div>
                 </div>
