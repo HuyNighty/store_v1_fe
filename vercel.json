@@ -15,6 +15,14 @@
         {
             "source": "/uploads/:path*",
             "destination": "http://52.62.234.97:8080/Store/uploads/:path*"
+        },
+        {
+            "source": "/Store/:path*",
+            "destination": "http://52.62.234.97:8080/Store/:path*"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
         }
     ],
     "headers": [
