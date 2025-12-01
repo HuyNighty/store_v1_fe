@@ -26,17 +26,12 @@ function ReviewSection({
         if (!imagePath) return null;
 
         if (imagePath.startsWith('http')) {
-            let fixedPath = imagePath;
-
-            if (fixedPath.startsWith('https://52.62.234.97')) {
-                fixedPath = fixedPath.replace('https://', 'http://');
+            try {
+                const url = new URL(imagePath);
+                imagePath = url.pathname;
+            } catch (e) {
+                console.error('Invalid URL:', imagePath);
             }
-
-            if (fixedPath.includes('52.62.234.97') && !fixedPath.includes(':8080')) {
-                fixedPath = fixedPath.replace('52.62.234.97', '52.62.234.97:8080');
-            }
-
-            return fixedPath;
         }
 
         let cleaned = imagePath.replace(/^\/+/, '');
@@ -45,10 +40,7 @@ function ReviewSection({
             cleaned = `Store/${cleaned}`;
         }
 
-        const HOST = 'http://52.62.234.97:8080';
-        const finalUrl = `${HOST}/${cleaned}`;
-        console.log('🔄 ReviewSection - Final URL:', finalUrl);
-        return finalUrl;
+        return `/${cleaned}`;
     };
 
     const renderAvatar = (review) => {
