@@ -1,7 +1,3 @@
-/* CategoryForm.module.scss
-   Styles chuẩn cho list + modal form CRUD của Category.
-   Responsive, clean, easy-to-read. */
-
 .wrapper {
     padding: 16px;
     font-family: var(--font-family-primary, 'Noto Sans', system-ui, sans-serif);
@@ -29,7 +25,6 @@
         }
     }
 
-    /* ===== Toolbar ===== */
     .toolbar {
         display: flex;
         gap: 12px;
@@ -64,7 +59,6 @@
         }
     }
 
-    /* ===== Table ===== */
     .table-wrap {
         overflow-x: auto;
         margin-top: 8px;
@@ -102,7 +96,6 @@
                 border-bottom: 1px solid rgba(0, 0, 0, 0.04);
                 vertical-align: middle;
 
-                /* Small badges / key text */
                 .muted {
                     color: var(--secondary-color, #6b7280);
                     font-size: 1.3rem;
@@ -111,7 +104,6 @@
         }
     }
 
-    /* ===== Messages / server errors ===== */
     .server-error {
         color: var(--danger-color, #b91c1c);
         background: rgba(185, 28, 28, 0.06);
@@ -137,7 +129,6 @@
         }
     }
 
-    /* ===== Form elements (modal) ===== */
     .form-group {
         display: flex;
         flex-direction: column;
@@ -204,7 +195,6 @@
         margin-top: 8px;
     }
 
-    /* ===== Modal (overlay + content) ===== */
     .modal {
         position: fixed;
         inset: 0;
@@ -231,7 +221,6 @@
         }
     }
 
-    /* Small helpers */
     .toolbar-buttons {
         display: flex;
         gap: 8px;
@@ -239,7 +228,6 @@
     }
 }
 
-/* ===== Responsive ===== */
 @media (max-width: 900px) {
     .wrapper {
         .toolbar {
@@ -306,7 +294,6 @@
     }
 }
 
-/* Accessibility: reduce motion */
 @media (prefers-reduced-motion: reduce) {
     * {
         transition: none !important;

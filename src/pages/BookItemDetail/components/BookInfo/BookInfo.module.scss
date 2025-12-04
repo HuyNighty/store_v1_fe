@@ -10,7 +10,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    font-weight: 100;
+    font-weight: 400;
     color: #333;
 }
 
@@ -23,7 +23,7 @@
         color: var(--primary-600);
         font-family: var(--font-family-primary, inherit);
         line-height: 1.08;
-        font-weight: 100;
+        font-weight: 400;
     }
 
     .original-title {
@@ -76,7 +76,7 @@
         margin: 0 0 10px 0;
         font-size: 1.8rem;
         color: #333;
-        font-weight: 100;
+        font-weight: 400;
     }
 
     .authors-list {
@@ -109,7 +109,6 @@
                 line-height: 1.4;
             }
 
-            /* nếu Button.text render một button/a, style cho nó */
             .author-name-btn,
             button.author-name-btn,
             a.author-name-btn {
@@ -121,7 +120,7 @@
                 color: var(--primary-600);
                 text-decoration: none;
                 cursor: pointer;
-                font-weight: 100;
+                font-weight: 400;
                 font-size: 1.04rem;
             }
 
@@ -135,7 +134,6 @@
     }
 }
 
-/* Rating row */
 .rating-section {
     display: flex;
     align-items: center;
@@ -150,7 +148,7 @@
     }
 
     .rating-value {
-        font-weight: 100;
+        font-weight: 400;
         color: var(--primary-600);
         font-size: 1.2rem;
     }
@@ -181,7 +179,6 @@
     }
 }
 
-/* Price */
 .price-section {
     margin-bottom: 20px;
 
@@ -195,7 +192,7 @@
     .current-price {
         font-size: 2.8rem;
         font-weight: 800;
-        color: #9c632b; /* sale color */
+        color: #9c632b;
     }
 
     .original-price {
@@ -210,11 +207,10 @@
         padding: 6px 10px;
         border-radius: 14px;
         font-size: 1.2rem;
-        font-weight: 100;
+        font-weight: 400;
     }
 }
 
-/* Details grid */
 .book-details {
     margin-bottom: 18px;
 
@@ -222,7 +218,7 @@
         margin: 0 0 10px 0;
         font-size: 1.4rem;
         color: #333;
-        font-weight: 100;
+        font-weight: 400;
     }
 
     .details-grid {
@@ -243,7 +239,7 @@
 
         strong {
             color: #666;
-            font-weight: 100;
+            font-weight: 400;
             font-size: 1rem;
         }
 
@@ -287,7 +283,6 @@
     margin-left: 10px;
 }
 
-/* Quantity */
 .quantity-section {
     margin-bottom: 16px;
 
@@ -296,7 +291,7 @@
         margin-bottom: 8px;
         color: #333;
         font-size: 0.98rem;
-        font-weight: 100;
+        font-weight: 400;
     }
 
     .cart-notice {
@@ -307,7 +302,6 @@
     }
 }
 
-/* Stock status */
 .stock-section {
     margin-bottom: 18px;
 
@@ -318,7 +312,7 @@
         padding: 10px 14px;
         border-radius: 8px;
         font-size: 0.98rem;
-        font-weight: 100;
+        font-weight: 400;
         border: 1px solid transparent;
     }
 
@@ -335,7 +329,6 @@
     }
 }
 
-/* Actions */
 .action-buttons {
     margin-bottom: 26px;
     display: flex;
@@ -343,7 +336,6 @@
     flex-wrap: wrap;
     align-items: center;
 
-    /* target classNames passed in JSX */
     .add-to-cart-btn,
     .update-cart-btn,
     .buy-now-btn {
@@ -419,7 +411,6 @@
     }
 }
 
-/* Tags */
 .tags {
     margin-top: 10px;
     display: flex;
@@ -436,14 +427,12 @@
     }
 }
 
-/* small helpers */
 .hidden-mobile {
     @media (max-width: 480px) {
         display: none !important;
     }
 }
 
-/* responsiveness */
 @media (max-width: 1024px) {
     .product-title {
         font-size: 2.2rem;

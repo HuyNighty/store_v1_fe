@@ -44,8 +44,6 @@ function Cart() {
     const handleViewProductDetails = (item) => {
         if (processingRef.current) return;
 
-        console.log('Viewing product details:', item.productName);
-
         navigate('/book-item', {
             state: {
                 book: {

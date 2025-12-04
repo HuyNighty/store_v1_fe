@@ -6,7 +6,6 @@
     --radius: 8px;
 }
 
-/* Root + variants */
 .root {
     display: flex;
     flex-direction: column;
@@ -14,7 +13,6 @@
     font-family: var(--font-family-primary);
     position: relative;
 
-    /* size variants */
     &.small .input {
         font-size: 1.2rem;
         padding: 8px 10px;
@@ -74,8 +72,6 @@
         pointer-events: none;
     }
 
-    /* animation/interaction modifiers (basic implementations) */
-
     /* Pulse */
     &.pulse {
         animation: pulse 2s infinite;
@@ -115,7 +111,7 @@
         }
     }
 
-    /* Ripple (click effect) - uses pseudo element on .input */
+    /* Ripple */
     &.ripple {
         .input {
             position: relative;
@@ -143,7 +139,7 @@
         }
     }
 
-    /* Slide (bg gradient slide) */
+    /* Slide */
     &.slide {
         .input {
             background: linear-gradient(90deg, var(--primary-color) 50%, var(--input-bg) 50%);
@@ -157,7 +153,7 @@
         }
     }
 
-    /* borderDraw (corner-draw effect) */
+    /* borderDraw */
     &.borderDraw {
         .input {
             background: transparent !important;
@@ -265,7 +261,7 @@
     padding-right: 12px;
 }
 
-/* right controls (clear/toggle) */
+/* right controls */
 .right {
     position: absolute;
     right: 8px;
@@ -300,11 +296,9 @@
     gap: 10px;
     cursor: pointer;
     user-select: none;
-    /* ensure label doesn't shrink */
     white-space: nowrap;
 }
 
-/* the control area that contains the native input (hidden) and the faux */
 .checkbox-control {
     position: relative;
     width: 20px;
@@ -316,10 +310,9 @@
     justify-content: center;
 }
 
-/* keep native input accessible but visually hidden and exactly over faux */
 .native-input {
     position: absolute;
-    inset: 0; /* top:0; right:0; bottom:0; left:0 */
+    inset: 0;
     width: 100%;
     height: 100%;
     margin: 0;
@@ -327,10 +320,9 @@
     opacity: 0;
     cursor: pointer;
     z-index: 2;
-    /* keep it focusable and keyboard-operable */
 }
 
-/* faux box (visible) */
+/* faux box */
 .checkbox-faux {
     position: relative;
     display: inline-block;
@@ -344,19 +336,16 @@
     transition: all 0.12s ease;
 }
 
-/* radio uses circle */
 .root.radio .checkbox-faux {
     border-radius: 50%;
 }
 
-/* checked styles (use sibling selector with input) */
 .native-input:checked + .checkbox-faux {
     background: var(--primary-color);
     border-color: var(--primary-color);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
-/* check mark for checkbox (pure CSS) */
 .native-input:checked + .checkbox-faux::after {
     content: '';
     position: absolute;
@@ -370,7 +359,6 @@
     transform: rotate(40deg);
 }
 
-/* text (label) style */
 .checkbox-text {
     font-size: 1.4rem;
     color: var(--text-color);
@@ -378,20 +366,17 @@
     display: inline-block;
 }
 
-/* disabled state */
 .root.disabled .checkbox-faux,
 .root.disabled .checkbox-text {
     opacity: 0.6;
     pointer-events: none;
 }
 
-/* focus-visible outline for accessibility */
 .native-input:focus + .checkbox-faux {
     box-shadow: 0 0 0 4px rgba(147, 125, 107, 0.12);
     outline: none;
 }
 
-/* responsive small adjustments */
 @media (max-width: 480px) {
     .checkbox-control {
         width: 18px;
@@ -406,7 +391,6 @@
     }
 }
 
-/* small responsive tweak */
 @media (max-width: 480px) {
     .input {
         padding: 10px;
@@ -416,7 +400,6 @@
     }
 }
 
-/* animation keyframes (re-used from global, but safe fallback) */
 @keyframes pulse {
     0% {
         transform: scale(1);

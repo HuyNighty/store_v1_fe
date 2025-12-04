@@ -46,7 +46,6 @@
     margin: 0;
 }
 
-/* Alerts */
 .alert {
     display: flex;
     gap: 12px;
@@ -226,7 +225,6 @@
     }
 }
 
-/* Animations */
 @keyframes rotate {
     to {
         transform: rotate(360deg);

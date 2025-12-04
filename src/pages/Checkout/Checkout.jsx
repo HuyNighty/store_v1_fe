@@ -88,7 +88,7 @@ function Checkout() {
 
             addToast('Đặt hàng thành công!', 'success');
 
-            navigate('/order-success', {
+            navigate('/', {
                 state: {
                     order: response.data.result,
                     orderNumber: response.data.result.orderNumber,
@@ -239,8 +239,10 @@ function Checkout() {
                         >
                             {loading ? (
                                 <>
-                                    <div className={cx('spinner')}></div>
-                                    Đang xử lý...
+                                    <div className={cx('spinner-wrapper')}>
+                                        <div className={cx('spinner')}></div>
+                                        Đang xử lý...
+                                    </div>
                                 </>
                             ) : (
                                 `Đặt hàng - ${formatPrice(finalTotal)}.000 đ`

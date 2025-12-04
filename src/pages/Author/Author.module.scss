@@ -326,7 +326,6 @@
         }
     }
 
-    /* overlay revealed by PixelTransition secondContent */
     .portrait-overlay {
         width: 100%;
         height: 100%;
@@ -355,7 +354,6 @@
     }
 }
 
-/* small polish */
 .author-info {
     min-height: 200px;
 }
@@ -373,7 +371,6 @@
     font-weight: 500;
 }
 
-/* responsive */
 @media (max-width: 768px) {
     .author-portrait .portrait,
     .author-portrait .portrait-placeholder {

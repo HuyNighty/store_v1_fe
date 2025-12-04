@@ -289,7 +289,7 @@ function BookInfo({
                     aria-live="polite"
                 >
                     <FontAwesomeIcon icon={faTruck} />
-                    <span>{Number(stockQuantity) > 0 ? ` Còn hàng (${stockQuantity})` : ' Tạm hết hàng'}</span>
+                    <span>{Number(stockQuantity) > 0 ? ` Còn hàng` : ' Tạm hết hàng'}</span>
                 </div>
             </div>
 

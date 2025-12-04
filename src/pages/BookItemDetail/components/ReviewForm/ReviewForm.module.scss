@@ -13,7 +13,6 @@
     --transition-fast: 0.12s ease;
 }
 
-/* container */
 .write-review {
     margin: 20px 0;
     padding: 20px;
@@ -30,7 +29,6 @@
     }
 }
 
-/* form area */
 .review-form {
     margin-top: 12px;
     display: flex;
@@ -38,7 +36,6 @@
     gap: 14px;
 }
 
-/* rating input */
 .rating-input {
     display: flex;
     align-items: center;
@@ -51,7 +48,6 @@
     }
 }
 
-/* interactive stars: layout + hit areas */
 .interactive-stars {
     display: flex;
     align-items: center;
@@ -61,7 +57,6 @@
     outline: none;
 }
 
-/* wrapper for each star (contains two invisible buttons left/right and visible star) */
 .star-wrapper {
     position: relative;
     width: 40px;
@@ -71,7 +66,6 @@
     justify-content: center;
 }
 
-/* invisible hit areas for half selection */
 .star-hit {
     position: absolute;
     top: 0;
@@ -85,7 +79,6 @@
     z-index: 3;
 }
 
-/* left / right placement */
 .star-hit.left {
     left: 0;
 }
@@ -93,7 +86,6 @@
     right: 0;
 }
 
-/* visible star symbol */
 .star {
     z-index: 1;
     font-size: 22px;
@@ -105,7 +97,6 @@
     display: inline-block;
 }
 
-/* states */
 .star.filled {
     color: var(--warning-color);
     transform: scale(1.05);
@@ -113,23 +104,20 @@
 }
 
 .star.half {
-    /* visually indicate half using a subtle gradient fallback char */
     color: linear-gradient(90deg, var(--warning-color) 60%, #e0e0e0 40%);
-    color: var(--warning-color); /* keep simple fallback */
+    color: var(--warning-color);
 }
 
 .star.empty {
     color: #e0e0e0;
 }
 
-/* rating text to the right */
 .rating-text {
     margin-left: 8px;
     color: var(--muted);
     font-size: 0.95rem;
 }
 
-/* comment area */
 .comment-input {
     display: flex;
     flex-direction: column;
@@ -170,7 +158,6 @@
     color: var(--muted);
 }
 
-/* actions (buttons) */
 .review-actions {
     display: flex;
     gap: 10px;
@@ -203,7 +190,6 @@
     }
 }
 
-/* login prompt */
 .login-prompt {
     text-align: center;
     padding: 18px 12px;
@@ -214,7 +200,6 @@
     }
 }
 
-/* small screens */
 @media (max-width: 768px) {
     .rating-input {
         flex-direction: column;
@@ -236,7 +221,6 @@
     }
 }
 
-/* focus-visible for accessibility */
 .star-hit:focus,
 .star-hit:active,
 .interactive-stars:focus {
@@ -244,7 +228,6 @@
     outline-offset: 3px;
 }
 
-/* reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .star,
     .review-form,
