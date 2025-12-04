@@ -521,6 +521,7 @@ function BookItemDetail() {
                     isWishlisted={isWishlisted}
                     handleWishlistToggle={handleWishlistToggle}
                     handleShare={handleShare}
+                    isAuthenticated={!!user}
                 />
             </div>
 

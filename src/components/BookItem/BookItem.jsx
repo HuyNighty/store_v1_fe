@@ -32,8 +32,8 @@ function BookItem({ book, onClick }) {
 
     const discountPercentage = salePrice && price ? Math.round(((price - salePrice) / price) * 100) : 0;
 
-    const formatPrice = (price) => {
-        return (price / 1000).toLocaleString('vi-VN') + '.000 đ';
+    const formatPrice = (priceVal) => {
+        return Math.round(priceVal / 1000).toLocaleString('vi-VN') + '.000 đ';
     };
 
     useEffect(() => {
@@ -89,15 +89,18 @@ function BookItem({ book, onClick }) {
         return stars;
     };
 
-    const handleClick = () => {
+    const handleClick = (e) => {
         if (onClick) {
+            try {
+                if (e && typeof e.preventDefault === 'function') e.preventDefault();
+            } catch {}
             onClick(book);
         }
     };
 
     return (
         <div key={productId} className={cx('book-item')}>
-            <div className={cx('book-item-image')}>
+            <div className={cx('book-item-image')} onClick={handleClick} role="button" tabIndex={0}>
                 <img src={imageUrl} alt={productName} className={cx('book-item-img')} />
                 {featured && <span className={cx('bestseller')}>Bestseller</span>}
                 {discountPercentage > 0 && <span className={cx('discount-badge')}>-{discountPercentage}%</span>}
@@ -108,8 +111,8 @@ function BookItem({ book, onClick }) {
 
                 {bookAuthors.length > 0 ? (
                     bookAuthors.map((author) => (
-                        <p key={author.authorId} className={cx('book-item-author')}>
-                            {author.authorName}
+                        <p key={author.authorId ?? author.id ?? author.name} className={cx('book-item-author')}>
+                            {author.authorName ?? author.name}
                         </p>
                     ))
                 ) : (

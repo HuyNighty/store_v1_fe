@@ -13,7 +13,7 @@ const cx = classNames.bind(styles);
 
 function Wishlist() {
     const navigate = useNavigate();
-    const { items: wishlistItems, removeFromWishlist, clearWishlist, getWishlistCount, moveToCart } = useWishlist();
+    const { items: wishlistItems, removeFromWishlist, clearWishlist, getWishlistCount } = useWishlist();
     const { addToCart } = useCart();
     const { addToast } = useToast();
 
@@ -23,7 +23,7 @@ function Wishlist() {
 
     const handleRemoveItem = (productId, productName) => {
         const result = removeFromWishlist(productId);
-        if (result.success) {
+        if (result && result.success) {
             addToast(`Đã xóa "${productName}" khỏi danh sách yêu thích`, 'info');
         }
     };
@@ -33,7 +33,7 @@ function Wishlist() {
 
         if (window.confirm('Bạn có chắc muốn xóa toàn bộ danh sách yêu thích?')) {
             const result = clearWishlist();
-            if (result.success) {
+            if (result && result.success) {
                 addToast('Đã xóa toàn bộ danh sách yêu thích', 'success');
             }
         }
@@ -42,22 +42,34 @@ function Wishlist() {
     const handleAddToCart = async (product) => {
         try {
             const result = await addToCart(product.productId, 1);
-            if (result.success) {
+            if (result && result.success) {
                 removeFromWishlist(product.productId);
                 addToast(`Đã thêm "${product.productName}" vào giỏ hàng`, 'success');
             } else {
-                addToast(result.error || 'Không thể thêm vào giỏ hàng', 'error');
+                addToast(result?.error || 'Không thể thêm vào giỏ hàng', 'error');
             }
         } catch (error) {
             addToast('Có lỗi xảy ra khi thêm vào giỏ hàng', 'error');
         }
     };
 
-    const handleViewProduct = (product) => {
-        navigate(`/books/${product.productId}`, { state: { book: product } });
+    const handleViewProduct = (product, e) => {
+        if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+
+        const pid = product?.productId ?? product?.id ?? product?.product_id;
+        if (!pid) {
+            addToast('Không tìm thấy thông tin sản phẩm để mở chi tiết', 'error');
+            return;
+        }
+
+        try {
+            navigate(`/books/${pid}`, { state: { book: product } });
+        } catch (err) {
+            addToast('Không thể chuyển tới trang chi tiết', 'error');
+        }
     };
 
-    if (wishlistItems.length === 0) {
+    if (!wishlistItems || wishlistItems.length === 0) {
         return (
             <div className={cx('container')}>
                 <div className={cx('header')}>
@@ -97,8 +109,16 @@ function Wishlist() {
 
             <div className={cx('wishlist-items')}>
                 {wishlistItems.map((item) => (
-                    <div key={item.productId} className={cx('wishlist-item')}>
-                        <div className={cx('product-image')} onClick={() => handleViewProduct(item)}>
+                    <div key={item.productId ?? item.id} className={cx('wishlist-item')}>
+                        <div
+                            className={cx('product-image')}
+                            onClick={(e) => handleViewProduct(item, e)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') handleViewProduct(item, e);
+                            }}
+                        >
                             <img
                                 src={item.productAssets?.[0]?.url || item.url || '/images/default-book.jpg'}
                                 alt={item.productName}
@@ -106,7 +126,15 @@ function Wishlist() {
                         </div>
 
                         <div className={cx('product-info')}>
-                            <h3 className={cx('product-name')} onClick={() => handleViewProduct(item)}>
+                            <h3
+                                className={cx('product-name')}
+                                onClick={(e) => handleViewProduct(item, e)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') handleViewProduct(item, e);
+                                }}
+                            >
                                 {item.productName}
                             </h3>
 
@@ -118,11 +146,11 @@ function Wishlist() {
 
                             <div className={cx('price')}>
                                 <span className={cx('current-price')}>
-                                    {((item.salePrice || item.price) / 1000).toLocaleString()}.000 đ
+                                    {Math.round((item.salePrice || item.price) / 1000).toLocaleString()}.000 đ
                                 </span>
                                 {item.salePrice && item.price && item.salePrice < item.price && (
                                     <span className={cx('original-price')}>
-                                        {(item.price / 1000).toLocaleString()}.000 đ
+                                        {Math.round(item.price / 1000).toLocaleString()}.000 đ
                                     </span>
                                 )}
                             </div>

@@ -75,6 +75,7 @@ function BookInfo({
     isWishlisted = false,
     handleWishlistToggle = () => {},
     handleShare = () => {},
+    isAuthenticated = false,
 }) {
     const cats = useMemo(() => ensureArr(categories), [categories]);
     const authors = useMemo(() => ensureArr(bookAuthors), [bookAuthors]);
@@ -96,6 +97,16 @@ function BookInfo({
             : '/authors';
         if (typeof navigate === 'function') navigate(slugOrPath);
         else window.location.href = slugOrPath;
+    };
+
+    const onWishlistClick = (e) => {
+        e && e.preventDefault && e.preventDefault();
+        if (!isAuthenticated) {
+            if (typeof navigate === 'function') navigate('/login');
+            else window.location.href = '/login';
+            return;
+        }
+        handleWishlistToggle();
     };
 
     const priceToShow = displayPrice ?? salePrice ?? price;
@@ -257,14 +268,14 @@ function BookInfo({
                     shine
                     outline
                     type="button"
-                    onClick={handleWishlistToggle}
+                    onClick={onWishlistClick}
                     className={cx('wishlist-btn', { wishlisted: isWishlisted })}
                     aria-pressed={!!isWishlisted}
                     aria-label={isWishlisted ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'}
                     title={isWishlisted ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'}
                 >
                     <FontAwesomeIcon icon={isWishlisted ? faHeartSolid : faHeartRegular} />
-                    <span className={cx('wishlist-text')}>{isWishlisted ? 'Yêu thích' : 'Thêm yêu thích'}</span>
+                    <span className={cx('wishlist-text')}>{isWishlisted ? 'Bỏ yêu thích' : 'Thêm yêu thích'}</span>
                 </Button>
             </div>
 
@@ -363,6 +374,7 @@ BookInfo.propTypes = {
     isWishlisted: PropTypes.bool,
     handleWishlistToggle: PropTypes.func,
     handleShare: PropTypes.func,
+    isAuthenticated: PropTypes.bool,
 };
 
 export default BookInfo;

@@ -4,7 +4,14 @@ import classNames from 'classnames/bind';
 import styles from './Author.module.scss';
 import Button from '../../Layouts/components/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faBook, faCalendar, faMapMarkerAlt, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import {
+    faArrowLeft,
+    faBook,
+    faCalendar,
+    faMapMarkerAlt,
+    faExternalLinkAlt,
+    faStar,
+} from '@fortawesome/free-solid-svg-icons';
 import authorApi from '../../api/authorApi';
 import { BookItem } from '../../components/BookItem';
 

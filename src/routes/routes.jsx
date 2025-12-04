@@ -26,6 +26,7 @@ const publicRoutes = [
     { path: '/books', component: Books, headerMode: 'solid' },
     { path: '/profile', component: Profile, headerMode: 'solid' },
     { path: '/book-item', component: BookItemDetail, headerMode: 'solid' },
+    { path: '/books/:bookId', component: BookItemDetail, headerMode: 'solid' },
     { path: '/login', component: Login, layout: null },
     { path: '/register', component: Register, layout: null },
     { path: '/cart', component: Cart, layout: HeaderOnly, headerMode: 'solid' },
