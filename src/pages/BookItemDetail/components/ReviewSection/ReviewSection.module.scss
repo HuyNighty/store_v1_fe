@@ -307,17 +307,7 @@
     width: 200%;
     height: 200%;
     background: radial-gradient(circle at center, rgba(245, 158, 11, 0.1) 0%, transparent 70%);
-    animation: rotateGlow 8s linear infinite;
     pointer-events: none;
-}
-
-@keyframes rotateGlow {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
 }
 
 .card-header {
@@ -374,7 +364,7 @@
     }
 
     &.admin-placeholder {
-        background: linear-gradient(135deg, #f59e0b 0%, #ec4899 100%);
+        background: li near-gradient(135deg, #f59e0b 0%, #ec4899 100%);
         border: 3px solid rgba(245, 158, 11, 0.3);
     }
 
