@@ -1,5 +1,6 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import cartApi from '../../api/cartApi';
+import { useAuth } from '../Auth/AuthContext';
 
 const CartContext = createContext();
 
@@ -12,27 +13,43 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
+    const { user, token } = useAuth();
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const fetchIdRef = useRef(0);
+
     const fetchCartItems = async () => {
+        if (!user) {
+            setCartItems([]);
+            return;
+        }
+
+        const currentFetchId = ++fetchIdRef.current;
         setLoading(true);
         setError(null);
+
         try {
             const response = await cartApi.getCartItems();
 
-            if (response.data && response.data.result) {
+            if (currentFetchId !== fetchIdRef.current) return;
+
+            if (response?.data && response.data.result) {
                 setCartItems(response.data.result);
             } else {
                 setCartItems([]);
             }
         } catch (err) {
+            if (currentFetchId !== fetchIdRef.current) return;
+
             console.error('Error fetching cart items:', err);
             setError('Không thể tải giỏ hàng');
             setCartItems([]);
         } finally {
-            setLoading(false);
+            if (currentFetchId === fetchIdRef.current) {
+                setLoading(false);
+            }
         }
     };
 
@@ -40,7 +57,7 @@ export const CartProvider = ({ children }) => {
         try {
             const response = await cartApi.addToCart({ productId, quantity });
 
-            if (response.data) {
+            if (response?.data) {
                 await fetchCartItems();
                 return {
                     success: true,
@@ -58,7 +75,7 @@ export const CartProvider = ({ children }) => {
         try {
             const response = await cartApi.updateCartItem(productId, { quantity });
 
-            if (response.data) {
+            if (response?.data) {
                 await fetchCartItems();
                 return {
                     success: true,
@@ -76,7 +93,7 @@ export const CartProvider = ({ children }) => {
         try {
             const response = await cartApi.removeFromCart(productId);
 
-            if (response.data) {
+            if (response?.data) {
                 await fetchCartItems();
                 return {
                     success: true,
@@ -93,7 +110,7 @@ export const CartProvider = ({ children }) => {
     const clearCart = async () => {
         try {
             const response = await cartApi.clearCart();
-            if (response.data) {
+            if (response?.data) {
                 await fetchCartItems();
                 return { success: true, message: 'Đã xóa toàn bộ giỏ hàng!' };
             }
@@ -137,22 +154,20 @@ export const CartProvider = ({ children }) => {
 
     useEffect(() => {
         fetchCartItems();
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.id, token]);
 
     const value = {
-        // State
         cartItems,
         loading,
         error,
 
-        // Actions
         addToCart,
         updateCartItem,
         removeFromCart,
         clearCart,
         fetchCartItems,
 
-        // Getters
         getTotalPrice,
         getTotalItems,
         isItemInCart,
