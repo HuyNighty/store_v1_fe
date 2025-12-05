@@ -118,8 +118,10 @@ function ReviewSection({
                                 <div className={cx('reviewer-info')}>
                                     {renderAvatar(review)}
                                     <div className={cx('reviewer-details')}>
-                                        <div className={cx('reviewer')}>{review.userName || 'Độc giả'}</div>
-                                        <div className={cx('reviewer-email')}>{review.email || 'Độc giả'}</div>
+                                        <div className={cx('reviewer', { 'admin-user': review.userName === 'admin1' })}>
+                                            {review.userName || 'Độc giả'}
+                                        </div>
+                                        {/* <div className={cx('reviewer-email')}>{review.email || 'Độc giả'}</div> */}
                                         <div className={cx('review-rating')}>{renderStars(review.rating)}</div>
                                     </div>
                                 </div>
