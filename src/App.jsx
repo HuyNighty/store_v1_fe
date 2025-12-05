@@ -72,13 +72,13 @@ function App() {
                                         />
                                     ))}
 
-                                    {adminRoutes.map((route, index) => (
+                                    {/* {adminRoutes.map((route, index) => (
                                         <Route
                                             key={route.path || index}
                                             path={route.path}
                                             element={renderElement(route, true, 'admin')}
                                         />
-                                    ))}
+                                    ))} */}
 
                                     {userRoutes.map((route, index) => (
                                         <Route
