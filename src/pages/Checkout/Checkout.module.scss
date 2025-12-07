@@ -37,7 +37,7 @@
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
 
     h2 {
-        font-weight: 100;
+        font-weight: 400;
     }
 
     .section-title {
@@ -61,7 +61,7 @@
 
     label {
         display: block;
-        font-weight: 100;
+        font-weight: 400;
         margin-bottom: 8px;
         color: var(--text-color);
         font-size: 1.5rem;
@@ -150,7 +150,7 @@
 
     .method-label {
         font-size: 1.5rem;
-        font-weight: 100;
+        font-weight: 400;
         color: var(--text-color);
     }
 }
@@ -198,7 +198,7 @@
             }
 
             .item-price {
-                font-weight: 100;
+                font-weight: 400;
                 color: var(--primary-color);
                 font-size: 1.4rem;
             }
@@ -222,7 +222,7 @@
             border-top: 1px solid var(--border-color);
             padding-top: 15px;
             margin-top: 15px;
-            font-weight: 100;
+            font-weight: 400;
             font-size: 1.8rem;
 
             .final-total {
@@ -232,7 +232,7 @@
 
         .free {
             color: var(--success-color);
-            font-weight: 100;
+            font-weight: 400;
         }
 
         .cost {
@@ -250,7 +250,7 @@
             margin: 0;
             font-size: 1.3rem;
             color: var(--success-color);
-            font-weight: 100;
+            font-weight: 400;
         }
     }
 }
@@ -268,7 +268,7 @@
         justify-content: center;
         gap: 10px;
         font-size: 1.8rem;
-        font-weight: 100;
+        font-weight: 400;
         padding: 16px 24px;
     }
 

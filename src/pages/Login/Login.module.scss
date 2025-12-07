@@ -171,7 +171,7 @@
         font-size: 4.5rem;
         color: var(--background-color);
         margin: 0 0 8px 0;
-        font-weight: 100;
+        font-weight: 400;
         line-height: 1.1;
         font-family: var(--font-family-primary);
     }
@@ -247,7 +247,7 @@
             font-size: 1.8rem;
             color: var(--background-color);
             margin: 0 0 8px 0;
-            font-weight: 100;
+            font-weight: 400;
             font-family: var(--font-family-primary);
         }
 
@@ -276,7 +276,7 @@
             font-size: 3rem;
             color: var(--primary-hover);
             margin-bottom: 8px;
-            font-weight: 100;
+            font-weight: 400;
             line-height: 1;
             font-family: var(--font-family-primary);
         }
@@ -386,13 +386,13 @@
             font-size: 3.2rem;
             color: var(--primary-color-bold);
             margin: 0 0 8px 0;
-            font-weight: 100;
+            font-weight: 400;
             line-height: 1.2;
             font-family: var(--font-family-primary);
             word-wrap: break-word;
 
             h2 {
-                font-weight: 100;
+                font-weight: 400;
             }
         }
 
@@ -443,7 +443,7 @@
     .input-label {
         display: block;
         margin-bottom: 8px;
-        font-weight: 100;
+        font-weight: 400;
         color: var(--primary-color-bold);
         font-size: 1.4rem;
         font-family: var(--font-family-primary);
@@ -614,7 +614,7 @@
         height: 52px;
         border-radius: 12px;
         font-size: 1.6rem;
-        font-weight: 100;
+        font-weight: 400;
         font-family: var(--font-family-primary);
 
         .loading-spinner {
@@ -653,7 +653,7 @@
         position: relative;
         z-index: 1;
         font-family: var(--font-family-primary);
-        font-weight: 100;
+        font-weight: 400;
     }
 }
 
@@ -674,7 +674,7 @@
         color: var(--primary-color-bold);
         border-radius: 12px;
         font-size: 1.4rem;
-        font-weight: 100;
+        font-weight: 400;
         transition: all var(--transition-fast);
         font-family: var(--font-family-primary);
 

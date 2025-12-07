@@ -10,7 +10,7 @@
     h1 {
         height: 36px;
 
-        font-weight: 100;
+        font-weight: 400;
         font-size: 2rem;
         color: #333;
         margin-bottom: 8px;
@@ -37,7 +37,7 @@
     text-align: center;
 
     h3 {
-        font-weight: 100;
+        font-weight: 400;
         font-size: 0.9rem;
         color: #666;
         margin-bottom: 8px;
@@ -46,7 +46,7 @@
 
     .stat-number {
         font-size: 2rem;
-        font-weight: 100;
+        font-weight: 400;
         color: #333;
     }
 
@@ -119,7 +119,7 @@
     color: #000;
 
     h2 {
-        font-weight: 100;
+        font-weight: 400;
     }
 }
 
@@ -181,7 +181,7 @@
 
     th {
         background: #f8f9fa;
-        font-weight: 100;
+        font-weight: 400;
         color: #333;
     }
 
@@ -197,7 +197,7 @@
 
 .order-number {
     color: #000;
-    font-weight: 100;
+    font-weight: 400;
 }
 
 .customer {
@@ -213,7 +213,7 @@
 }
 
 .amount {
-    font-weight: 100;
+    font-weight: 400;
     color: #e74c3c;
 }
 
@@ -223,7 +223,7 @@
         padding: 4px 12px;
         border-radius: 20px;
         font-size: 0.8rem;
-        font-weight: 100;
+        font-weight: 400;
 
         &.pending {
             background: #fff3cd;
